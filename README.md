@@ -1,55 +1,82 @@
-# SSL_Gate
+# Dry-stack
 
-This gem allows to start TCP(HTTP) server that serves SSL(TLS) connections and forwards them to the target.  
-HTTP requests are recreated and responses are send back 
-while TCP connections are coupled and each data packets are forwarded both directions asynchronously.  
+This gem allows ...  
 
-https://rdoc.info/gems/ssl_gate
-https://rubydoc.info/gems/ssl_gate
-https://gemdocs.org/gems/ssl_gate/
+https://rdoc.info/gems/dry-stack
+https://rubydoc.info/gems/dry-stack
+https://gemdocs.org/gems/dry-stack/
 
 ## Installation
 To install the gem
 
-    $ gem install ssl_gate
+    $ gem install dry-stack
 
 ## Usage
-Create the file `SSLGate` which describes the gates
-```yaml
-google:
-  bind_port: 9001
-  target: https://www.google.com
-  private_key_file: "../test/ssl/server.key"
-  cert_chain_file: "../test/ssl/server.crt"
+Create the file `stack.drs` which describes the stack
+```ruby
+Stack :simple_stack do
+
+  HttpFront services: {admin: 'admin.*', operator: 'operator.*', reports: 'reports.*',
+                       navigator: 'navigator.*', backend: 'admin.*, operator.*, navigator.*'}
+
+  PublishPorts admin: 4000, operator: 4001, navigator: 4002, reports: 7000 # mode: ingress, protocol: tcp
+
+  Service :admin,     image: 'frontend', env: {APP: 'admin'},     ports: 5000
+  Service :operator,  image: 'frontend', env: {APP: 'operator'},  ports: 5000
+  Service :navigator, image: 'frontend', env: {APP: 'navigator'}, ports: 5000
+
+  Service :backend,   image: 'backend', ports: 3000 do
+    env APP_PORT: 3000, NODE_ENV: 'development', SKIP_GZ: true, DB_URL: '$DB_URL'
+  end
+
+  Service :reports, image: 'reports:0.1', env: {DB_URL: '$DB_URL'}, ports: 7000
+
+  Network :default, attachable: true
+end
+
 ```
 Then run in the current directory
 
-    $ ssl_gate
+    $ dry-stack stack.drs compose
 
-This will start the HTTPS server on the 0.0.0.0:9001 with the SSL Certificate specified.
-Each request will spawn the corresponding one to the target server and response will be send back.
+This will ...
 
-## Local Gate
-More practical example is to setup server gates to secure local services access. 
-Suppose you have Wiki server, RestAPI server and Jabber server running locally. 
-Then you can setup three gates to provide SSL access to these services from outside. 
-
-The `SSLGate` file may looks as follows  
 ```yaml
-wiki:
-  bind_port: 80
-  target: http://127.0.0.1:8080
-  private_key_file: "server.key"
-  cert_chain_file: "server.crt"
-rest_api:
-  bind_port: 90
-  target: http://127.0.0.1:9090
-  private_key_file: "rest_server.key"
-  cert_chain_file: "rest_server.crt"
-jabber:
-  bind_port: 6222
-  target: tcp://127.0.0.1:5222
-  private_key_file: "xmpp_server.key"
-  cert_chain_file: "xmpp_server.crt"
+---
+name: :simple_stack
+services:
+  admin:
+    environment:
+      APP: admin
+    image: frontend
+    ports:
+      - 4000:5000
+  operator:
+    environment:
+      APP: operator
+    image: frontend
+    ports:
+      - 4001:5000
+  navigator:
+    environment:
+      APP: navigator
+    image: frontend
+    ports:
+      - 4002:5000
+  backend:
+    environment:
+      APP_PORT: 3000
+      NODE_ENV: development
+      SKIP_GZ: true
+      DB_URL: "$DB_URL"
+    image: backend
+  reports:
+    environment:
+      DB_URL: "$DB_URL"
+    image: reports:0.1
+    ports:
+      - 7000:7000
+networks:
+  default:
+    attachable: true
 ```
-To start the gates simply run `ssl_gate` in the SSLGate file directory 
