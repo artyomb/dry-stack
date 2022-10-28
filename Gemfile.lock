@@ -57,10 +57,10 @@ DEPENDENCIES
   dry-stack!
   rake (~> 13.0)
   rspec (~> 3.10)
-  rspec_junit_formatter
+  rspec_junit_formatter (~> 0.5.1)
   rubocop (~> 1.12)
-  rubocop-rake
-  rubocop-rspec
+  rubocop-rake (~> 0.6.0)
+  rubocop-rspec (~> 2.14.2)
 
 RUBY VERSION
    ruby 3.1.2p20

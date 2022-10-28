@@ -2,6 +2,10 @@
 
 This gem allows ...  
 
+```
+docker stack deploy -c - simple_stack < <(dry-stack simple_stack.drs compose)
+```
+
 https://rdoc.info/gems/dry-stack
 https://rubydoc.info/gems/dry-stack
 https://gemdocs.org/gems/dry-stack/

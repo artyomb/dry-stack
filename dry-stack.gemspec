@@ -26,9 +26,9 @@ Gem::Specification.new do |s|
   s.add_development_dependency "rake", "~> 13.0"
   s.add_development_dependency "rspec", "~> 3.10"
   s.add_development_dependency "rubocop", "~> 1.12"
-  s.add_development_dependency "rubocop-rake"
-  s.add_development_dependency "rubocop-rspec"
-  s.add_development_dependency "rspec_junit_formatter"
+  s.add_development_dependency "rubocop-rake", "~> 0.6.0"
+  s.add_development_dependency "rubocop-rspec", "~> 2.14.2"
+  s.add_development_dependency "rspec_junit_formatter", "~> 0.5.1"
 end
 # http://guides.rubygems.org/make-your-own-gem
 # gem build dry-stack.gemspec
