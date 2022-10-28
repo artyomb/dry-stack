@@ -1,0 +1,37 @@
+---
+name: :simple_stack
+services:
+  admin:
+    environment:
+      APP: admin
+    image: frontend
+    ports:
+      - 4000:5000
+  operator:
+    environment:
+      APP: operator
+    image: frontend
+    ports:
+      - 4001:5000
+  navigator:
+    environment:
+      APP: navigator
+    image: frontend
+    ports:
+      - 4002:5000
+  backend:
+    environment:
+      APP_PORT: 3000
+      NODE_ENV: development
+      SKIP_GZ: true
+      DB_URL: "$DB_URL"
+    image: backend
+  reports:
+    environment:
+      DB_URL: "$DB_URL"
+    image: reports:0.1
+    ports:
+      - 7000:7000
+networks:
+  default:
+    attachable: true

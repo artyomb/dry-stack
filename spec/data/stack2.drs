@@ -1,0 +1,3 @@
+Stack :name1 do
+  Service :svc1, image: 'service-image'
+end
