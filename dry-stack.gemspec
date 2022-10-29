@@ -1,10 +1,10 @@
-# lib = File.expand_path('lib', __dir__)
-# $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-# require 'lib/version'
+#lib = File.expand_path('lib', __dir__)
+#$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
+require_relative 'lib/version'
 
 Gem::Specification.new do |s|
   s.name        = 'dry-stack'
-  s.version     = '0.0.1'
+  s.version     = Dry::Stack::VERSION
   s.executables << 'dry-stack'
   s.summary     = 'Dry docker swarm stack definition'
   s.description = ''
@@ -30,9 +30,3 @@ Gem::Specification.new do |s|
   s.add_development_dependency "rubocop-rspec", "~> 2.14.2"
   s.add_development_dependency "rspec_junit_formatter", "~> 0.5.1"
 end
-# http://guides.rubygems.org/make-your-own-gem
-# gem build dry-stack.gemspec
-# gem install ./dry-stack-0.0.0.gem
-# curl -u gempusher https://rubygems.org/api/v1/api_key.yaml > ~/.gem/credentials; chmod 0600 ~/.gem/credentials
-# gem push dry-stack-0.0.0.gem
-# gem list -r dry-stack

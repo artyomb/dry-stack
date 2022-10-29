@@ -3,7 +3,22 @@
 This gem allows ...  
 
 ```
-docker stack deploy -c - simple_stack < <(dry-stack simple_stack.drs compose)
+docker stack deploy -c - simple_stack < <(dry-stack -s simple_stack.drs compose)
+cat simple_stack.drs | dry-stack compose | swarm deploy -c - deploy
+
+$ dry-stack
+Usage:
+        dry-stack -s stackfile [options] COMMAND
+        cat stackfile | dry-stack COMMAND
+        dry-stack COMMAND < stack.drs
+
+Commands:
+     compose -  Print stack in docker compose format
+
+Options:
+    -s, --stack STACK_NAME           Stack file
+    -h, --help
+
 ```
 
 https://rdoc.info/gems/dry-stack

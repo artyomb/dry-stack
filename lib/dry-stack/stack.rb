@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 require 'yaml'
+require 'optparse'
 
 module Dry
 
@@ -16,13 +17,6 @@ module Dry
   class Stack
     class << self
       attr_accessor :last_stack
-
-      def command_line(argv)
-        if argv[1] == 'compose'
-          load argv[0]
-          $stdout.puts Stack.last_stack.to_compose
-        end
-      end
     end
 
     def initialize(name)

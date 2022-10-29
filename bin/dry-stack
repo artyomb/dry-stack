@@ -4,7 +4,8 @@ $LOAD_PATH << lib
 #$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 require 'dry-stack'
+require 'dry-stack/command_line'
+require 'dry-stack/command_compose'
 include Dry
 
-
-Dry::Stack.command_line ARGV
+Dry::CommandLine.run ARGV
