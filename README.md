@@ -4,7 +4,7 @@ This gem allows ...
 
 ```
 docker stack deploy -c - simple_stack < <(dry-stack -s simple_stack.drs -e to_compose)
-cat simple_stack.drs | dry-stack -e to_compose | docker swarm deploy -c - deploy
+cat simple_stack.drs | dry-stack -e to_compose | docker stack deploy -c - simple_stack
 
 $ dry-stack
 Usage:
