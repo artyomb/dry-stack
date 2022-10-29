@@ -3,21 +3,24 @@
 This gem allows ...  
 
 ```
-docker stack deploy -c - simple_stack < <(dry-stack -s simple_stack.drs compose)
-cat simple_stack.drs | dry-stack compose | swarm deploy -c - deploy
+docker stack deploy -c - simple_stack < <(dry-stack -s simple_stack.drs -e to_compose)
+cat simple_stack.drs | dry-stack -e to_compose | docker swarm deploy -c - deploy
 
 $ dry-stack
 Usage:
         dry-stack -s stackfile [options] COMMAND
         cat stackfile | dry-stack COMMAND
-        dry-stack COMMAND < stack.drs
+        dry-stack COMMAND < stackfile
 
 Commands:
-     compose -  Print stack in docker compose format
+     to_compose -  Print stack in docker compose format
 
 Options:
     -s, --stack STACK_NAME           Stack file
+    -e, --env                        Load .env file
+    -n, --no-env                     Do not process env variables
     -h, --help
+
 
 ```
 
@@ -56,7 +59,7 @@ end
 ```
 Then run in the current directory
 
-    $ dry-stack stack.drs compose
+    $ dry-stack stack.drs -e to_compose
 
 This will ...
 
