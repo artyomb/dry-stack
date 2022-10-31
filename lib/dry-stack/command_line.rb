@@ -47,7 +47,8 @@ module Dry
           command = args.shift || ''
           raise "Unknown command: #{command}" unless COMMANDS.key?(command.to_sym)
 
-          eval $stdin.tty? ? File.read(params[:stack]) : STDIN.read
+          stack_text = $stdin.tty? ? File.read(params[:stack]) : STDIN.read
+          Dry::Stack() { eval stack_text }
           COMMANDS[command.to_sym].run Stack.last_stack, params, args
         rescue => e
           puts e.message

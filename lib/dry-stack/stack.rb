@@ -4,7 +4,7 @@ require 'optparse'
 
 module Dry
 
-  def Stack(name, &)
+  def Stack(name = nil, &)
     Stack.last_stack = Stack.new name
     Stack.last_stack.instance_exec(&) if block_given?
   end
@@ -12,11 +12,18 @@ module Dry
   class ServiceFunction
     def initialize(service, &); @service = service; instance_exec(&) end
     def env(variables)= @service[:environment].merge! variables
+    def image(name)= @service[:image] = name
+    def ports(ports)= ((@service[:ports] ||= []) << ports).flatten!
   end
 
   class Stack
     class << self
       attr_accessor :last_stack
+    end
+
+    def Stack(name = nil, &)
+      Stack.last_stack = Stack.new name
+      Stack.last_stack.instance_exec(&) if block_given?
     end
 
     def initialize(name)

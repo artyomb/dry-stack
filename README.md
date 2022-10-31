@@ -35,25 +35,22 @@ To install the gem
 ## Usage
 Create the file `stack.drs` which describes the stack
 ```ruby
-Stack :simple_stack do
+HttpFront services: {admin: 'admin.*', operator: 'operator.*', reports: 'reports.*',
+                   navigator: 'navigator.*', backend: 'admin.*, operator.*, navigator.*'}
 
-  HttpFront services: {admin: 'admin.*', operator: 'operator.*', reports: 'reports.*',
-                       navigator: 'navigator.*', backend: 'admin.*, operator.*, navigator.*'}
+PublishPorts admin: 4000, operator: 4001, navigator: 4002, reports: 7000 # mode: ingress, protocol: tcp
 
-  PublishPorts admin: 4000, operator: 4001, navigator: 4002, reports: 7000 # mode: ingress, protocol: tcp
+Service :admin,     image: 'frontend', env: {APP: 'admin'},     ports: 5000
+Service :operator,  image: 'frontend', env: {APP: 'operator'},  ports: 5000
+Service :navigator, image: 'frontend', env: {APP: 'navigator'}, ports: 5000
 
-  Service :admin,     image: 'frontend', env: {APP: 'admin'},     ports: 5000
-  Service :operator,  image: 'frontend', env: {APP: 'operator'},  ports: 5000
-  Service :navigator, image: 'frontend', env: {APP: 'navigator'}, ports: 5000
-
-  Service :backend,   image: 'backend', ports: 3000 do
-    env APP_PORT: 3000, NODE_ENV: 'development', SKIP_GZ: true, DB_URL: '$DB_URL'
-  end
-
-  Service :reports, image: 'reports:0.1', env: {DB_URL: '$DB_URL'}, ports: 7000
-
-  Network :default, attachable: true
+Service :backend,   image: 'backend', ports: 3000 do
+  env APP_PORT: 3000, NODE_ENV: 'development', SKIP_GZ: true, DB_URL: '$DB_URL'
 end
+
+Service :reports, image: 'reports:0.1', env: {DB_URL: '$DB_URL'}, ports: 7000
+
+Network :default, attachable: true
 
 ```
 Then run in the current directory

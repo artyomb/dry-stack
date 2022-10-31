@@ -1,0 +1,5 @@
+Service :reports do
+  image 'reports'
+  ports 7000
+  env DB_URL: '$DB_URL'
+end

@@ -1,0 +1,5 @@
+services:
+  reports:
+    environment:
+      DB_URL: "$DB_URL"
+    image: reports
