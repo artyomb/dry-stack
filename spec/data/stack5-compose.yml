@@ -13,6 +13,7 @@ services:
         - ingress.protocol=http
         - ingress.port=7000
     networks:
+      - default
       - ingress_routing
     ports:
       - 7000:7000

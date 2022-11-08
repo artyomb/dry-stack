@@ -51,6 +51,7 @@ module Dry
         service[:deploy][:labels] = @ingress[name]&.map { |k, v| "ingress.#{k}=#{v}" }
         if @ingress[name]
           service[:networks] ||= []
+          service[:networks] << 'default' if service[:networks].empty?
           service[:networks] << 'ingress_routing'
         end
 
