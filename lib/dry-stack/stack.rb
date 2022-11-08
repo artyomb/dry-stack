@@ -31,6 +31,7 @@ module Dry
       @services = {}
       @networks = {}
       @publish_ports = {}
+      @ingress = {}
     end
 
     def stringify(hash) = hash.to_h { |k, v| [k.to_s, v.is_a?(Hash) ? stringify(v) : v] }
@@ -42,11 +43,18 @@ module Dry
       }
 
       compose[:services].each do |name, service|
-        service[:ports] = @publish_ports[name]&.zip(service[:ports])&.map { _1.join ':' }
-        service.delete_if { _2.nil? || _2.empty? }
+        @ingress[name][:port] ||= service[:ports]&.first if @ingress[name]
+        service[:deploy] ||= {}
+        service[:deploy][:labels] = @ingress[name]&.map { |k, v| "ingress.#{k}=#{v}" }
+
+        service[:ports] = @publish_ports[name]&.zip(service[:ports] || @publish_ports[name])&.map { _1.join ':' }
       end
 
-      compose.delete_if { _2.nil? || _2.empty? }
+      prune = ->(o) {
+        o.each { prune[_2] }  if o.is_a? Hash
+        o.delete_if { _2.nil? || (_2.respond_to?(:empty?) && _2.empty?) } if o.is_a? Hash
+      }
+      prune[compose]
       stringify(compose).to_yaml
     end
 
@@ -65,6 +73,10 @@ module Dry
       @services[name] ||= {environment: {}}
       @services[name].merge! opts
       ServiceFunction.new(@services[name], &)  if block_given?
+    end
+
+    def Ingress(services)
+      @ingress.merge! services
     end
 
     def Network(name, opts = {})

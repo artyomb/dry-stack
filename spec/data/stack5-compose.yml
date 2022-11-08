@@ -1,0 +1,22 @@
+services:
+  admin:
+    environment:
+      APP: admin
+    image: "$REGISTRY_HOST/frontend"
+  reports:
+    environment:
+      DB_URL: "$DB_URL"
+    image: "$REGISTRY_HOST/reports"
+    deploy:
+      labels:
+        - ingress.host=reports.*
+        - ingress.protocol=http
+        - ingress.port=7000
+    ports:
+      - 7000:7000
+networks:
+  default:
+    attachable: true
+  ingress_routing:
+    external: true
+    name: ingress-routing

@@ -1,0 +1,8 @@
+PublishPorts reports: 7000
+Ingress reports: {host: 'reports.*', protocol: :http, port: 7000}
+
+Service :admin,     image: '$REGISTRY_HOST/frontend',  env: { APP: 'admin' },      ports: 5000
+Service :reports,   image: '$REGISTRY_HOST/reports', env: { DB_URL: '$DB_URL' }
+
+Network :default, attachable: true
+Network :ingress_routing, external: true, name: 'ingress-routing'
