@@ -12,6 +12,8 @@ services:
         - ingress.host=reports.*
         - ingress.protocol=http
         - ingress.port=7000
+    networks:
+      - ingress_routing
     ports:
       - 7000:7000
 networks:

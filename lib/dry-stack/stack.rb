@@ -41,11 +41,18 @@ module Dry
                  services: YAML.load(@services.to_yaml),
                  networks: YAML.load(@networks.to_yaml),
       }
+      if @ingress.any?
+        compose[:networks].merge! ingress_routing: {external: true, name: 'ingress-routing'}
+      end
 
       compose[:services].each do |name, service|
         @ingress[name][:port] ||= service[:ports]&.first if @ingress[name]
         service[:deploy] ||= {}
         service[:deploy][:labels] = @ingress[name]&.map { |k, v| "ingress.#{k}=#{v}" }
+        if @ingress[name]
+          service[:networks] ||= []
+          service[:networks] << 'ingress_routing'
+        end
 
         service[:ports] = @publish_ports[name]&.zip(service[:ports] || @publish_ports[name])&.map { _1.join ':' }
       end

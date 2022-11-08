@@ -5,4 +5,3 @@ Service :admin,     image: '$REGISTRY_HOST/frontend',  env: { APP: 'admin' },   
 Service :reports,   image: '$REGISTRY_HOST/reports', env: { DB_URL: '$DB_URL' }
 
 Network :default, attachable: true
-Network :ingress_routing, external: true, name: 'ingress-routing'
