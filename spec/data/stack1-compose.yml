@@ -1,5 +1,4 @@
 ---
-name: simple_stack
 services:
   admin:
     environment:

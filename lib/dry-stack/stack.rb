@@ -42,7 +42,8 @@ module Dry
 
     def to_compose(opts = {})
       compose = {
-        name: @name.to_s, # https://docs.docker.com/compose/compose-file/#name-top-level-element
+        # name: @name.to_s, # https://docs.docker.com/compose/compose-file/#name-top-level-element
+        # Not allowed by docker stack deploy
         services: YAML.load(@services.to_yaml),
         networks: YAML.load(@networks.to_yaml),
       }

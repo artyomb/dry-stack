@@ -1,5 +1,4 @@
 ---
-name: name1
 services:
   svc1:
     image: service-image
