@@ -27,7 +27,7 @@ module Dry
     end
 
     def initialize(name)
-      @name = name
+      @name = name || 'stack'
       @services = {}
       @networks = {}
       @publish_ports = {}
@@ -36,11 +36,17 @@ module Dry
 
     def stringify(hash) = hash.to_h { |k, v| [k.to_s, v.is_a?(Hash) ? stringify(v) : v] }
 
-    def to_compose
-      compose = {name: @name,
-                 services: YAML.load(@services.to_yaml),
-                 networks: YAML.load(@networks.to_yaml),
+    def nginx_host2regexp(str)
+      str.to_s.gsub('.', '\.').gsub('*', '.*')
+    end
+
+    def to_compose(opts = {})
+      compose = {
+        name: @name.to_s, # https://docs.docker.com/compose/compose-file/#configs-top-level-element
+        services: YAML.load(@services.to_yaml),
+        networks: YAML.load(@networks.to_yaml),
       }
+
       if @ingress.any?
         compose[:networks].merge! ingress_routing: {external: true, name: 'ingress-routing'}
       end
@@ -48,11 +54,26 @@ module Dry
       compose[:services].each do |name, service|
         @ingress[name][:port] ||= service[:ports]&.first if @ingress[name]
         service[:deploy] ||= {}
-        service[:deploy][:labels] = @ingress[name]&.map { |k, v| "ingress.#{k}=#{v}" }
-        if @ingress[name]
+        service[:deploy][:labels] ||= []
+
+        if @ingress[name] && (opts[:ingress] || opts[:traefik])
           service[:networks] ||= []
           service[:networks] << 'default' if service[:networks].empty?
           service[:networks] << 'ingress_routing'
+        end
+
+        if @ingress[name] && opts[:ingress]
+          service[:deploy][:labels] = @ingress[name]&.map { |k, v| "ingress.#{k}=#{v}" }
+        end
+
+        if @ingress[name] && opts[:traefik]
+          service_name = "#{@name}_#{name}"
+          service[:deploy][:labels] += [
+            'traefik.enable=true',
+            "traefik.http.routers.nginx.service=#{service_name}",
+            "traefik.http.services.#{service_name}.loadbalancer.server.port=#{@ingress[name][:port]}",
+            "traefik.http.routers.nginx.rule=HostRegexp(`{name:#{nginx_host2regexp @ingress[name][:host]}}`)"
+          ]
         end
 
         service[:ports] = @publish_ports[name]&.zip(service[:ports] || @publish_ports[name])&.map { _1.join ':' }

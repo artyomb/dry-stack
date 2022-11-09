@@ -1,3 +1,4 @@
+name: stack
 services:
   admin:
     environment:
@@ -12,6 +13,10 @@ services:
         - ingress.host=reports.*
         - ingress.protocol=http
         - ingress.port=7000
+        - traefik.enable=true
+        - traefik.http.routers.nginx.service=stack_reports
+        - traefik.http.services.stack_reports.loadbalancer.server.port=7000
+        - traefik.http.routers.nginx.rule=HostRegexp(`{name:reports\..*}`)
     networks:
       - default
       - ingress_routing

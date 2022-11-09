@@ -38,6 +38,8 @@ module Dry
           #  in all caps are required
           o.on('-s', '--stack STACK_NAME', 'Stack file')
           o.on('-e', '--env', 'Load .env file') { load_env }
+          o.on('',   '--ingress', 'Generate ingress labels') { true }
+          o.on('',   '--traefik', 'Generate traefik labels') { true }
           o.on('-n', '--no-env', 'Do not process env variables') { true }
           o.on('-h', '--help') { puts o; exit }
           o.parse! args, into: params
@@ -49,10 +51,10 @@ module Dry
 
           stack_text = $stdin.tty? ? File.read(params[:stack]) : STDIN.read
           Dry::Stack() { eval stack_text }
-          COMMANDS[command.to_sym].run Stack.last_stack, params, args
-        rescue => e
-          puts e.message
-          exit 1
+          COMMANDS[command.to_sym].run Stack.last_stack, params
+        # rescue => e
+        #   puts e.message
+        #   exit 1
         end
       end
     end
