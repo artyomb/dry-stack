@@ -42,7 +42,7 @@ module Dry
 
     def to_compose(opts = {})
       compose = {
-        name: @name.to_s, # https://docs.docker.com/compose/compose-file/#configs-top-level-element
+        name: @name.to_s, # https://docs.docker.com/compose/compose-file/#name-top-level-element
         services: YAML.load(@services.to_yaml),
         networks: YAML.load(@networks.to_yaml),
       }

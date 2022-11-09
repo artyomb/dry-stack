@@ -5,7 +5,7 @@ Dry::CommandLine::COMMANDS[:to_compose] = Class.new do
     yaml = stack.to_compose(params).lines[1..].join
 
     # substitute ENV variables
-    params[:'no-env'] ? $stdout.puts(yaml) : system("echo \"#{yaml}\"")
+    params[:'no-env'] ? $stdout.puts(yaml) : system("echo \"#{yaml.gsub("`", '\\\`')}\"")
   end
 
   def help = 'Print stack in docker compose format'
