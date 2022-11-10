@@ -13,9 +13,9 @@ services:
         - ingress.protocol=http
         - ingress.port=7000
         - traefik.enable=true
-        - traefik.http.routers.nginx.service=stack_reports
+        - traefik.http.routers.stack_reports.service=stack_reports
         - traefik.http.services.stack_reports.loadbalancer.server.port=7000
-        - traefik.http.routers.nginx.rule=HostRegexp(`{name:reports\..*}`)
+        - traefik.http.routers.stack_reports.rule=HostRegexp(`{name:reports\..*}`)
     networks:
       - default
       - ingress_routing

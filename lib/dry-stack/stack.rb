@@ -71,9 +71,9 @@ module Dry
           service_name = "#{@name}_#{name}"
           service[:deploy][:labels] += [
             'traefik.enable=true',
-            "traefik.http.routers.nginx.service=#{service_name}",
+            "traefik.http.routers.#{service_name}.service=#{service_name}",
             "traefik.http.services.#{service_name}.loadbalancer.server.port=#{@ingress[name][:port]}",
-            "traefik.http.routers.nginx.rule=HostRegexp(`{name:#{nginx_host2regexp @ingress[name][:host]}}`)"
+            "traefik.http.routers.#{service_name}.rule=HostRegexp(`{name:#{nginx_host2regexp @ingress[name][:host]}}`)"
           ]
         end
 
