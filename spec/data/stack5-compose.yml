@@ -3,6 +3,12 @@ services:
     environment:
       APP: admin
     image: "$REGISTRY_HOST/frontend"
+    deploy:
+      replica: 2
+      resources:
+        limits:
+          cpus: 4
+          memory: 500M
   reports:
     environment:
       DB_URL: "$DB_URL"

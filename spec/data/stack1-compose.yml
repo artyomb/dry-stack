@@ -25,12 +25,32 @@ services:
       SKIP_GZ: true
       DB_URL: "$DB_URL"
     image: backend
+    deploy:
+      labels:
+        - ingress.host=backend.*
+        - ingress.port=3000
+        - traefik.enable=true
+        - traefik.http.routers.simple_stack_backend.service=simple_stack_backend
+        - traefik.http.services.simple_stack_backend.loadbalancer.server.port=3000
+        - traefik.http.routers.simple_stack_backend.rule=HostRegexp(`{name:backend\..*}`)
+      replica: 2
+      resources:
+        limits:
+          cpus: 4
+          memory: 500M
+    networks:
+      - default
+      - ingress_routing
   reports:
-    environment:
-      DB_URL: "$DB_URL"
-    image: reports:0.1
-    ports:
-      - 7000:7000
+      environment:
+        DB_URL: "$DB_URL"
+      image: reports:0.1
+      ports:
+        - 7000:7000
+
 networks:
   default:
     attachable: true
+  ingress_routing:
+    external: true
+    name: ingress-routing

@@ -1,9 +1,8 @@
 Stack :simple_stack do
 
-  HttpFront services: {admin: 'admin.*', operator: 'operator.*', reports: 'reports.*',
-                       navigator: 'navigator.*', backend: 'admin.*, operator.*, navigator.*'}
-
   PublishPorts admin: 4000, operator: 4001, navigator: 4002, reports: 7000 # mode: ingress, protocol: tcp
+  Deploy backend: { replica: 2, 'resources.limits': { cpus: 4, memory: '500M' } }
+  Ingress backend: { host: 'backend.*' }
 
   Service :admin,     image: 'frontend', env: {APP: 'admin'},     ports: 5000
   Service :operator,  image: 'frontend', env: {APP: 'operator'},  ports: 5000

@@ -33,9 +33,22 @@ module Dry
       @networks = {}
       @publish_ports = {}
       @ingress = {}
+      @deploy = {}
     end
 
     def stringify(hash) = hash.to_h { |k, v| [k.to_s, v.is_a?(Hash) ? stringify(v) : v] }
+    def expand_hash(hash)
+      hash.select { _1.to_s =~ /\./ }.each do |k, v|
+        name = k.to_s.scan(/([^\.]*)\.(.*)/).flatten
+        hash.delete k
+        hash[name[0]] ||= {}
+        hash[name[0]][name[1]] ||= {}
+        hash[name[0]][name[1]].merge! v if v.is_a?(Hash)
+        hash[name[0]][name[1]] = v unless v.is_a?(Hash)
+      end
+      hash.each { expand_hash(_2) if _2.is_a?(Hash) }
+      hash
+    end
 
     def nginx_host2regexp(str)
       str.to_s.gsub('.', '\.').gsub('*', '.*')
@@ -78,6 +91,8 @@ module Dry
           ]
         end
 
+        service[:deploy].merge! @deploy[name] if @deploy[name]
+
         service[:ports] = @publish_ports[name]&.zip(service[:ports] || @publish_ports[name])&.map { _1.join ':' }
       end
 
@@ -108,6 +123,10 @@ module Dry
 
     def Ingress(services)
       @ingress.merge! services
+    end
+
+    def Deploy(services)
+      @deploy.merge! expand_hash(services)
     end
 
     def Network(name, opts = {})
