@@ -20,6 +20,7 @@ module Dry
     class << self
       attr_accessor :last_stack
     end
+    attr_accessor :name
 
     def Stack(name = nil, &)
       Stack.last_stack = Stack.new name
