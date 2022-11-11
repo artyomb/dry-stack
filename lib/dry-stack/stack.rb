@@ -29,6 +29,7 @@ module Dry
 
     def initialize(name)
       @name = name || 'stack'
+      # @version =
       @options = {}
       @services = {}
       @networks = {}
@@ -59,6 +60,7 @@ module Dry
       compose = {
         # name: @name.to_s, # https://docs.docker.com/compose/compose-file/#name-top-level-element
         # Not allowed by docker stack deploy
+        version: '3.8',
         services: YAML.load(@services.to_yaml),
         networks: YAML.load(@networks.to_yaml),
       }

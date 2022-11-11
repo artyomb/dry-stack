@@ -1,4 +1,5 @@
 ---
+version: '3.8'
 services:
   svc1:
     image: service-image
