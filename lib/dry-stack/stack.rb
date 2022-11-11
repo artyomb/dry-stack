@@ -121,10 +121,6 @@ module Dry
       stringify(compose).to_yaml
     end
 
-    def HttpFront(params)
-      yield if block_given?
-    end
-
     def PublishPorts(ports)
       @publish_ports = ports.to_h { |k, v| [k,[v].flatten] }
     end
@@ -139,6 +135,7 @@ module Dry
     end
 
     def Options(opts)
+      warn 'WARN: Options command is used for testing purpose. Not recommended in real life configurations.'
       @options.merge! opts
     end
 
