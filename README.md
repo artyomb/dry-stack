@@ -9,7 +9,7 @@ $ dry-stack
 Usage:
         dry-stack -s stackfile [options] COMMAND
         cat stackfile | dry-stack COMMAND
-        dry-stack COMMAND < stackfile
+        dry-stack COMMAND < stack.drs
 
 Commands:
      to_compose -  Print stack in docker compose format
@@ -17,10 +17,12 @@ Commands:
 Options:
     -s, --stack STACK_NAME           Stack file
     -e, --env                        Load .env file
+        --name STACK_NAME            Define stack name
+        --ingress                    Generate ingress labels
+        --traefik                    Generate traefik labels
+        --traefik_tls                Generate traefik tls labels
     -n, --no-env                     Do not process env variables
     -h, --help
-
-
 ```
 
 https://rdoc.info/gems/dry-stack
