@@ -1,3 +1,6 @@
+
 Stack :name1 do
+  Options traefik: true, ingress: true
+
   Service :svc1, image: 'service-image'
 end

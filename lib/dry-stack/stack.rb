@@ -20,7 +20,7 @@ module Dry
     class << self
       attr_accessor :last_stack
     end
-    attr_accessor :name
+    attr_accessor :name, :options
 
     def Stack(name = nil, &)
       Stack.last_stack = Stack.new name
@@ -29,6 +29,7 @@ module Dry
 
     def initialize(name)
       @name = name || 'stack'
+      @options = {}
       @services = {}
       @networks = {}
       @publish_ports = {}
@@ -54,7 +55,7 @@ module Dry
       str.to_s.gsub('.', '\.').gsub('*', '.*')
     end
 
-    def to_compose(opts = {})
+    def to_compose(opts = @options )
       compose = {
         # name: @name.to_s, # https://docs.docker.com/compose/compose-file/#name-top-level-element
         # Not allowed by docker stack deploy
@@ -91,6 +92,22 @@ module Dry
           ]
         end
 
+        if @ingress[name] && opts[:traefik_tls]
+          service_name = "#{@name}_#{name}"
+          service[:deploy][:labels] += [
+            'traefik.enable=true',
+            "traefik.http.routers.#{service_name}.service=#{service_name}",
+            "traefik.http.services.#{service_name}.loadbalancer.server.port=#{@ingress[name][:port]}",
+            "traefik.http.routers.#{service_name}.rule=HostRegexp(`{name:#{nginx_host2regexp @ingress[name][:host]}}`)",
+            "traefik.http.routers.#{service_name}.entrypoints=http",
+            "traefik.http.routers.#{service_name}.middlewares=service_stack-https-redirect",
+            "traefik.http.routers.#{service_name}.rule=Host(`${REGISTRY_HOSTNAME}`)",
+            "traefik.http.routers.#{service_name}.entrypoints=https",
+            "traefik.http.routers.#{service_name}.tls=true",
+            "traefik.http.routers.#{service_name}.tls.certresolver=le"
+          ]
+        end
+
         service[:deploy].merge! @deploy[name] if @deploy[name]
 
         service[:ports] = @publish_ports[name]&.zip(service[:ports] || @publish_ports[name])&.map { _1.join ':' }
@@ -119,6 +136,10 @@ module Dry
       @services[name] ||= {environment: {}}
       @services[name].merge! opts
       ServiceFunction.new(@services[name], &)  if block_given?
+    end
+
+    def Options(opts)
+      @options.merge! opts
     end
 
     def Ingress(services)

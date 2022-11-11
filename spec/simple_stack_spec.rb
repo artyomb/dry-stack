@@ -10,9 +10,8 @@ describe 'Test simple Stack' do
 
       puts Stack.last_stack.to_compose
       compose = YAML.load_file stack_file.gsub('.drs', '-compose.yml')
-      opts = {traefik: true, ingress: true}
 
-      expect(Stack.last_stack.to_compose(opts)).to eq(compose.to_yaml)
+      expect(Stack.last_stack.to_compose).to eq(compose.to_yaml)
     end
   end
 end

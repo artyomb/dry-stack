@@ -41,6 +41,7 @@ module Dry
           o.on('',   '--name STACK_NAME', 'Define stack name')
           o.on('',   '--ingress', 'Generate ingress labels') { true }
           o.on('',   '--traefik', 'Generate traefik labels') { true }
+          o.on('',   '--traefik_tls', 'Generate traefik tls labels') { true }
           o.on('-n', '--no-env', 'Do not process env variables') { true }
           o.on('-h', '--help') { puts o; exit }
           o.parse! args, into: params

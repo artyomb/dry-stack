@@ -1,3 +1,5 @@
+Options traefik: true, ingress: true
+
 Service :reports do
   image 'reports'
   ports 7000

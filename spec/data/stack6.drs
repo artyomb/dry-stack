@@ -1,4 +1,4 @@
-Options traefik: true, ingress: true
+Options traefik_tls: true, ingress: true
 
 PublishPorts reports: 7000
 Ingress reports: {host: 'reports.*', protocol: :http, port: 7000}

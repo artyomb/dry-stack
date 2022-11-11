@@ -1,0 +1,41 @@
+services:
+  admin:
+    environment:
+      APP: admin
+    image: "$REGISTRY_HOST/frontend"
+    deploy:
+      replica: 2
+      resources:
+        limits:
+          cpus: 4
+          memory: 500M
+  reports:
+    environment:
+      DB_URL: "$DB_URL"
+    image: "$REGISTRY_HOST/reports"
+    deploy:
+      labels:
+        - ingress.host=reports.*
+        - ingress.protocol=http
+        - ingress.port=7000
+        - traefik.enable=true
+        - traefik.http.routers.stack_reports.service=stack_reports
+        - traefik.http.services.stack_reports.loadbalancer.server.port=7000
+        - traefik.http.routers.stack_reports.rule=HostRegexp(`{name:reports\..*}`)
+        - traefik.http.routers.stack_reports.entrypoints=http
+        - traefik.http.routers.stack_reports.middlewares=service_stack-https-redirect
+        - traefik.http.routers.stack_reports.rule=Host(`${REGISTRY_HOSTNAME}`)
+        - traefik.http.routers.stack_reports.entrypoints=https
+        - traefik.http.routers.stack_reports.tls=true
+        - traefik.http.routers.stack_reports.tls.certresolver=le
+    networks:
+      - default
+      - ingress_routing
+    ports:
+      - 7000:7000
+networks:
+  default:
+    attachable: true
+  ingress_routing:
+    external: true
+    name: ingress-routing
