@@ -135,7 +135,8 @@ module Dry
     end
 
     def Options(opts)
-      warn 'WARN: Options command is used for testing purpose. Not recommended in real life configurations.'
+      warn 'WARN: Options command is used for testing purpose.\
+            Not recommended in real life configurations.' unless $0 =~ /rspec/
       @options.merge! opts
     end
 

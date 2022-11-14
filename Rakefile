@@ -13,8 +13,8 @@ task default: %i[rspec]
 desc 'CI Rspec run with reports'
 task :rspec do |t|
   # rm "coverage.data" if File.exist?("coverage.data")
-  rspec.rspec_opts = "--profile --color -f documentation -f RspecJunitFormatter --out ./results/rspec.xml"
-  Rake::Task["spec"].invoke
+  rspec.rspec_opts = '--profile --color -f documentation -f RspecJunitFormatter --out ./results/rspec.xml'
+  Rake::Task['spec'].invoke
 end
 
 require 'erb'
@@ -28,7 +28,7 @@ task :readme do |t|
 end
 
 desc 'Build&push new version'
-task push: %i[rspec readme] do |t|
+task push: %i[spec readme] do |t|
   puts 'Build&push new version'
   system 'gem build dry-stack.gemspec' or exit 1
   system "gem install ./dry-stack-#{Dry::Stack::VERSION}.gem" or exit 1
