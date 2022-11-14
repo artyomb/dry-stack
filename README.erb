@@ -1,0 +1,34 @@
+# Dry-stack
+
+This gem allows ...  
+
+```
+cat simple_stack.drs | dry-stack -e to_compose | docker stack deploy -c - simple_stack
+
+$ dry-stack
+<%= %x{./bin/dry-stack -h} %>
+```
+
+https://rdoc.info/gems/dry-stack
+https://rubydoc.info/gems/dry-stack
+https://gemdocs.org/gems/dry-stack/
+
+## Installation
+To install the gem
+
+    $ gem install dry-stack
+
+## Usage
+Create the file `stack.drs` which describes the stack
+```ruby
+<%= %x{cat ./examples/simple_stack.drs} %>
+```
+Then run in the current directory
+
+    $ dry-stack stack.drs -n --traefik to_compose
+
+This will ...
+
+```yaml
+<%= %x{./bin/dry-stack -s ./examples/simple_stack.drs -n --traefik to_compose } %>
+```
