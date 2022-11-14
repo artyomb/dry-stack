@@ -1,6 +1,6 @@
 PublishPorts admin: 5000
 Ingress admin: { host: 'admin.*' }
-Deploy admin: { replica: 2, 'resources.limits': { cpus: 4, memory: '500M' } }
+Deploy admin: { replica: 2, 'resources.limits': { cpus: '4', memory: '500M' } }
 
 Service :admin,     image: 'frontend', env: {APP: 'admin'},     ports: 5000
 

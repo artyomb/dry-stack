@@ -6,7 +6,7 @@ This gem allows ...
 cat simple_stack.drs | dry-stack -e to_compose | docker stack deploy -c - simple_stack
 
 $ dry-stack
-Version: 0.0.15
+Version: 0.0.16
 Usage:
 	dry-stack -s stackfile [options] COMMAND
 	cat stackfile | dry-stack COMMAND
@@ -45,7 +45,7 @@ Create the file `stack.drs` which describes the stack
 ```ruby
 PublishPorts admin: 5000
 Ingress admin: { host: 'admin.*' }
-Deploy admin: { replica: 2, 'resources.limits': { cpus: 4, memory: '500M' } }
+Deploy admin: { replica: 2, 'resources.limits': { cpus: '4', memory: '500M' } }
 
 Service :admin,     image: 'frontend', env: {APP: 'admin'},     ports: 5000
 
@@ -78,7 +78,7 @@ services:
       replica: 2
       resources:
         limits:
-          cpus: 4
+          cpus: '4'
           memory: 500M
     networks:
     - default
