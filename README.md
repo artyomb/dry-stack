@@ -62,6 +62,7 @@ Then run in the current directory
 This will ...
 
 ```yaml
+version: '3.8'
 services:
   admin:
     environment:

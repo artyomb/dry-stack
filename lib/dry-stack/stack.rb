@@ -17,6 +17,7 @@ module Dry
   end
 
   class Stack
+    COMPOSE_VERSION = '3.8'
     class << self
       attr_accessor :last_stack
     end
@@ -29,6 +30,7 @@ module Dry
 
     def initialize(name)
       @name = name || 'stack'
+      @version = COMPOSE_VERSION
       @options = {}
       @services = {}
       @networks = {}
@@ -59,6 +61,7 @@ module Dry
       compose = {
         # name: @name.to_s, # https://docs.docker.com/compose/compose-file/#name-top-level-element
         # Not allowed by docker stack deploy
+        version: @version,
         services: YAML.load(@services.to_yaml),
         networks: YAML.load(@networks.to_yaml),
       }
