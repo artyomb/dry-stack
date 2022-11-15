@@ -6,10 +6,11 @@ This gem allows ...
 cat simple_stack.drs | dry-stack -e to_compose | docker stack deploy -c - simple_stack
 
 $ dry-stack
+Version: 0.0.16
 Usage:
-        dry-stack -s stackfile [options] COMMAND
-        cat stackfile | dry-stack COMMAND
-        dry-stack COMMAND < stack.drs
+	dry-stack -s stackfile [options] COMMAND
+	cat stackfile | dry-stack COMMAND
+	dry-stack COMMAND < stack.drs
 
 Commands:
      to_compose -  Print stack in docker compose format
@@ -17,12 +18,17 @@ Commands:
 Options:
     -s, --stack STACK_NAME           Stack file
     -e, --env                        Load .env file
-        --name STACK_NAME            Define stack name
-        --ingress                    Generate ingress labels
-        --traefik                    Generate traefik labels
-        --traefik_tls                Generate traefik tls labels
+        --name STACK_NAME
+                                     Define stack name
+        --ingress
+                                     Generate ingress labels
+        --traefik
+                                     Generate traefik labels
+        --traefik_tls
+                                     Generate traefik tls labels
     -n, --no-env                     Do not process env variables
     -h, --help
+
 ```
 
 https://rdoc.info/gems/dry-stack
@@ -37,52 +43,46 @@ To install the gem
 ## Usage
 Create the file `stack.drs` which describes the stack
 ```ruby
-HttpFront services: {admin: 'admin.*', operator: 'operator.*', reports: 'reports.*',
-                   navigator: 'navigator.*', backend: 'admin.*, operator.*, navigator.*'}
-
-PublishPorts admin: 4000, operator: 4001, navigator: 4002, reports: 7000 # mode: ingress, protocol: tcp
+PublishPorts admin: 5000
+Ingress admin: { host: 'admin.*' }
+Deploy admin: { replica: 2, 'resources.limits': { cpus: '4', memory: '500M' } }
 
 Service :admin,     image: 'frontend', env: {APP: 'admin'},     ports: 5000
-Service :operator,  image: 'frontend', env: {APP: 'operator'},  ports: 5000
-Service :navigator, image: 'frontend', env: {APP: 'navigator'}, ports: 5000
 
 Service :backend,   image: 'backend', ports: 3000 do
   env APP_PORT: 3000, NODE_ENV: 'development', SKIP_GZ: true, DB_URL: '$DB_URL'
 end
 
-Service :reports, image: 'reports:0.1', env: {DB_URL: '$DB_URL'}, ports: 7000
-
-Network :default, attachable: true
 
 ```
 Then run in the current directory
 
-    $ dry-stack stack.drs -e to_compose
+    $ dry-stack stack.drs -n --traefik to_compose
 
 This will ...
 
 ```yaml
----
-name: :simple_stack
 services:
   admin:
     environment:
       APP: admin
     image: frontend
     ports:
-      - 4000:5000
-  operator:
-    environment:
-      APP: operator
-    image: frontend
-    ports:
-      - 4001:5000
-  navigator:
-    environment:
-      APP: navigator
-    image: frontend
-    ports:
-      - 4002:5000
+    - 5000:5000
+    deploy:
+      labels:
+      - traefik.enable=true
+      - traefik.http.routers.stack_admin.service=stack_admin
+      - traefik.http.services.stack_admin.loadbalancer.server.port=5000
+      - traefik.http.routers.stack_admin.rule=HostRegexp(`{name:admin\..*}`)
+      replica: 2
+      resources:
+        limits:
+          cpus: '4'
+          memory: 500M
+    networks:
+    - default
+    - ingress_routing
   backend:
     environment:
       APP_PORT: 3000
@@ -90,13 +90,9 @@ services:
       SKIP_GZ: true
       DB_URL: "$DB_URL"
     image: backend
-  reports:
-    environment:
-      DB_URL: "$DB_URL"
-    image: reports:0.1
-    ports:
-      - 7000:7000
 networks:
-  default:
-    attachable: true
+  ingress_routing:
+    external: true
+    name: ingress-routing
+
 ```

@@ -20,14 +20,14 @@ module Dry
 
         ARGV << '-h' if ARGV.empty?
         OptionParser.new do |o|
-          o.version = "v#{Dry::Stack::VERSION}"
+          o.version = "#{Dry::Stack::VERSION}"
 
           usage = [
             'dry-stack -s stackfile [options] COMMAND',
             'cat stackfile | dry-stack COMMAND',
             'dry-stack COMMAND < stack.drs'
           ]
-          o.banner = "Usage:\n\t#{usage.join "\n\t"}"
+          o.banner = "Version: #{o.version}\nUsage:\n\t#{usage.join "\n\t"}"
           o.separator ''
           o.separator 'Commands:'
           COMMANDS.each { |name, cmd| o.separator "#{' ' * 5}#{name} -  #{cmd.help}" }
