@@ -42,6 +42,7 @@ module Dry
           o.on('',   '--ingress', 'Generate ingress labels') { true }
           o.on('',   '--traefik', 'Generate traefik labels') { true }
           o.on('',   '--traefik_tls', 'Generate traefik tls labels') { true }
+          o.on('',   '--host_sed /from/to/', 'Sed ingress host  /\\*/dev.*/')
           o.on('-n', '--no-env', 'Do not process env variables') { true }
           o.on('-h', '--help') { puts o; exit }
           o.parse! args, into: params

@@ -1,0 +1,5 @@
+Options traefik_tls: true, ingress: true, host_sed: '/\*/dev.*'
+
+Ingress reports: {host: 'reports.*'}
+
+Service :reports,   image: '$REGISTRY_HOST/reports', env: { DB_URL: '$DB_URL' }

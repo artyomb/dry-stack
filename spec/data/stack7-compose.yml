@@ -1,0 +1,25 @@
+version: '3.8'
+services:
+  admin:
+    environment:
+      APP: admin
+    image: "$REGISTRY_HOST/frontend"
+    deploy:
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.stack_admin.service=stack_admin
+        - traefik.http.services.stack_admin.loadbalancer.server.port=5000
+        - traefik.http.routers.stack_admin.entrypoints=http
+        - traefik.http.routers.stack_admin.middlewares=service_stack-https-redirect
+        - traefik.http.routers.stack_admin.entrypoints=https
+        - traefik.http.routers.stack_admin.tls=true
+        - traefik.http.routers.stack_admin.tls.certresolver=le
+        - traefik.http.routers.stack_admin.rule=HostRegexp(`{name:admin\..*}`) && Path(`/bar`)
+
+    networks:
+      - default
+      - ingress_routing
+networks:
+  ingress_routing:
+    external: true
+    name: ingress-routing

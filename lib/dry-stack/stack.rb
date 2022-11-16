@@ -75,40 +75,46 @@ module Dry
         service[:deploy] ||= {}
         service[:deploy][:labels] ||= []
 
-        if @ingress[name] && (opts[:ingress] || opts[:traefik])
+        if @ingress[name] && (opts[:ingress] || opts[:traefik] || opts[:traefik_tls])
           service[:networks] ||= []
           service[:networks] << 'default' if service[:networks].empty?
           service[:networks] << 'ingress_routing'
+        end
+
+        if opts[:host_sed] && @ingress.dig(name,:host)
+          a, b = opts[:host_sed].split('/').reject(&:empty?)
+          @ingress[name][:host].gsub! %r{#{a}}, b
         end
 
         if @ingress[name] && opts[:ingress]
           service[:deploy][:labels] = @ingress[name]&.map { |k, v| "ingress.#{k}=#{v}" }
         end
 
-        if @ingress[name] && opts[:traefik]
+        if @ingress[name] && (opts[:traefik] || opts[:traefik_tls])
           service_name = "#{@name}_#{name}"
-          service[:deploy][:labels] += [
-            'traefik.enable=true',
-            "traefik.http.routers.#{service_name}.service=#{service_name}",
-            "traefik.http.services.#{service_name}.loadbalancer.server.port=#{@ingress[name][:port]}",
-            "traefik.http.routers.#{service_name}.rule=HostRegexp(`{name:#{nginx_host2regexp @ingress[name][:host]}}`)"
-          ]
-        end
 
-        if @ingress[name] && opts[:traefik_tls]
-          service_name = "#{@name}_#{name}"
           service[:deploy][:labels] += [
             'traefik.enable=true',
             "traefik.http.routers.#{service_name}.service=#{service_name}",
             "traefik.http.services.#{service_name}.loadbalancer.server.port=#{@ingress[name][:port]}",
-            "traefik.http.routers.#{service_name}.rule=HostRegexp(`{name:#{nginx_host2regexp @ingress[name][:host]}}`)",
-            "traefik.http.routers.#{service_name}.entrypoints=http",
-            "traefik.http.routers.#{service_name}.middlewares=service_stack-https-redirect",
-            "traefik.http.routers.#{service_name}.rule=Host(`${REGISTRY_HOSTNAME}`)",
-            "traefik.http.routers.#{service_name}.entrypoints=https",
-            "traefik.http.routers.#{service_name}.tls=true",
-            "traefik.http.routers.#{service_name}.tls.certresolver=le"
           ]
+
+          if opts[:traefik_tls]
+            service[:deploy][:labels] += [
+              "traefik.http.routers.#{service_name}.entrypoints=http",
+              "traefik.http.routers.#{service_name}.middlewares=service_stack-https-redirect",
+              "traefik.http.routers.#{service_name}.entrypoints=https",
+              "traefik.http.routers.#{service_name}.tls=true",
+              "traefik.http.routers.#{service_name}.tls.certresolver=le"
+            ]
+          end
+
+          if @ingress[name][:host]
+            service[:deploy][:labels] << "traefik.http.routers.#{service_name}.rule=HostRegexp(`{name:#{nginx_host2regexp @ingress[name][:host]}}`)"
+          end
+          if @ingress[name][:rule]
+            service[:deploy][:labels] << "traefik.http.routers.#{service_name}.rule=#{@ingress[name][:rule]}"
+          end
         end
 
         service[:deploy].merge! @deploy[name] if @deploy[name]
