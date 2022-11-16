@@ -6,6 +6,7 @@ $LOAD_PATH << lib
 require 'dry-stack'
 require 'dry-stack/command_line'
 require 'dry-stack/command_compose'
+require 'dry-stack/command_swarm_deploy'
 include Dry
 
 Dry::CommandLine.run ARGV
