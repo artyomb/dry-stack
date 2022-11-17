@@ -3,8 +3,8 @@ require_relative 'command_line'
 Dry::CommandLine::COMMANDS[:swarm_deploy] = Class.new do
   def run(stack, params)
     _params = stack.options.merge params
-    yaml = stack.to_compose(_params).lines[1..].join
     stack.name = _params[:name] if _params[:name]
+    yaml = stack.to_compose(_params).lines[1..].join
 
     # substitute ENV variables
     yaml = _params[:'no-env'] ? yaml : `echo \"#{yaml.gsub("`", '\\\`')}\"`

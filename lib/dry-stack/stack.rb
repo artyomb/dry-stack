@@ -109,12 +109,11 @@ module Dry
             ]
           end
 
-          if @ingress[name][:host]
-            service[:deploy][:labels] << "traefik.http.routers.#{service_name}.rule=HostRegexp(`{name:#{nginx_host2regexp @ingress[name][:host]}}`)"
-          end
-          if @ingress[name][:rule]
-            service[:deploy][:labels] << "traefik.http.routers.#{service_name}.rule=#{@ingress[name][:rule]}"
-          end
+          rule = []
+          rule << "HostRegexp(`{name:#{nginx_host2regexp @ingress[name][:host]}}`)" if @ingress[name][:host]
+          rule << "PathPrefix(`#{nginx_host2regexp @ingress[name][:path]}`)" if @ingress[name][:path]
+          rule << "#{@ingress[name][:rule]}" if @ingress[name][:rule]
+          service[:deploy][:labels] << "traefik.http.routers.#{service_name}.rule=#{rule.join ' && '}"
         end
 
         service[:deploy].merge! @deploy[name] if @deploy[name]
