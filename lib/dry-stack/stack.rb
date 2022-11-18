@@ -14,6 +14,7 @@ module Dry
     def env(variables)= @service[:environment].merge! variables
     def image(name)= @service[:image] = name
     def ports(ports)= ((@service[:ports] ||= []) << ports).flatten!
+    def command(cmd)= @service[:command] = cmd
   end
 
   class Stack
@@ -54,7 +55,13 @@ module Dry
     end
 
     def nginx_host2regexp(str)
-      str.to_s.gsub('.', '\.').gsub('*', '.*')
+      # http://nginx.org/en/docs/http/server_names.html
+      if str[0] == '~'
+        # ~^(?<user>.+)\.example\.net$;
+        str[1..]
+      else
+        str.to_s.gsub('.', '\.').gsub('*', '.*')
+      end
     end
 
     def to_compose(opts = @options )

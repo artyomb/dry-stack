@@ -1,5 +1,5 @@
 Options traefik_tls: true
 
-Ingress admin: {host: 'admin.*', path: '/bar'}
+Ingress admin: {host: '~(admin|some)\..*', path: '/bar'}
 
 Service :admin,     image: '$REGISTRY_HOST/frontend',  env: { APP: 'admin' },      ports: 5000

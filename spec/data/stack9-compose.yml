@@ -14,7 +14,7 @@ services:
         - traefik.http.routers.stack_admin.entrypoints=https
         - traefik.http.routers.stack_admin.tls=true
         - traefik.http.routers.stack_admin.tls.certresolver=le
-        - traefik.http.routers.stack_admin.rule=HostRegexp(`{name:admin\..*}`) && PathPrefix(`/bar`)
+        - traefik.http.routers.stack_admin.rule=HostRegexp(`{name:(admin|some)\..*}`) && PathPrefix(`/bar`)
 
     networks:
       - default
