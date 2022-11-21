@@ -6,7 +6,7 @@ This gem allows ...
 cat simple_stack.drs | dry-stack -e to_compose | docker stack deploy -c - simple_stack
 
 $ dry-stack
-Version: 0.0.26
+Version: 0.0.28
 Usage:
 	dry-stack -s stackfile [options] COMMAND
 	cat stackfile | dry-stack COMMAND
@@ -14,7 +14,7 @@ Usage:
 
 Commands:
      to_compose -  Print stack in docker compose format
-     swarm_deploy -  Call docker stack deploy
+     swarm_deploy -  Call docker stack deploy & add config readme w/ description
 
 Options:
     -s, --stack STACK_NAME           Stack file
@@ -46,6 +46,11 @@ To install the gem
 ## Usage
 Create the file `stack.drs` which describes the stack
 ```ruby
+Description <<~DSC
+  Stack description
+DSC
+
+
 PublishPorts admin: 5000
 Ingress admin: { host: 'admin.*' }
 Deploy admin: { replica: 2, 'resources.limits': { cpus: '4', memory: '500M' } }

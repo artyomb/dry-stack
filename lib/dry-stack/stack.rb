@@ -22,7 +22,7 @@ module Dry
     class << self
       attr_accessor :last_stack
     end
-    attr_accessor :name, :options
+    attr_accessor :name, :options, :description
 
     def Stack(name = nil, &)
       Stack.last_stack = Stack.new name
@@ -32,6 +32,7 @@ module Dry
     def initialize(name)
       @name = name || 'stack'
       @version = COMPOSE_VERSION
+      @description = ''
       @options = {}
       @services = {}
       @networks = {}
@@ -147,6 +148,10 @@ module Dry
       @services[name] ||= {environment: {}}
       @services[name].merge! opts
       ServiceFunction.new(@services[name], &)  if block_given?
+    end
+
+    def Description(string)
+      @description = string
     end
 
     def Options(opts)
