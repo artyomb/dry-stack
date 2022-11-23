@@ -1,5 +1,6 @@
 Stack :simple_stack do
   Options traefik: true, ingress: true
+  Labels 'stack.product': 'product A'
 
   PublishPorts admin: 4000, operator: 4001, navigator: 4002, reports: 7000 # mode: ingress, protocol: tcp
   Deploy backend: { replica: 2, 'resources.limits': { cpus: 4, memory: '500M' } }

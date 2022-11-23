@@ -7,18 +7,27 @@ services:
     image: frontend
     ports:
       - 4000:5000
+    deploy:
+      labels:
+      - stack.product=product A
   operator:
     environment:
       APP: operator
     image: frontend
     ports:
       - 4001:5000
+    deploy:
+      labels:
+        - stack.product=product A
   navigator:
     environment:
       APP: navigator
     image: frontend
     ports:
       - 4002:5000
+    deploy:
+      labels:
+        - stack.product=product A
   backend:
     environment:
       APP_PORT: 3000
@@ -48,6 +57,9 @@ services:
       image: reports:0.1
       ports:
         - 7000:7000
+      deploy:
+        labels:
+          - stack.product=product A
 
 networks:
   default:

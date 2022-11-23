@@ -39,6 +39,7 @@ module Dry
       @publish_ports = {}
       @ingress = {}
       @deploy = {}
+      @labels = {}
     end
 
     def stringify(hash) = hash.to_h { |k, v| [k.to_s, v.is_a?(Hash) ? stringify(v) : v] }
@@ -82,6 +83,7 @@ module Dry
         @ingress[name][:port] ||= service[:ports]&.first if @ingress[name]
         service[:deploy] ||= {}
         service[:deploy][:labels] ||= []
+        service[:deploy][:labels] += @labels.map { "#{_1}=#{_2}" }
 
         if @ingress[name] && (opts[:ingress] || opts[:traefik] || opts[:traefik_tls])
           service[:networks] ||= []
@@ -158,6 +160,10 @@ module Dry
       warn 'WARN: Options command is used for testing purpose.\
             Not recommended in real life configurations.' unless $0 =~ /rspec/
       @options.merge! opts
+    end
+
+    def Labels(labels)
+      @labels.merge! labels
     end
 
     def Ingress(services)

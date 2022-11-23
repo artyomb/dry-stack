@@ -2,6 +2,7 @@ Description <<~DSC
   Stack description
 DSC
 
+Labels 'stack.product': 'product A'
 
 PublishPorts admin: 5000
 Ingress admin: { host: 'admin.*' }
