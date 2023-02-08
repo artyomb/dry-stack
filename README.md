@@ -6,7 +6,7 @@ This gem allows ...
 cat simple_stack.drs | dry-stack -e to_compose | docker stack deploy -c - simple_stack
 
 $ dry-stack
-Version: 0.0.28
+Version: 0.0.30
 Usage:
 	dry-stack -s stackfile [options] COMMAND
 	cat stackfile | dry-stack COMMAND
@@ -50,6 +50,7 @@ Description <<~DSC
   Stack description
 DSC
 
+Labels 'stack.product': 'product A'
 
 PublishPorts admin: 5000
 Ingress admin: { host: 'admin.*' }
@@ -80,6 +81,7 @@ services:
     - 5000:5000
     deploy:
       labels:
+      - stack.product=product A
       - traefik.enable=true
       - traefik.http.routers.stack_admin.service=stack_admin
       - traefik.http.services.stack_admin.loadbalancer.server.port=5000
@@ -99,6 +101,9 @@ services:
       SKIP_GZ: true
       DB_URL: "$DB_URL"
     image: backend
+    deploy:
+      labels:
+      - stack.product=product A
 networks:
   ingress_routing:
     external: true

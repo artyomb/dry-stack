@@ -12,6 +12,7 @@ module Dry
   class ServiceFunction
     def initialize(service, &); @service = service; instance_exec(&) end
     def env(variables)= @service[:environment].merge! variables
+    def volume(opts)= ((@service[:volumes] ||= []) << opts).flatten!
     def image(name)= @service[:image] = name
     def ports(ports)= ((@service[:ports] ||= []) << ports).flatten!
     def command(cmd)= @service[:command] = cmd
@@ -36,13 +37,21 @@ module Dry
       @options = {}
       @services = {}
       @networks = {}
+      @volumes = {}
       @publish_ports = {}
       @ingress = {}
       @deploy = {}
       @labels = {}
     end
 
-    def stringify(hash) = hash.to_h { |k, v| [k.to_s, v.is_a?(Hash) ? stringify(v) : v] }
+    def stringify(obj)
+      case
+        when obj.is_a?(Hash); obj.to_h { |k, v| [k.to_s, stringify(v)] }
+        when obj.is_a?(Array); obj.map { stringify(_1) }
+        else obj
+      end
+    end
+
     def expand_hash(hash)
       hash.select { _1.to_s =~ /\./ }.each do |k, v|
         name = k.to_s.scan(/([^\.]*)\.(.*)/).flatten
@@ -72,6 +81,7 @@ module Dry
         # Not allowed by docker stack deploy
         version: @version,
         services: YAML.load(@services.to_yaml),
+        volumes: YAML.load(@volumes.to_yaml),
         networks: YAML.load(@networks.to_yaml),
       }
 
@@ -177,6 +187,12 @@ module Dry
     def Network(name, opts = {})
       @networks[name] ||= {}
       @networks[name].merge! opts
+      yield if block_given?
+    end
+
+    def Volume(name, opts = {})
+      @volumes[name] ||= {}
+      @volumes[name].merge! opts
       yield if block_given?
     end
   end

@@ -1,0 +1,8 @@
+Service :db, image: 'postgres:13.5' do
+  env POSTGRES_DB: 'dbname', POSTGRES_USER: 'user', POSTGRES_PASSWORD: 'password'
+  env PGDATA: '/var/lib/postgresql/data/pgdata'
+  volume 'database:/var/lib/postgresql/data'
+  volume type: 'volume', source: 'mydata', target: '/data', volume: { nocopy: true }
+end
+
+Volume :database, driver: 'zfs', name: 'tank/volume1', driver_opts: { compression: 'lz4', dedup: 'on' }

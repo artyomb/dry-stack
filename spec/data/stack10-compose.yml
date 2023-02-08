@@ -1,0 +1,23 @@
+version: '3.8'
+services:
+  db:
+    environment:
+      POSTGRES_DB: dbname
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      PGDATA: /var/lib/postgresql/data/pgdata
+    image: postgres:13.5
+    volumes:
+      - database:/var/lib/postgresql/data
+      - type: volume
+        source: mydata
+        target: /data
+        volume:
+          nocopy: true
+volumes:
+  database:
+    driver: zfs
+    name: tank/volume1
+    driver_opts:
+      compression: lz4
+      dedup: 'on'
