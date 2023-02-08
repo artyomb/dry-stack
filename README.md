@@ -60,7 +60,10 @@ Service :admin,     image: 'frontend', env: {APP: 'admin'},     ports: 5000
 
 Service :backend,   image: 'backend', ports: 3000 do
   env APP_PORT: 3000, NODE_ENV: 'development', SKIP_GZ: true, DB_URL: '$DB_URL'
+  volume 'database:/var/lib/postgresql/data'
 end
+
+Volume :database, driver: 'zfs', name: 'tank/volume1', driver_opts: { compression: 'lz4', dedup: 'on' }
 
 
 ```
@@ -101,9 +104,18 @@ services:
       SKIP_GZ: true
       DB_URL: "$DB_URL"
     image: backend
+    volumes:
+    - database:/var/lib/postgresql/data
     deploy:
       labels:
       - stack.product=product A
+volumes:
+  database:
+    driver: zfs
+    name: tank/volume1
+    driver_opts:
+      compression: lz4
+      dedup: 'on'
 networks:
   ingress_routing:
     external: true
