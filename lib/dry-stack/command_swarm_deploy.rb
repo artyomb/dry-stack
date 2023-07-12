@@ -9,10 +9,12 @@ Dry::CommandLine::COMMANDS[:swarm_deploy] = Class.new do
     # substitute ENV variables
     yaml = _params[:'no-env'] ? yaml : `echo \"#{yaml.gsub("`", '\\\`')}\"`
     system " echo \"#{yaml.gsub("`", '\\\`')}\"" if _params[:v]
-    system " echo \"#{yaml.gsub("`", '\\\`')}\" | docker stack deploy -c - #{stack.name} --prune --resolve-image changed"
-    system " docker config rm #{stack.name}_readme"
-    puts " printf \"#{stack.description}\" | docker config create #{stack.name}_readme -"
-    system " printf \"#{stack.description}\" | docker config create #{stack.name}_readme -"
+    # system " echo \"#{yaml.gsub("`", '\\\`')}\" | docker stack deploy -c - #{stack.name} --prune --resolve-image changed"
+
+    exec_i "docker stack deploy -c - #{stack.name} --prune  --resolve-image changed", yaml
+    system "docker config rm #{stack.name}_readme"
+    puts "stack description: #{stack.description}"
+    exec_i "docker config create #{stack.name}_readme -", stack.description
   end
 
   def help = 'Call docker stack deploy & add config readme w/ description'

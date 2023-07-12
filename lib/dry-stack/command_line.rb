@@ -1,4 +1,15 @@
 require_relative '../version'
+require 'open3'
+
+def exec_i(cmd, input_string)
+    puts "exec_i(inputs.size #{input_string.size}): #{cmd}"
+    Open3.popen3(cmd) do |i, o, e, t|
+	i.puts input_string
+	i.close
+	while line = o.gets; puts "o: " + line end
+	while line = e.gets; puts "o: " + line end
+    end
+end
 
 module Dry
   module CommandLine
