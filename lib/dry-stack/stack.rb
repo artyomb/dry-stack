@@ -138,7 +138,10 @@ module Dry
 
         service[:deploy].merge! @deploy[name] if @deploy[name]
 
-        service[:ports] = @publish_ports[name]&.zip(service[:ports] || @publish_ports[name])&.map { _1.join ':' }
+        pp_i = @publish_ports[name]&.reject { _1.class == String }
+        pp_s = @publish_ports[name]&.select { _1.class == String }
+        service[:ports] = pp_i&.zip(service[:ports] || pp_i)&.map { _1.join ':' }
+        service[:ports] = (service[:ports] || []) + pp_s unless pp_s.nil?
       end
 
       prune = ->(o) {

@@ -2,12 +2,12 @@ Stack :simple_stack do
   Options traefik: true, ingress: true
   Labels 'stack.product': 'product A'
 
-  PublishPorts admin: 4000, operator: 4001, navigator: 4002, reports: 7000 # mode: ingress, protocol: tcp
+  PublishPorts admin: 4000, operator: [4001,4002], navigator: '4002:5000', reports: [7000,'2000:3000'] # mode: ingress, protocol: tcp
   Deploy backend: { replica: 2, 'resources.limits': { cpus: 4, memory: '500M' } }
   Ingress backend: { host: 'backend.*' }
 
   Service :admin,     image: 'frontend', env: {APP: 'admin'},     ports: 5000
-  Service :operator,  image: 'frontend', env: {APP: 'operator'},  ports: 5000
+  Service :operator,  image: 'frontend', env: {APP: 'operator'},  ports: [5000, 6000]
   Service :navigator, image: 'frontend', env: {APP: 'navigator'}, ports: 5000
 
   Service :backend,   image: 'backend', ports: 3000 do
