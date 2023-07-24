@@ -124,9 +124,6 @@ module Dry
             domain = @ingress[name][:host].gsub('.*', ".#{domain}") if @ingress[name][:host]
             domain = @ingress[name][:tls_domain] if @ingress[name][:tls_domain]
             service[:deploy][:labels] += [
-              "traefik.http.routers.#{service_name}.entrypoints=http",
-              "traefik.http.routers.#{service_name}.middlewares=service_stack-https-redirect",
-              "traefik.http.routers.#{service_name}.entrypoints=https",
               "traefik.http.routers.#{service_name}.tls=true",
               "traefik.http.routers.#{service_name}.tls.certresolver=le",
               "traefik.http.routers.#{service_name}.tls.domains[0].main=#{domain}"

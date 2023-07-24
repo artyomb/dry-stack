@@ -11,9 +11,6 @@ services:
         - traefik.enable=true
         - traefik.http.routers.stack_reports.service=stack_reports
         - traefik.http.services.stack_reports.loadbalancer.server.port=
-        - traefik.http.routers.stack_reports.entrypoints=http
-        - traefik.http.routers.stack_reports.middlewares=service_stack-https-redirect
-        - traefik.http.routers.stack_reports.entrypoints=https
         - traefik.http.routers.stack_reports.tls=true
         - traefik.http.routers.stack_reports.tls.certresolver=le
         - traefik.http.routers.stack_reports.tls.domains[0].main=reports.dev.example.com
