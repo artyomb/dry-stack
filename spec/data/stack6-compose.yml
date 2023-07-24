@@ -5,11 +5,28 @@ services:
       APP: admin
     image: "$REGISTRY_HOST/frontend"
     deploy:
+      labels:
+        - ingress.host=admin.*
+        - ingress.tls_domain=test.com
+        - ingress.port=5000
+        - traefik.enable=true
+        - traefik.http.routers.stack_admin.service=stack_admin
+        - traefik.http.services.stack_admin.loadbalancer.server.port=5000
+        - traefik.http.routers.stack_admin.entrypoints=http
+        - traefik.http.routers.stack_admin.middlewares=service_stack-https-redirect
+        - traefik.http.routers.stack_admin.entrypoints=https
+        - traefik.http.routers.stack_admin.tls=true
+        - traefik.http.routers.stack_admin.tls.certresolver=le
+        - traefik.http.routers.stack_admin.tls.domains[0].main=test.com
+        - traefik.http.routers.stack_admin.rule=HostRegexp(`{name:admin\..*}`)
       replica: 2
       resources:
         limits:
           cpus: '4'
           memory: 500M
+    networks:
+    - default
+    - ingress_routing
   reports:
     environment:
       DB_URL: "$DB_URL"
@@ -27,6 +44,7 @@ services:
         - traefik.http.routers.stack_reports.entrypoints=https
         - traefik.http.routers.stack_reports.tls=true
         - traefik.http.routers.stack_reports.tls.certresolver=le
+        - traefik.http.routers.stack_reports.tls.domains[0].main=reports.my.com
         - traefik.http.routers.stack_reports.rule=HostRegexp(`{name:reports\..*}`)
     networks:
       - default

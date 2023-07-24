@@ -1,7 +1,8 @@
-Options traefik_tls: true, ingress: true
+Options traefik_tls: true, tls_domain: 'my.com', ingress: true
 
 PublishPorts reports: 7000
-Ingress reports: {host: 'reports.*', protocol: :http, port: 7000}
+Ingress reports: {host: 'reports.*', protocol: :http, port: 7000},
+        admin: {host: 'admin.*', tls_domain: 'test.com'}
 Deploy admin: { replica: 2, 'resources.limits': { cpus: '4', memory: '500M' } }
 
 Service :admin,     image: '$REGISTRY_HOST/frontend',  env: { APP: 'admin' },      ports: 5000
