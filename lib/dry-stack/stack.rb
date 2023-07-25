@@ -16,7 +16,7 @@ module Dry
     def image(name)= @service[:image] = name
     def ports(ports)= ((@service[:ports] ||= []) << ports).flatten!
     def command(cmd)= @service[:command] = cmd
-    def label(str)= @service[:deploy][:labels] << str
+    def deploy_label(str)= @service[:deploy][:labels] << str
   end
 
   class Stack
@@ -111,9 +111,9 @@ module Dry
           service[:deploy][:labels] = @ingress[name]&.map { |k, v| "ingress.#{k}=#{v}" }
         end
 
-        if @ingress[name] && (opts[:traefik] || opts[:traefik_tls])
-          service_name = "#{@name}_#{name}"
+        service_name = "#{@name}_#{name}"
 
+        if @ingress[name] && (opts[:traefik] || opts[:traefik_tls])
           service[:deploy][:labels] += [
             'traefik.enable=true',
             "traefik.http.routers.#{service_name}.service=#{service_name}",
@@ -137,6 +137,13 @@ module Dry
           rule << "#{@ingress[name][:rule]}" if @ingress[name][:rule]
           service[:deploy][:labels] << "traefik.http.routers.#{service_name}.rule=#{rule.join ' && '}"
         end
+
+        hash = {'service-name': service_name}
+        hash.default = ''
+        original_verbosity = $VERBOSE
+        $VERBOSE = nil
+        service[:deploy][:labels].map!{ _1 % hash }
+        $VERBOSE = original_verbosity
 
         service[:deploy].merge! @deploy[name] if @deploy[name]
 

@@ -6,7 +6,8 @@ services:
       APP: admin
     deploy:
       labels:
-        - traefik.http.middlewares.simple_stack_admin.basicauth.users=admin:admin
+        - traefik.http.middlewares.simple_stack_admin_auth.basicauth.users=admin:$apr1$i7hdbc9g$Rkocxo9snhmuESvUg0TTv/
+        - traefik.http.routers.simple_stack_admin.middlewares=simple_stack_admin_auth
         - stack.product=product A
     image: frontend
     ports:

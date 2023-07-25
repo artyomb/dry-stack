@@ -7,7 +7,8 @@ Stack :simple_stack do
   Ingress backend: { host: 'backend.*' }
 
   Service :admin,     image: 'frontend', env: {APP: 'admin'},     ports: 5000 do
-    label 'traefik.http.middlewares.simple_stack_admin.basicauth.users=admin:admin'
+    deploy_label 'traefik.http.middlewares.%{service-name}_auth.basicauth.users=admin:$apr1$i7hdbc9g$Rkocxo9snhmuESvUg0TTv/'
+    deploy_label "traefik.http.routers.%{service-name}.middlewares=%{service-name}_auth"
   end
   Service :operator,  image: 'frontend', env: {APP: 'operator'},  ports: [5000, 6000]
   Service :navigator, image: 'frontend', env: {APP: 'navigator'}, ports: 5000
