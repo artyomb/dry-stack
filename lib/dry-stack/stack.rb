@@ -16,6 +16,7 @@ module Dry
     def image(name)= @service[:image] = name
     def ports(ports)= ((@service[:ports] ||= []) << ports).flatten!
     def command(cmd)= @service[:command] = cmd
+    def label(str)= (@service[:labels] ||= []) << str
   end
 
   class Stack

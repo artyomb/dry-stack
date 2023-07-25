@@ -7,6 +7,8 @@ services:
     image: frontend
     ports:
       - 4000:5000
+    labels:
+      - traefik.http.middlewares.simple_stack_admin.basicauth.users=admin:admin
     deploy:
       labels:
       - stack.product=product A

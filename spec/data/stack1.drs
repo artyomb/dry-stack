@@ -6,7 +6,9 @@ Stack :simple_stack do
   Deploy backend: { replica: 2, 'resources.limits': { cpus: 4, memory: '500M' } }
   Ingress backend: { host: 'backend.*' }
 
-  Service :admin,     image: 'frontend', env: {APP: 'admin'},     ports: 5000
+  Service :admin,     image: 'frontend', env: {APP: 'admin'},     ports: 5000 do
+    label 'traefik.http.middlewares.simple_stack_admin.basicauth.users=admin:admin'
+  end
   Service :operator,  image: 'frontend', env: {APP: 'operator'},  ports: [5000, 6000]
   Service :navigator, image: 'frontend', env: {APP: 'navigator'}, ports: 5000
 
