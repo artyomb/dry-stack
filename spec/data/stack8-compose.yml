@@ -3,7 +3,6 @@ services:
   reports:
     environment:
       DB_URL: "$DB_URL"
-    image: "$REGISTRY_HOST/reports"
     deploy:
       labels:
         - ingress.host=reports.dev.*
@@ -15,6 +14,7 @@ services:
         - traefik.http.routers.stack_reports.tls.certresolver=le
         - traefik.http.routers.stack_reports.tls.domains[0].main=reports.dev.example.com
         - traefik.http.routers.stack_reports.rule=HostRegexp(`{name:reports\.dev\..*}`)
+    image: "$REGISTRY_HOST/reports"
     networks:
       - default
       - ingress_routing

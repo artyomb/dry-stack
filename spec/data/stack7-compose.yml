@@ -3,7 +3,6 @@ services:
   admin:
     environment:
       APP: admin
-    image: "$REGISTRY_HOST/frontend"
     deploy:
       labels:
         - traefik.enable=true
@@ -14,6 +13,7 @@ services:
         - traefik.http.routers.stack_admin.tls.domains[0].main=example.com
         - traefik.http.routers.stack_admin.rule=HostRegexp(`{name:admin\..*}`) && Path(`/bar`)
 
+    image: "$REGISTRY_HOST/frontend"
     networks:
       - default
       - ingress_routing

@@ -6,7 +6,7 @@ This gem allows ...
 cat simple_stack.drs | dry-stack -e to_compose | docker stack deploy -c - simple_stack
 
 $ dry-stack
-Version: 0.0.35
+Version: 0.0.36
 Usage:
 	dry-stack -s stackfile [options] COMMAND
 	cat stackfile | dry-stack COMMAND
@@ -79,9 +79,6 @@ services:
   admin:
     environment:
       APP: admin
-    image: frontend
-    ports:
-    - 5000:5000
     deploy:
       labels:
       - stack.product=product A
@@ -94,6 +91,9 @@ services:
         limits:
           cpus: '4'
           memory: 500M
+    image: frontend
+    ports:
+    - 5000:5000
     networks:
     - default
     - ingress_routing
@@ -103,12 +103,12 @@ services:
       NODE_ENV: development
       SKIP_GZ: true
       DB_URL: "$DB_URL"
-    image: backend
-    volumes:
-    - database:/var/lib/postgresql/data
     deploy:
       labels:
       - stack.product=product A
+    image: backend
+    volumes:
+    - database:/var/lib/postgresql/data
 volumes:
   database:
     driver: zfs

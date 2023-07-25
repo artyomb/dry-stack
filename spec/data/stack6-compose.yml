@@ -3,7 +3,6 @@ services:
   admin:
     environment:
       APP: admin
-    image: "$REGISTRY_HOST/frontend"
     deploy:
       labels:
         - ingress.host=admin.*
@@ -21,13 +20,13 @@ services:
         limits:
           cpus: '4'
           memory: 500M
+    image: "$REGISTRY_HOST/frontend"
     networks:
     - default
     - ingress_routing
   reports:
     environment:
       DB_URL: "$DB_URL"
-    image: "$REGISTRY_HOST/reports"
     deploy:
       labels:
         - ingress.host=reports.*
@@ -40,6 +39,7 @@ services:
         - traefik.http.routers.stack_reports.tls.certresolver=le
         - traefik.http.routers.stack_reports.tls.domains[0].main=reports.my.com
         - traefik.http.routers.stack_reports.rule=HostRegexp(`{name:reports\..*}`)
+    image: "$REGISTRY_HOST/reports"
     networks:
       - default
       - ingress_routing

@@ -3,17 +3,16 @@ services:
   admin:
     environment:
       APP: admin
-    image: "$REGISTRY_HOST/frontend"
     deploy:
       replica: 2
       resources:
         limits:
           cpus: '4'
           memory: 500M
+    image: "$REGISTRY_HOST/frontend"
   reports:
     environment:
       DB_URL: "$DB_URL"
-    image: "$REGISTRY_HOST/reports"
     deploy:
       labels:
         - ingress.host=reports.*
@@ -23,6 +22,7 @@ services:
         - traefik.http.routers.stack_reports.service=stack_reports
         - traefik.http.services.stack_reports.loadbalancer.server.port=7000
         - traefik.http.routers.stack_reports.rule=HostRegexp(`{name:reports\..*}`)
+    image: "$REGISTRY_HOST/reports"
     networks:
       - default
       - ingress_routing

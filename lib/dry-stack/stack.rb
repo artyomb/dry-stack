@@ -16,7 +16,7 @@ module Dry
     def image(name)= @service[:image] = name
     def ports(ports)= ((@service[:ports] ||= []) << ports).flatten!
     def command(cmd)= @service[:command] = cmd
-    def label(str)= (@service[:labels] ||= []) << str
+    def label(str)= @service[:deploy][:labels] << str
   end
 
   class Stack
@@ -162,7 +162,7 @@ module Dry
       opts[:ports] = [opts[:ports]].flatten if opts.key? :ports
       opts[:environment] = opts.delete(:env) if opts.key? :env
 
-      @services[name] ||= {environment: {}}
+      @services[name] ||= {environment: {}, deploy: {labels: []}}
       @services[name].merge! opts
       ServiceFunction.new(@services[name], &)  if block_given?
     end

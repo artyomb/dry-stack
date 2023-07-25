@@ -4,40 +4,38 @@ services:
   admin:
     environment:
       APP: admin
+    deploy:
+      labels:
+        - traefik.http.middlewares.simple_stack_admin.basicauth.users=admin:admin
+        - stack.product=product A
     image: frontend
     ports:
       - 4000:5000
-    labels:
-      - traefik.http.middlewares.simple_stack_admin.basicauth.users=admin:admin
-    deploy:
-      labels:
-      - stack.product=product A
   operator:
     environment:
       APP: operator
+    deploy:
+      labels:
+        - stack.product=product A
     image: frontend
     ports:
       - 4001:5000
       - 4002:6000
-    deploy:
-      labels:
-        - stack.product=product A
   navigator:
     environment:
       APP: navigator
-    image: frontend
-    ports:
-      - 4002:5000
     deploy:
       labels:
         - stack.product=product A
+    image: frontend
+    ports:
+      - 4002:5000
   backend:
     environment:
       APP_PORT: 3000
       NODE_ENV: development
       SKIP_GZ: true
       DB_URL: "$DB_URL"
-    image: backend
     deploy:
       labels:
         - ingress.host=backend.*
@@ -51,19 +49,20 @@ services:
         limits:
           cpus: 4
           memory: 500M
+    image: backend
     networks:
       - default
       - ingress_routing
   reports:
       environment:
         DB_URL: "$DB_URL"
+      deploy:
+        labels:
+          - stack.product=product A
       image: reports:0.1
       ports:
         - 7000:7000
         - 2000:3000
-      deploy:
-        labels:
-          - stack.product=product A
 
 networks:
   default:
