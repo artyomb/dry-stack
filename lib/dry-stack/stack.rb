@@ -91,33 +91,36 @@ module Dry
       end
 
       compose[:services].each do |name, service|
-        @ingress[name][:port] ||= service[:ports]&.first if @ingress[name]
+        ingress = [@ingress[name]].flatten
+        ingress[0][:port] ||= service[:ports]&.first if ingress[0]
         service[:deploy] ||= {}
         service[:deploy][:labels] ||= []
         service[:deploy][:labels] += @labels.map { "#{_1}=#{_2}" }
 
-        if @ingress[name] && (opts[:ingress] || opts[:traefik] || opts[:traefik_tls])
+        if ingress[0] && (opts[:ingress] || opts[:traefik] || opts[:traefik_tls])
           service[:networks] ||= []
           service[:networks] << 'default' if service[:networks].empty?
           service[:networks] << 'ingress_routing'
         end
 
-        if opts[:host_sed] && @ingress.dig(name,:host)
-          a, b = opts[:host_sed].split('/').reject(&:empty?)
-          @ingress[name][:host].gsub! %r{#{a}}, b
+        ingress.each do |rule|
+          if opts[:host_sed] && rule[:host]
+            a, b = opts[:host_sed].split('/').reject(&:empty?)
+            rule[:host].gsub! %r{#{a}}, b
+          end
         end
 
-        if @ingress[name] && opts[:ingress]
-          service[:deploy][:labels] = @ingress[name]&.map { |k, v| "ingress.#{k}=#{v}" }
+        if ingress[0] && opts[:ingress]
+          service[:deploy][:labels] = ingress[0]&.map { |k, v| "ingress.#{k}=#{v}" }
         end
 
         service_name = "#{@name}_#{name}"
 
-        if @ingress[name] && (opts[:traefik] || opts[:traefik_tls])
+        if ingress[0] && (opts[:traefik] || opts[:traefik_tls])
           service[:deploy][:labels] += [
             'traefik.enable=true',
             "traefik.http.routers.#{service_name}.service=#{service_name}",
-            "traefik.http.services.#{service_name}.loadbalancer.server.port=#{@ingress[name][:port]}",
+            "traefik.http.services.#{service_name}.loadbalancer.server.port=#{ingress[0][:port]}"
           ]
 
           if opts[:traefik_tls]
@@ -131,11 +134,15 @@ module Dry
             ]
           end
 
-          rule = []
-          rule << "HostRegexp(`{name:#{nginx_host2regexp @ingress[name][:host]}}`)" if @ingress[name][:host]
-          rule << "PathPrefix(`#{nginx_host2regexp @ingress[name][:path]}`)" if @ingress[name][:path]
-          rule << "#{@ingress[name][:rule]}" if @ingress[name][:rule]
-          service[:deploy][:labels] << "traefik.http.routers.#{service_name}.rule=#{rule.join ' && '}"
+          rule_group = ingress.map do|r|
+            rule = []
+            rule << "HostRegexp(`{name:#{nginx_host2regexp r[:host]}}`)" if r[:host]
+            rule << "PathPrefix(`#{nginx_host2regexp r[:path]}`)" if r[:path]
+            rule << "#{r[:rule]}" if r[:rule]
+            rule.join ' && '
+          end
+          rule = rule_group.size > 1 ? rule_group.map{"(#{_1})"}.join(' || ') : rule_group[0]
+          service[:deploy][:labels] << "traefik.http.routers.#{service_name}.rule=#{rule}"
         end
 
         hash = {'service-name': service_name}
