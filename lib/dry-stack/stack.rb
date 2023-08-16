@@ -16,6 +16,7 @@ module Dry
     def image(name)= @service[:image] = name
     def ports(ports)= ((@service[:ports] ||= []) << ports).flatten!
     def command(cmd)= @service[:command] = cmd
+    def entrypoint(cmd)= @service[:entrypoint] = cmd
     def deploy_label(str)= @service[:deploy][:labels] << str
   end
 

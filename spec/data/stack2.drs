@@ -5,5 +5,6 @@ Stack :name1 do
   Service :svc1, image: 'service-image'
   Service :svc2, image: 'postgres:13.5-alpine' do
     command 'bash -c "apk add curl && docker-entrypoint.sh -c \"shared_buffers=256MB\" -c \"max_connections=200\" "'
+    entrypoint '/usr/bin/tini -- wait-for-it opensearch:9200 --  /docker-entrypoint.sh'
   end
 end
