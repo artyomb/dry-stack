@@ -118,14 +118,14 @@ module Dry
         service_name = "#{@name}_#{name}"
 
         if ingress[0] && (opts[:traefik] || opts[:traefik_tls])
-          service[:deploy][:labels] += [
-            'traefik.enable=true',
-            "traefik.http.routers.#{service_name}.service=#{service_name}",
-          ]
+          service[:deploy][:labels] << 'traefik.enable=true'
+
           ingress.each_with_index do |ing, index|
             ing[:port] ||= service[:ports]&.first
-            service[:deploy][:labels] <<
+            service[:deploy][:labels] += [
+              "traefik.http.routers.#{service_name}-#{index}.service=#{service_name}-#{index}",
               "traefik.http.services.#{service_name}-#{index}.loadbalancer.server.port=#{ing[:port]}"
+            ]
 
             if opts[:traefik_tls]
               domain = opts[:tls_domain] || 'example.com'

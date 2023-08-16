@@ -6,7 +6,7 @@ services:
     deploy:
       labels:
         - traefik.enable=true
-        - traefik.http.routers.stack_admin.service=stack_admin
+        - traefik.http.routers.stack_admin-0.service=stack_admin-0
         - traefik.http.services.stack_admin-0.loadbalancer.server.port=5000
         - traefik.http.routers.stack_admin-0.tls=true
         - traefik.http.routers.stack_admin-0.tls.certresolver=le

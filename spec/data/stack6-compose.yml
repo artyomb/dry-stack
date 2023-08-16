@@ -9,7 +9,7 @@ services:
         - ingress.tls_domain=test.com
         - ingress.port=5000
         - traefik.enable=true
-        - traefik.http.routers.stack_admin.service=stack_admin
+        - traefik.http.routers.stack_admin-0.service=stack_admin-0
         - traefik.http.services.stack_admin-0.loadbalancer.server.port=5000
         - traefik.http.routers.stack_admin-0.tls=true
         - traefik.http.routers.stack_admin-0.tls.certresolver=le
@@ -34,7 +34,7 @@ services:
         - ingress.protocol=http
         - ingress.port=7000
         - traefik.enable=true
-        - traefik.http.routers.stack_reports.service=stack_reports
+        - traefik.http.routers.stack_reports-0.service=stack_reports-0
         - traefik.http.services.stack_reports-0.loadbalancer.server.port=7000
         - traefik.http.routers.stack_reports-0.tls=true
         - traefik.http.routers.stack_reports-0.tls.certresolver=le

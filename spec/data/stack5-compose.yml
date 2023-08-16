@@ -19,7 +19,7 @@ services:
         - ingress.protocol=http
         - ingress.port=7000
         - traefik.enable=true
-        - traefik.http.routers.stack_reports.service=stack_reports
+        - traefik.http.routers.stack_reports-0.service=stack_reports-0
         - traefik.http.services.stack_reports-0.loadbalancer.server.port=7000
         - traefik.http.routers.stack_reports-0.rule=HostRegexp(`{name:reports\..*}`)
     image: "$REGISTRY_HOST/reports"

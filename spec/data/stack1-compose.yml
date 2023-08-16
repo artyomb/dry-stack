@@ -42,9 +42,10 @@ services:
         - ingress.host=backend.*
         - ingress.port=3000
         - traefik.enable=true
-        - traefik.http.routers.simple_stack_backend.service=simple_stack_backend
+        - traefik.http.routers.simple_stack_backend-0.service=simple_stack_backend-0
         - traefik.http.services.simple_stack_backend-0.loadbalancer.server.port=3000
         - traefik.http.routers.simple_stack_backend-0.rule=HostRegexp(`{name:backend\..*}`)
+        - traefik.http.routers.simple_stack_backend-1.service=simple_stack_backend-1
         - traefik.http.services.simple_stack_backend-1.loadbalancer.server.port=4000
         - traefik.http.routers.simple_stack_backend-1.rule=HostRegexp(`{name:admin\..*}`)
             && PathPrefix(`/api`)

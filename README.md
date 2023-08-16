@@ -6,7 +6,7 @@ This gem allows ...
 cat simple_stack.drs | dry-stack -e to_compose | docker stack deploy -c - simple_stack
 
 $ dry-stack
-Version: 0.0.39
+Version: 0.0.41
 Usage:
 	dry-stack -s stackfile [options] COMMAND
 	cat stackfile | dry-stack COMMAND
@@ -83,9 +83,9 @@ services:
       labels:
       - stack.product=product A
       - traefik.enable=true
-      - traefik.http.routers.stack_admin.service=stack_admin
-      - traefik.http.services.stack_admin.loadbalancer.server.port=5000
-      - traefik.http.routers.stack_admin.rule=HostRegexp(`{name:admin\..*}`)
+      - traefik.http.routers.stack_admin-0.service=stack_admin-0
+      - traefik.http.services.stack_admin-0.loadbalancer.server.port=5000
+      - traefik.http.routers.stack_admin-0.rule=HostRegexp(`{name:admin\..*}`)
       replica: 2
       resources:
         limits:
