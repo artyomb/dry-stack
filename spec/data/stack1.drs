@@ -4,7 +4,7 @@ Stack :simple_stack do
 
   PublishPorts admin: 4000, operator: [4001,4002], navigator: '4002:5000', reports: [7000,'2000:3000'] # mode: ingress, protocol: tcp
   Deploy backend: { replica: 2, 'resources.limits': { cpus: 4, memory: '500M' } }
-  Ingress backend: [{host: 'backend.*'}, {host: 'admin.*', path: '/api'}]
+  Ingress backend: [{host: 'backend.*'}, {host: 'admin.*', path: '/api', port: 4000}]
 
   Service :admin,     image: 'frontend', env: {APP: 'admin'},     ports: 5000 do
     deploy_label 'traefik.http.middlewares.%{service-name}_auth.basicauth.users=admin:$apr1$i7hdbc9g$Rkocxo9snhmuESvUg0TTv/'

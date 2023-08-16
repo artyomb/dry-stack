@@ -7,11 +7,12 @@ services:
       labels:
         - traefik.enable=true
         - traefik.http.routers.stack_admin.service=stack_admin
-        - traefik.http.services.stack_admin.loadbalancer.server.port=5000
-        - traefik.http.routers.stack_admin.tls=true
-        - traefik.http.routers.stack_admin.tls.certresolver=le
-        - traefik.http.routers.stack_admin.tls.domains[0].main=admin.test.com
-        - traefik.http.routers.stack_admin.rule=HostRegexp(`{name:(admin|some)\..*}`) && PathPrefix(`/bar`)
+        - traefik.http.services.stack_admin-0.loadbalancer.server.port=5000
+        - traefik.http.routers.stack_admin-0.tls=true
+        - traefik.http.routers.stack_admin-0.tls.certresolver=le
+        - traefik.http.routers.stack_admin-0.tls.domains[0].main=admin.test.com
+        - traefik.http.routers.stack_admin-0.rule=HostRegexp(`{name:(admin|some)\..*}`)
+          && PathPrefix(`/bar`)
 
     image: "$REGISTRY_HOST/frontend"
     networks:

@@ -9,11 +9,12 @@ services:
         - ingress.port=
         - traefik.enable=true
         - traefik.http.routers.stack_reports.service=stack_reports
-        - traefik.http.services.stack_reports.loadbalancer.server.port=
-        - traefik.http.routers.stack_reports.tls=true
-        - traefik.http.routers.stack_reports.tls.certresolver=le
-        - traefik.http.routers.stack_reports.tls.domains[0].main=reports.dev.example.com
-        - traefik.http.routers.stack_reports.rule=HostRegexp(`{name:reports\.dev\..*}`)
+        - traefik.http.services.stack_reports-0.loadbalancer.server.port=
+        - traefik.http.routers.stack_reports-0.tls=true
+        - traefik.http.routers.stack_reports-0.tls.certresolver=le
+        - traefik.http.routers.stack_reports-0.tls.domains[0].main=reports.dev.example.com
+        - traefik.http.routers.stack_reports-0.rule=HostRegexp(`{name:reports\.dev\..*}`)
+
     image: "$REGISTRY_HOST/reports"
     networks:
       - default
