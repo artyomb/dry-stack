@@ -173,7 +173,7 @@ module Dry
           md5 = Digest::MD5.hexdigest config[:file_content]
           fname = "./#{@name}.config(md5:#{md5}).#{name}"
           File.write fname, config[:file_content]
-          {file: fname}.merge config.except(:file_content)
+          {name: "#{name}-#{md5}", file: fname}.merge config.except(:file_content)
         else
           config
         end
