@@ -12,6 +12,11 @@ services:
     image: frontend
     ports:
       - 4000:5000
+    logging:
+      driver: syslog
+      options:
+        syslog-address: tcp://swarm.next:5005
+        tag: image:{{.ImageName}}/service:{{.Name}}/container:{{.ID}}
   operator:
     environment:
       APP: operator
@@ -58,7 +63,8 @@ services:
     logging:
       driver: syslog
       options:
-        syslog-address: tcp://localhost:5005
+        syslog-address: tcp://swarm.next:5005
+        tag: image:{{.ImageName}}/service:{{.Name}}/container:{{.ID}}
     networks:
       - default
       - ingress_routing

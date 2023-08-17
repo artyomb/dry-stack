@@ -86,10 +86,10 @@ module Dry
         # name: @name.to_s, # https://docs.docker.com/compose/compose-file/#name-top-level-element
         # Not allowed by docker stack deploy
         version: @version,
-        services: YAML.load(@services.to_yaml),
-        volumes: YAML.load(@volumes.to_yaml),
-        networks: YAML.load(@networks.to_yaml),
-        configs: YAML.load(@configs.to_yaml)
+        services: YAML.load(@services.to_yaml, aliases: true),
+        volumes: YAML.load(@volumes.to_yaml, aliases: true),
+        networks: YAML.load(@networks.to_yaml, aliases: true),
+        configs: YAML.load(@configs.to_yaml, aliases: true)
       }
 
       if @ingress.any?
