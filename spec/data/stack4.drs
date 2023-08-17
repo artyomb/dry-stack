@@ -4,4 +4,12 @@ Service :reports do
   image 'reports'
   ports 7000
   env DB_URL: '$DB_URL'
+  config :filebeat_cfg, target: '/usr/share/filebeat/filebeat.yml' #, uid: '103', gid: '103', mode: 0440
 end
+
+Config :filebeat_cfg, file_content: <<~CFG
+  filebeat.inputs:
+  - type: container
+    paths:
+      - '/var/lib/docker/containers/*/*.log'
+CFG

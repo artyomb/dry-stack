@@ -4,3 +4,9 @@ services:
     environment:
       DB_URL: "$DB_URL"
     image: reports
+    configs:
+      - source: filebeat_cfg
+        target: "/usr/share/filebeat/filebeat.yml"
+configs:
+  filebeat_cfg:
+    file: "./stack.config(md5:db17013f458be1851886c50065480d92).filebeat_cfg"

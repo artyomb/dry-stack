@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 require 'yaml'
 require 'optparse'
+require 'digest'
 
 module Dry
 
@@ -18,6 +19,7 @@ module Dry
     def command(cmd)= @service[:command] = cmd
     def entrypoint(cmd)= @service[:entrypoint] = cmd
     def deploy_label(str)= @service[:deploy][:labels] << str
+    def config(name, opts)= (@service[:configs] ||= []) << {source: name.to_s }.merge(opts)
   end
 
   class Stack
@@ -44,6 +46,7 @@ module Dry
       @ingress = {}
       @deploy = {}
       @labels = {}
+      @configs = {}
     end
 
     def stringify(obj)
@@ -85,6 +88,7 @@ module Dry
         services: YAML.load(@services.to_yaml),
         volumes: YAML.load(@volumes.to_yaml),
         networks: YAML.load(@networks.to_yaml),
+        configs: YAML.load(@configs.to_yaml)
       }
 
       if @ingress.any?
@@ -161,7 +165,18 @@ module Dry
         service[:ports] = pp_i&.zip(service[:ports] || pp_i)&.map { _1.join ':' }
         service[:ports] = (service[:ports] || []) + pp_s unless pp_s.nil?
 
-        service[:environment].transform_values!{ !!_1 == _1 ? _1.to_s : _1 } # false | true to string
+        service[:environment].transform_values! { !!_1 == _1 ? _1.to_s : _1 } # (false|true) to string
+      end
+
+      compose[:configs].update(compose[:configs]) do |name, config|
+        if config[:file_content]
+          md5 = Digest::MD5.hexdigest config[:file_content]
+          fname = "./#{@name}.config(md5:#{md5}).#{name}"
+          File.write fname, config[:file_content]
+          {file: fname}.merge config.except(:file_content)
+        else
+          config
+        end
       end
 
       prune = ->(o) {
@@ -201,6 +216,10 @@ module Dry
 
     def Ingress(services)
       @ingress.merge! services
+    end
+
+    def Config(name, opts)
+      @configs[name] = opts
     end
 
     def Deploy(services)
