@@ -71,7 +71,7 @@ module Dry
           COMMANDS[command.to_sym].run Stack.last_stack, params
         rescue => e
           puts e.message
-          exit 1
+          exit 1 unless ENV['DEBUG']
         end
       end
     end

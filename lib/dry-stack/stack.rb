@@ -20,7 +20,7 @@ module Dry
     def entrypoint(cmd)= @service[:entrypoint] = cmd
     def deploy_label(str)= @service[:deploy][:labels] << str
     def config(name, opts)= (@service[:configs] ||= []) << {source: name.to_s }.merge(opts)
-    def logging(opts) = (@service[:logging] ||= {}).merge! opts
+    def logging(opts) = (@service[:logging] ||= {}).merge!  opts
   end
 
   class Stack
@@ -172,7 +172,7 @@ module Dry
       compose[:configs].update(compose[:configs]) do |name, config|
         if config[:file_content]
           md5 = Digest::MD5.hexdigest config[:file_content]
-          fname = "./#{@name}.config(md5:#{md5}).#{name}"
+          fname = "./#{@name}.config.#{name}"
           File.write fname, config[:file_content]
           {name: "#{name}-#{md5}", file: fname}.merge config.except(:file_content)
         else

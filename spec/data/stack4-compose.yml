@@ -10,4 +10,4 @@ services:
 configs:
   filebeat_cfg:
     name: filebeat_cfg-db17013f458be1851886c50065480d92
-    file: "./stack.config(md5:db17013f458be1851886c50065480d92).filebeat_cfg"
+    file: "./stack.config.filebeat_cfg"
