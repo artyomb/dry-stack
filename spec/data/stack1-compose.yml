@@ -35,7 +35,7 @@ services:
     environment:
       APP_PORT: 3000
       NODE_ENV: development
-      SKIP_GZ: true
+      SKIP_GZ: 'true'
       DB_URL: "$DB_URL"
     deploy:
       labels:

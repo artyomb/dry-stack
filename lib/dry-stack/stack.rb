@@ -160,6 +160,8 @@ module Dry
         pp_s = @publish_ports[name]&.select { _1.class == String }
         service[:ports] = pp_i&.zip(service[:ports] || pp_i)&.map { _1.join ':' }
         service[:ports] = (service[:ports] || []) + pp_s unless pp_s.nil?
+
+        service[:environment].transform_values!{ !!_1 == _1 ? _1.to_s : _1 } # false | true to string
       end
 
       prune = ->(o) {

@@ -6,7 +6,7 @@ This gem allows ...
 cat simple_stack.drs | dry-stack -e to_compose | docker stack deploy -c - simple_stack
 
 $ dry-stack
-Version: 0.0.41
+Version: 0.0.42
 Usage:
 	dry-stack -s stackfile [options] COMMAND
 	cat stackfile | dry-stack COMMAND
@@ -101,7 +101,7 @@ services:
     environment:
       APP_PORT: 3000
       NODE_ENV: development
-      SKIP_GZ: true
+      SKIP_GZ: 'true'
       DB_URL: "$DB_URL"
     deploy:
       labels:
