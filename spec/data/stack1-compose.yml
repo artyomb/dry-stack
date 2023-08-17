@@ -55,6 +55,10 @@ services:
           cpus: 4
           memory: 500M
     image: backend
+    logging:
+      driver: syslog
+      options:
+        syslog-address: tcp://localhost:5005
     networks:
       - default
       - ingress_routing

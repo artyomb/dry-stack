@@ -20,6 +20,7 @@ module Dry
     def entrypoint(cmd)= @service[:entrypoint] = cmd
     def deploy_label(str)= @service[:deploy][:labels] << str
     def config(name, opts)= (@service[:configs] ||= []) << {source: name.to_s }.merge(opts)
+    def logging(opts) = (@service[:logging] ||= {}).merge! opts
   end
 
   class Stack

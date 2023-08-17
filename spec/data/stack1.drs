@@ -15,6 +15,7 @@ Stack :simple_stack do
 
   Service :backend,   image: 'backend', ports: 3000 do
     env APP_PORT: 3000, NODE_ENV: 'development', SKIP_GZ: true, DB_URL: '$DB_URL'
+    logging driver: 'syslog', options: { 'syslog-address': 'tcp://localhost:5005' }
   end
 
   Service :reports, image: 'reports:0.1', env: {DB_URL: '$DB_URL'}, ports: 7000
