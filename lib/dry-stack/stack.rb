@@ -64,6 +64,7 @@ module Dry
       @deploy = {}
       @labels = {}
       @configs = {}
+      @logging = {}
     end
 
     def stringify(obj)
@@ -183,6 +184,7 @@ module Dry
         service[:ports] = (service[:ports] || []) + pp_s unless pp_s.nil?
 
         service[:environment].transform_values! { !!_1 == _1 ? _1.to_s : _1 } # (false|true) to string
+        service[:logging] ||= @logging[name.to_sym]
       end
 
       compose[:configs].update(compose[:configs]) do |name, config|
@@ -252,6 +254,12 @@ module Dry
       @networks[name] ||= {}
       @networks[name].merge! opts
       yield if block_given?
+    end
+
+    def Logging(names, opts = {})
+      [names].flatten.each do |name|
+        @logging[name.to_sym] = opts
+      end
     end
 
     def Volume(name, opts = {})
