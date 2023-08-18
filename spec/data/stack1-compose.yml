@@ -61,10 +61,10 @@ services:
           memory: 500M
     image: backend
     logging:
-      driver: syslog
+      driver: fluentd
       options:
-        syslog-address: tcp://swarm.next:5005
-        tag: image:{{.ImageName}}/service:{{.Name}}/container:{{.ID}}
+        fluentd-address: fluentd:24224
+        fluentd-async: 'true'
     networks:
       - default
       - ingress_routing

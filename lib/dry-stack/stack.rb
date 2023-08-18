@@ -3,7 +3,23 @@ require 'yaml'
 require 'optparse'
 require 'digest'
 
+# class TrueClass
+#   def encode_with(coder) = coder.represent_scalar('tag:yaml.org,2002:str', 'true')
+# end
+#
+# class FalseClass
+#   def encode_with(coder)= coder.represent_scalar('tag:yaml.org,2002:str', 'false')
+# end
+
 module Dry
+
+  def each_recursive(parent, each_ =-> { _1.respond_to?(:each) ? _1.each : [] }, path = [], &blk)
+    each2_ = each_.is_a?(Array) ? ->(p) { (m = each_.find { p.respond_to? _1 }) ? p.send(m) : [] } : each_
+    (each2_[parent] || []).each do |(k,v)|
+      blk.call [path + [parent], k, v, path]
+      each_recursive(v || k, each_, path + [parent], &blk)
+    end
+  end
 
   def Stack(name = nil, &)
     Stack.last_stack = Stack.new name
@@ -185,6 +201,11 @@ module Dry
         o.delete_if { _2.nil? || (_2.respond_to?(:empty?) && _2.empty?) } if o.is_a? Hash
       }
       prune[compose]
+
+      each_recursive compose do |_path, node, _v|
+        _path.last[node] = _v.to_s if node.to_s == 'fluentd-async'
+      end
+
       stringify(compose).to_yaml
     end
 
