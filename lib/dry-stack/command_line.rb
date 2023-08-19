@@ -1,14 +1,17 @@
 require_relative '../version'
 require 'open3'
 
-def exec_i(cmd, input_string)
-    puts "exec_i(inputs.size #{input_string.size}): #{cmd}"
-    Open3.popen3(cmd) do |i, o, e, t|
-	i.puts input_string
-	i.close
-	while line = o.gets; puts "o: " + line end
-	while line = e.gets; puts "o: " + line end
-    end
+def exec_i(cmd, input_string = nil)
+  puts "exec_i(inputs.size #{input_string.size}): #{cmd}"
+  Open3.popen3(cmd) do |i, o, e, wait_thr|
+    i.puts input_string unless input_string.nil?
+    i.close
+    while line = o.gets; puts "o: " + line end
+    while line = e.gets; puts "o: " + line end
+    return_value = wait_thr.value
+    puts "Error level was: #{return_value.exitstatus}" unless return_value.success?
+    exit return_value.exitstatus unless return_value.success?
+  end
 end
 
 module Dry
