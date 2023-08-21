@@ -3,7 +3,11 @@ Options traefik_tls: true, tls_domain: 'my.com', ingress: true
 PublishPorts reports: 7000
 Ingress reports: {host: 'reports.*', protocol: :http, port: 7000},
         admin: {host: 'admin.*', tls_domain: 'test.com'}
+
 Deploy admin: { replica: 2, 'resources.limits': { cpus: '4', memory: '500M' } }
+Deploy [:admin, :reports],
+       { placement: { constraints: ['node.role == manager'] } }
+
 
 Service :admin,     image: '$REGISTRY_HOST/frontend',  env: { APP: 'admin' },      ports: 5000
 Service :reports,   image: '$REGISTRY_HOST/reports', env: { DB_URL: '$DB_URL' }

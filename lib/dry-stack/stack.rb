@@ -246,8 +246,14 @@ module Dry
       @configs[name] = opts
     end
 
-    def Deploy(services)
-      @deploy.merge! expand_hash(services)
+    def Deploy(names = nil, services)
+      if names
+        [names].flatten.each do |name|
+          (@deploy[name.to_sym] ||= {}).merge! services
+        end
+      else
+        @deploy.merge! expand_hash(services)
+      end
     end
 
     def Network(name, opts = {})
