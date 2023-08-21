@@ -20,7 +20,7 @@ services:
         limits:
           cpus: '4'
           memory: 500M
-      placement: &1
+      placement:
         constraints:
         - node.role == manager
     image: "$REGISTRY_HOST/frontend"
@@ -41,7 +41,9 @@ services:
       - traefik.http.routers.stack_reports-0.tls.certresolver=le
       - traefik.http.routers.stack_reports-0.tls.domains[0].main=reports.my.com
       - traefik.http.routers.stack_reports-0.rule=HostRegexp(`{name:reports\..*}`)
-      placement: *1
+      placement:
+        constraints:
+        - node.role == manager
     image: "$REGISTRY_HOST/reports"
     networks:
     - default

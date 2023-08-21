@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 require 'yaml'
+require 'json'
 require 'optparse'
 require 'digest'
 
@@ -204,7 +205,8 @@ module Dry
         _path.last[node] = v.to_s if node.to_s == 'fluentd-async'
       end
 
-      compose.to_yaml
+      # compose.to_yaml
+      JSON.parse(compose.to_json).to_yaml
     end
 
     def PublishPorts(ports)
