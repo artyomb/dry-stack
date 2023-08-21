@@ -1,6 +1,9 @@
+---
 version: '3.8'
 services:
   reports:
     environment:
       DB_URL: "$DB_URL"
+      STACK_NAME: stack
+      STACK_SERVICE_NAME: reports
     image: reports

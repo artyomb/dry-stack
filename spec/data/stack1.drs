@@ -1,6 +1,7 @@
 Stack :simple_stack do
   Options traefik: true, ingress: true
   Labels 'stack.product': 'product A'
+
   SYSLOG = { driver: 'syslog', options: {
     'syslog-address': 'tcp://swarm.next:5005',
     'tag': 'image:{{.ImageName}}/service:{{.Name}}/container:{{.ID}}'

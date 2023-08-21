@@ -1,12 +1,15 @@
+---
 version: '3.8'
 services:
   reports:
     environment:
       DB_URL: "$DB_URL"
+      STACK_NAME: stack
+      STACK_SERVICE_NAME: reports
     image: reports
     configs:
-      - source: filebeat_cfg
-        target: "/usr/share/filebeat/filebeat.yml"
+    - source: filebeat_cfg
+      target: "/usr/share/filebeat/filebeat.yml"
 configs:
   filebeat_cfg:
     name: filebeat_cfg-db17013f458be1851886c50065480d92

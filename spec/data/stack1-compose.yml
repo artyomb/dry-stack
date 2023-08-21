@@ -4,14 +4,16 @@ services:
   admin:
     environment:
       APP: admin
+      STACK_NAME: simple_stack
+      STACK_SERVICE_NAME: admin
     deploy:
       labels:
-        - traefik.http.middlewares.simple_stack_admin_auth.basicauth.users=admin:$apr1$i7hdbc9g$Rkocxo9snhmuESvUg0TTv/
-        - traefik.http.routers.simple_stack_admin.middlewares=simple_stack_admin_auth
-        - stack.product=product A
+      - traefik.http.middlewares.simple_stack_admin_auth.basicauth.users=admin:$apr1$i7hdbc9g$Rkocxo9snhmuESvUg0TTv/
+      - traefik.http.routers.simple_stack_admin.middlewares=simple_stack_admin_auth
+      - stack.product=product A
     image: frontend
     ports:
-      - 4000:5000
+    - 4000:5000
     logging:
       driver: syslog
       options:
@@ -20,22 +22,26 @@ services:
   operator:
     environment:
       APP: operator
+      STACK_NAME: simple_stack
+      STACK_SERVICE_NAME: operator
     deploy:
       labels:
-        - stack.product=product A
+      - stack.product=product A
     image: frontend
     ports:
-      - 4001:5000
-      - 4002:6000
+    - 4001:5000
+    - 4002:6000
   navigator:
     environment:
       APP: navigator
+      STACK_NAME: simple_stack
+      STACK_SERVICE_NAME: navigator
     deploy:
       labels:
-        - stack.product=product A
+      - stack.product=product A
     image: frontend
     ports:
-      - 4002:5000
+    - 4002:5000
   backend:
     environment:
       OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://open.tl/v1/traces
@@ -43,18 +49,19 @@ services:
       APP_PORT: 3000
       SKIP_GZ: 'true'
       DB_URL: "$DB_URL"
+      STACK_NAME: simple_stack
+      STACK_SERVICE_NAME: backend
     deploy:
       labels:
-        - ingress.host=backend.*
-        - ingress.port=3000
-        - traefik.enable=true
-        - traefik.http.routers.simple_stack_backend-0.service=simple_stack_backend-0
-        - traefik.http.services.simple_stack_backend-0.loadbalancer.server.port=3000
-        - traefik.http.routers.simple_stack_backend-0.rule=HostRegexp(`{name:backend\..*}`)
-        - traefik.http.routers.simple_stack_backend-1.service=simple_stack_backend-1
-        - traefik.http.services.simple_stack_backend-1.loadbalancer.server.port=4000
-        - traefik.http.routers.simple_stack_backend-1.rule=HostRegexp(`{name:admin\..*}`)
-            && PathPrefix(`/api`)
+      - stack.product=product A
+      - traefik.enable=true
+      - traefik.http.routers.simple_stack_backend-0.service=simple_stack_backend-0
+      - traefik.http.services.simple_stack_backend-0.loadbalancer.server.port=3000
+      - traefik.http.routers.simple_stack_backend-0.rule=HostRegexp(`{name:backend\..*}`)
+      - traefik.http.routers.simple_stack_backend-1.service=simple_stack_backend-1
+      - traefik.http.services.simple_stack_backend-1.loadbalancer.server.port=4000
+      - traefik.http.routers.simple_stack_backend-1.rule=HostRegexp(`{name:admin\..*}`)
+        && PathPrefix(`/api`)
       replica: 2
       resources:
         limits:
@@ -67,21 +74,22 @@ services:
         fluentd-address: fluentd:24224
         fluentd-async: 'true'
     networks:
-      - default
-      - ingress_routing
+    - default
+    - ingress_routing
   reports:
-      environment:
-        OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://open.tl/v1/traces
-        NODE_ENV: production
-        DB_URL: "$DB_URL"
-      deploy:
-        labels:
-          - stack.product=product A
-      image: reports:0.1
-      ports:
-        - 7000:7000
-        - 2000:3000
-
+    environment:
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://open.tl/v1/traces
+      NODE_ENV: production
+      DB_URL: "$DB_URL"
+      STACK_NAME: simple_stack
+      STACK_SERVICE_NAME: reports
+    deploy:
+      labels:
+      - stack.product=product A
+    image: reports:0.1
+    ports:
+    - 7000:7000
+    - 2000:3000
 networks:
   default:
     attachable: true

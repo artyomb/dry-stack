@@ -1,29 +1,28 @@
+---
 version: '3.8'
 services:
   admin:
     environment:
       APP: admin
+      STACK_NAME: stack
+      STACK_SERVICE_NAME: admin
     deploy:
       labels:
-        - ingress.host=admin.*
-        - ingress.tls_domain=test.com
-        - ingress.port=5000
-        - traefik.enable=true
-        - traefik.http.routers.stack_admin-0.service=stack_admin-0
-        - traefik.http.services.stack_admin-0.loadbalancer.server.port=5000
-        - traefik.http.routers.stack_admin-0.tls=true
-        - traefik.http.routers.stack_admin-0.tls.certresolver=le
-        - traefik.http.routers.stack_admin-0.tls.domains[0].main=test.com
-        - traefik.http.routers.stack_admin-0.rule=HostRegexp(`{name:admin\..*}`)
-
+      - traefik.enable=true
+      - traefik.http.routers.stack_admin-0.service=stack_admin-0
+      - traefik.http.services.stack_admin-0.loadbalancer.server.port=5000
+      - traefik.http.routers.stack_admin-0.tls=true
+      - traefik.http.routers.stack_admin-0.tls.certresolver=le
+      - traefik.http.routers.stack_admin-0.tls.domains[0].main=test.com
+      - traefik.http.routers.stack_admin-0.rule=HostRegexp(`{name:admin\..*}`)
       replica: 2
       resources:
         limits:
           cpus: '4'
           memory: 500M
-      placement:
+      placement: &1
         constraints:
-          - node.role == manager
+        - node.role == manager
     image: "$REGISTRY_HOST/frontend"
     networks:
     - default
@@ -31,27 +30,24 @@ services:
   reports:
     environment:
       DB_URL: "$DB_URL"
+      STACK_NAME: stack
+      STACK_SERVICE_NAME: reports
     deploy:
       labels:
-        - ingress.host=reports.*
-        - ingress.protocol=http
-        - ingress.port=7000
-        - traefik.enable=true
-        - traefik.http.routers.stack_reports-0.service=stack_reports-0
-        - traefik.http.services.stack_reports-0.loadbalancer.server.port=7000
-        - traefik.http.routers.stack_reports-0.tls=true
-        - traefik.http.routers.stack_reports-0.tls.certresolver=le
-        - traefik.http.routers.stack_reports-0.tls.domains[0].main=reports.my.com
-        - traefik.http.routers.stack_reports-0.rule=HostRegexp(`{name:reports\..*}`)
-      placement:
-        constraints:
-          - node.role == manager
+      - traefik.enable=true
+      - traefik.http.routers.stack_reports-0.service=stack_reports-0
+      - traefik.http.services.stack_reports-0.loadbalancer.server.port=7000
+      - traefik.http.routers.stack_reports-0.tls=true
+      - traefik.http.routers.stack_reports-0.tls.certresolver=le
+      - traefik.http.routers.stack_reports-0.tls.domains[0].main=reports.my.com
+      - traefik.http.routers.stack_reports-0.rule=HostRegexp(`{name:reports\..*}`)
+      placement: *1
     image: "$REGISTRY_HOST/reports"
     networks:
-      - default
-      - ingress_routing
+    - default
+    - ingress_routing
     ports:
-      - 7000:7000
+    - 7000:7000
 networks:
   default:
     attachable: true

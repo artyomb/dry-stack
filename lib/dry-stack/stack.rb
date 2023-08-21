@@ -68,14 +68,6 @@ module Dry
       @logging = {}
     end
 
-    def stringify(obj)
-      case
-        when obj.is_a?(Hash); obj.to_h { |k, v| [k.to_s, stringify(v)] }
-        when obj.is_a?(Array); obj.map { stringify(_1) }
-        else obj
-      end
-    end
-
     def expand_hash(hash)
       hash.select { _1.to_s =~ /\./ }.each do |k, v|
         name = k.to_s.scan(/([^\.]*)\.(.*)/).flatten
@@ -133,15 +125,11 @@ module Dry
           end
         end
 
-        if ingress[0] && opts[:ingress]
-          ingress[0][:port] ||= service[:ports]&.first
-          service[:deploy][:labels] = ingress[0]&.map { |k, v| "ingress.#{k}=#{v}" }
-        end
-
         service_name = "#{@name}_#{name}"
 
         if ingress[0] && (opts[:traefik] || opts[:traefik_tls])
           service[:deploy][:labels] << 'traefik.enable=true'
+          ingress[0][:port] ||= service[:ports]&.first
 
           ingress.each_with_index do |ing, index|
             ing[:port] ||= service[:ports]&.first
@@ -185,6 +173,8 @@ module Dry
         service[:ports] = (service[:ports] || []) + pp_s unless pp_s.nil?
 
         service[:environment] = @environment[name].merge(service[:environment])  if @environment[name]
+        service[:environment].merge! STACK_NAME: @name, STACK_SERVICE_NAME: name
+
         service[:environment].transform_values! { !!_1 == _1 ? _1.to_s : _1 } # (false|true) to string
         service[:logging] ||= @logging[name.to_sym]
       end
@@ -206,11 +196,15 @@ module Dry
       }
       prune[compose]
 
-      each_recursive compose do |_path, node, _v|
-        _path.last[node] = _v.to_s if node.to_s == 'fluentd-async'
+      each_recursive _root: compose do |_path, node, v|
+        v.transform_keys!(&:to_s) if v.is_a? Hash
+        node.transform_keys!(&:to_s) if node.is_a? Hash
+        _path.last[node] = v.to_s if v.is_a? Symbol
+
+        _path.last[node] = v.to_s if node.to_s == 'fluentd-async'
       end
 
-      stringify(compose).to_yaml
+      compose.to_yaml
     end
 
     def PublishPorts(ports)

@@ -1,3 +1,4 @@
+---
 version: '3.8'
 services:
   db:
@@ -5,15 +6,17 @@ services:
       POSTGRES_DB: dbname
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
-      PGDATA: /var/lib/postgresql/data/pgdata
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+      STACK_NAME: stack
+      STACK_SERVICE_NAME: db
     image: postgres:13.5
     volumes:
-      - database:/var/lib/postgresql/data
-      - type: volume
-        source: mydata
-        target: /data
-        volume:
-          nocopy: true
+    - database:/var/lib/postgresql/data
+    - type: volume
+      source: mydata
+      target: "/data"
+      volume:
+        nocopy: true
 volumes:
   database:
     driver: zfs

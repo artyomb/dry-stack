@@ -6,7 +6,7 @@ This gem allows ...
 cat simple_stack.drs | dry-stack -e to_compose | docker stack deploy -c - simple_stack
 
 $ dry-stack
-Version: 0.0.56
+Version: 0.0.57
 Usage:
 	dry-stack -s stackfile [options] COMMAND
 	cat stackfile | dry-stack COMMAND
@@ -79,6 +79,8 @@ services:
   admin:
     environment:
       APP: admin
+      STACK_NAME: stack
+      STACK_SERVICE_NAME: admin
     deploy:
       labels:
       - stack.product=product A
@@ -103,6 +105,8 @@ services:
       NODE_ENV: development
       SKIP_GZ: 'true'
       DB_URL: "$DB_URL"
+      STACK_NAME: stack
+      STACK_SERVICE_NAME: backend
     deploy:
       labels:
       - stack.product=product A
