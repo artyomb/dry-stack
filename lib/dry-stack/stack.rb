@@ -59,6 +59,7 @@ module Dry
       @services = {}
       @networks = {}
       @volumes = {}
+      @environment = {}
       @publish_ports = {}
       @ingress = {}
       @deploy = {}
@@ -183,6 +184,7 @@ module Dry
         service[:ports] = pp_i&.zip(service[:ports] || pp_i)&.map { _1.join ':' }
         service[:ports] = (service[:ports] || []) + pp_s unless pp_s.nil?
 
+        service[:environment] = @environment[name].merge(service[:environment])  if @environment[name]
         service[:environment].transform_values! { !!_1 == _1 ? _1.to_s : _1 } # (false|true) to string
         service[:logging] ||= @logging[name.to_sym]
       end
@@ -253,6 +255,16 @@ module Dry
         end
       else
         @deploy.merge! expand_hash(services)
+      end
+    end
+
+    def Environment(names = nil, envs)
+      if names
+        [names].flatten.each do |name|
+          (@environment[name.to_sym] ||= {}).merge! envs
+        end
+      else
+        @environment.merge! envs
       end
     end
 

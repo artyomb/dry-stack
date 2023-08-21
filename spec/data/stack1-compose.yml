@@ -38,8 +38,9 @@ services:
       - 4002:5000
   backend:
     environment:
-      APP_PORT: 3000
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://open.tl/v1/traces
       NODE_ENV: development
+      APP_PORT: 3000
       SKIP_GZ: 'true'
       DB_URL: "$DB_URL"
     deploy:
@@ -70,6 +71,8 @@ services:
       - ingress_routing
   reports:
       environment:
+        OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://open.tl/v1/traces
+        NODE_ENV: production
         DB_URL: "$DB_URL"
       deploy:
         labels:
