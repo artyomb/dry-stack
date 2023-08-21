@@ -12,6 +12,8 @@ Stack :name1 do
     'fluentd-async': true
   }
 
+  Deploy [:svc1, :svc2], 'placement.constraints': ['node.role == manager']
+
   Service :svc1, image: 'service-image'
   Service :svc2, image: 'postgres:13.5-alpine' do
     command 'bash -c "apk add curl && docker-entrypoint.sh -c \"shared_buffers=256MB\" -c \"max_connections=200\" "'

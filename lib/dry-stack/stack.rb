@@ -247,7 +247,7 @@ module Dry
     def Deploy(names = nil, services)
       if names
         [names].flatten.each do |name|
-          (@deploy[name.to_sym] ||= {}).merge! services
+          (@deploy[name.to_sym] ||= {}).merge! expand_hash(services)
         end
       else
         @deploy.merge! expand_hash(services)
