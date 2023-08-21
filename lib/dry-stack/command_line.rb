@@ -2,7 +2,7 @@ require_relative '../version'
 require 'open3'
 
 def exec_i(cmd, input_string = nil)
-  puts "exec_i(inputs.size #{input_string.size}): #{cmd}"
+  puts "exec_i(inputs.size #{input_string&.size}): #{cmd}"
   Open3.popen3(cmd) do |i, o, e, wait_thr|
     i.puts input_string unless input_string.nil?
     i.close

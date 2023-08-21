@@ -212,7 +212,7 @@ module Dry
     end
 
     def PublishPorts(ports)
-      @publish_ports = ports.to_h { |k, v| [k,[v].flatten] }
+      @publish_ports.merge! ports.to_h { |k, v| [k,[v].flatten] }
     end
 
     def Service(name, opts = {}, &)
