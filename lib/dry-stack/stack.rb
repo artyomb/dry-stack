@@ -178,6 +178,13 @@ module Dry
 
         service[:environment].transform_values! { !!_1 == _1 ? _1.to_s : _1 } # (false|true) to string
         service[:logging] ||= @logging[name.to_sym]
+
+        service[:configs]&.each do |config|
+          if config[:file_content]
+            compose[:configs][config[:source].to_sym] = {file_content: config[:file_content]}
+            config.delete :file_content
+          end
+        end
       end
 
       compose[:configs].update(compose[:configs]) do |name, config|

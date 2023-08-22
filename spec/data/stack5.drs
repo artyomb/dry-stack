@@ -5,6 +5,13 @@ Ingress reports: {host: 'reports.*', protocol: :http, port: 7000}
 Deploy admin: { replica: 2, 'resources.limits': { cpus: '4', memory: '500M' } }
 
 Service :admin,     image: '$REGISTRY_HOST/frontend',  env: { APP: 'admin' },      ports: 5000
-Service :reports,   image: '$REGISTRY_HOST/reports', env: { DB_URL: '$DB_URL' }
+Service :reports,   image: '$REGISTRY_HOST/reports', env: { DB_URL: '$DB_URL' } do
+  config :filebeat_cfg, target: '/usr/share/filebeat/filebeat.yml', file_content: <<~CFG
+    filebeat.inputs:
+      - type: container
+        paths:
+        - '/var/lib/docker/containers/*/*.log'
+  CFG
+end
 
 Network :default, attachable: true

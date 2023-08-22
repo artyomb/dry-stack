@@ -25,6 +25,9 @@ services:
       - traefik.http.services.stack_reports-0.loadbalancer.server.port=7000
       - traefik.http.routers.stack_reports-0.rule=HostRegexp(`{name:reports\..*}`)
     image: "$REGISTRY_HOST/reports"
+    configs:
+    - source: filebeat_cfg
+      target: "/usr/share/filebeat/filebeat.yml"
     networks:
     - default
     - ingress_routing
@@ -36,3 +39,7 @@ networks:
   ingress_routing:
     external: true
     name: ingress-routing
+configs:
+  filebeat_cfg:
+    name: filebeat_cfg-eba65858cd3f7bf18fd5c369b432aa12
+    file: "./stack.config.filebeat_cfg"
