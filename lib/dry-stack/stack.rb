@@ -159,11 +159,16 @@ module Dry
           end
         end
 
-        hash = {'service-name': service_name}
+        service[:environment] = @environment[name].merge(service[:environment])  if @environment[name]
+        service[:environment].merge! STACK_NAME: @name.to_s, STACK_SERVICE_NAME: name.to_s
+        service[:environment].transform_values! { !!_1 == _1 ? _1.to_s : _1 } # (false|true) to string
+
+        hash = {'service-name': service_name, 'stack-name': @name}
         hash.default = ''
         original_verbosity = $VERBOSE
         $VERBOSE = nil
         service[:deploy][:labels].map!{ _1 % hash }
+        service[:environment].transform_values!{ _1.is_a?(String) ? (_1 % hash) : _1 }
         $VERBOSE = original_verbosity
 
         service[:deploy].merge! @deploy[name] if @deploy[name]
@@ -173,10 +178,6 @@ module Dry
         service[:ports] = pp_i&.zip(service[:ports] || pp_i)&.map { _1.join ':' }
         service[:ports] = (service[:ports] || []) + pp_s unless pp_s.nil?
 
-        service[:environment] = @environment[name].merge(service[:environment])  if @environment[name]
-        service[:environment].merge! STACK_NAME: @name, STACK_SERVICE_NAME: name
-
-        service[:environment].transform_values! { !!_1 == _1 ? _1.to_s : _1 } # (false|true) to string
         service[:logging] ||= @logging[name.to_sym]
 
         service[:configs]&.each do |config|

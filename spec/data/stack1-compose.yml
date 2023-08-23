@@ -46,6 +46,7 @@ services:
     environment:
       OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://open.tl/v1/traces
       NODE_ENV: development
+      OTEL_RESOURCE_ATTRIBUTES: deployment.environment=simple_stack,service.name=simple_stack_backend
       APP_PORT: 3000
       SKIP_GZ: 'true'
       DB_URL: "$DB_URL"
@@ -80,6 +81,7 @@ services:
     environment:
       OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://open.tl/v1/traces
       NODE_ENV: production
+      OTEL_RESOURCE_ATTRIBUTES: deployment.environment=simple_stack,service.name=simple_stack_reports
       DB_URL: "$DB_URL"
       STACK_NAME: simple_stack
       STACK_SERVICE_NAME: reports

@@ -13,7 +13,8 @@ Stack :simple_stack do
 
   Environment [:backend, :reports], {
     OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: 'http://open.tl/v1/traces',
-    NODE_ENV: 'production'
+    NODE_ENV: 'production',
+    OTEL_RESOURCE_ATTRIBUTES: "deployment.environment=%{stack-name},service.name=%{service-name}"
   }
 
   PublishPorts admin: 4000, operator: [4001,4002]
