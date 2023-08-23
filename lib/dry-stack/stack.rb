@@ -141,8 +141,8 @@ module Dry
 
             if opts[:traefik_tls]
               domain = opts[:tls_domain] || 'example.com'
-              domain = @ingress[name][:host].gsub('.*', ".#{domain}") if @ingress[name][:host]
-              domain = @ingress[name][:tls_domain] if @ingress[name][:tls_domain]
+              domain = ing[:host].gsub('.*', ".#{domain}") if ing[:host]
+              domain = ing[:tls_domain] if ing[:tls_domain]
               service[:deploy][:labels] += [
                 "traefik.http.routers.#{service_name}-#{index}.tls=true",
                 "traefik.http.routers.#{service_name}-#{index}.tls.certresolver=le",
@@ -156,6 +156,14 @@ module Dry
             rule << "#{ing[:rule]}" if ing[:rule]
 
             service[:deploy][:labels] << "traefik.http.routers.#{service_name}-#{index}.rule=#{rule.join ' && '}"
+
+            if ing[:path_sub]
+              service[:deploy][:labels] += [
+                "traefik.http.routers.#{service_name}-#{index}.middlewares=#{service_name}-#{index}-path_sub",
+                "traefik.http.middlewares.#{service_name}-#{index}-path_sub.replacepathregex.regex=#{ing[:path_sub][0]}",
+                "traefik.http.middlewares.#{service_name}-#{index}-path_sub.replacepathregex.replacement=#{ing[:path_sub][1].gsub('$','$$')}"
+              ]
+            end
           end
         end
 

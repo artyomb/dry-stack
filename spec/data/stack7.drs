@@ -1,5 +1,8 @@
 Options traefik_tls: true
 
-Ingress admin: {rule: 'HostRegexp(`{name:admin\..*}`) && Path(`/bar`)'}
+Ingress admin: [
+  {rule: 'HostRegexp(`{name:admin\..*}`) && Path(`/bar`)'},
+  { host: 'admin.*', path: '/api', path_sub: ['^/api/(.*)', '/bar/$1'] }
+]
 
 Service :admin,     image: '$REGISTRY_HOST/frontend',  env: { APP: 'admin' },      ports: 5000
