@@ -25,7 +25,7 @@ services:
         - node.role == manager
     image: "$REGISTRY_HOST/frontend"
     networks:
-    - default
+    - outside
     - ingress_routing
   reports:
     environment:
@@ -53,6 +53,9 @@ services:
 networks:
   default:
     attachable: true
+  outside:
+    external:
+      name: host
   ingress_routing:
     external: true
     name: ingress-routing

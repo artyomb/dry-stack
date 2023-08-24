@@ -39,6 +39,7 @@ module Dry
     def config(name, opts)= (@service[:configs] ||= []) << {source: name.to_s }.merge(opts)
     def logging(opts) = (@service[:logging] ||= {}).merge!  opts
     def user(user) = @service[:user] = user #  "${UID}:${GID}", "www-data:www-data"
+    def network(names) = (@service[:networks] ||= []) << names
   end
 
   class Stack

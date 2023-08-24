@@ -9,7 +9,10 @@ Deploy [:admin, :reports],
        { placement: { constraints: ['node.role == manager'] } }
 
 
-Service :admin,     image: '$REGISTRY_HOST/frontend',  env: { APP: 'admin' },      ports: 5000
+Service :admin,     image: '$REGISTRY_HOST/frontend',  env: { APP: 'admin' },      ports: 5000 do
+  network :outside
+end
 Service :reports,   image: '$REGISTRY_HOST/reports', env: { DB_URL: '$DB_URL' }
 
 Network :default, attachable: true
+Network :outside, external: { name: 'host' }
