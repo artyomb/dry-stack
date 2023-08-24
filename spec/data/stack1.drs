@@ -31,6 +31,7 @@ Stack :simple_stack do
   Service :navigator, image: 'frontend', env: {APP: 'navigator'}, ports: 5000
 
   Service :backend,   image: 'backend', ports: 3000 do
+    user :root
     env APP_PORT: 3000, NODE_ENV: 'development', SKIP_GZ: true, DB_URL: '$DB_URL'
     logging FLUENTD
   end

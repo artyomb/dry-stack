@@ -38,6 +38,7 @@ module Dry
     def deploy_label(str)= @service[:deploy][:labels] << str
     def config(name, opts)= (@service[:configs] ||= []) << {source: name.to_s }.merge(opts)
     def logging(opts) = (@service[:logging] ||= {}).merge!  opts
+    def user(user) = @service[:user] = user #  "${UID}:${GID}", "www-data:www-data"
   end
 
   class Stack

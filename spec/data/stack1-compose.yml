@@ -69,6 +69,7 @@ services:
           cpus: 4
           memory: 500M
     image: backend
+    user: root
     logging:
       driver: fluentd
       options:
