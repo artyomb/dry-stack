@@ -1,0 +1,6 @@
+DB_URL='postgres://...?sslmode=disable'
+
+Options traefik: true, host_sed: '/\*$/sub.master.*/'
+
+
+Service :hidden,  image: 'dummy/hidden', ports: 3000

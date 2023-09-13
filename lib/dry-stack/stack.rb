@@ -110,7 +110,7 @@ module Dry
       end
 
       compose[:services].each do |name, service|
-        ingress = [@ingress[name]].flatten
+        ingress = [@ingress[name]].flatten.compact
         service[:deploy] ||= {}
         service[:deploy][:labels] ||= []
         service[:deploy][:labels] += @labels.map { "#{_1}=#{_2}" }

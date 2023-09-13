@@ -1,0 +1,8 @@
+---
+version: '3.8'
+services:
+  hidden:
+    environment:
+      STACK_NAME: stack
+      STACK_SERVICE_NAME: hidden
+    image: dummy/hidden
