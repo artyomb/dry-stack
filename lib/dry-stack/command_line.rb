@@ -29,6 +29,8 @@ module Dry
          raise 'Invalid .env file'
       end
 
+      def safe_eval(str) = Dry::Stack() { eval str, self.binding }
+
       def run(args)
         params = {}
 
@@ -69,7 +71,8 @@ module Dry
           stack_text = File.read(params[:stack]) if params[:stack]
           stack_text ||= STDIN.read unless $stdin.tty?
 
-          Dry::Stack() { eval stack_text }
+          safe_eval stack_text # isolate context
+
           Stack.last_stack.name = params[:name] if params[:name]
           COMMANDS[command.to_sym].run Stack.last_stack, params
         rescue => e

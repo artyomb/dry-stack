@@ -1,0 +1,30 @@
+Description <<~DSC
+  Stack description
+DSC
+
+Labels 'stack.product': 'product A'
+
+PublishPorts admin: 5000
+Ingress admin: { host: 'admin.*' }
+Deploy admin: { replica: 2, 'resources.limits': { cpus: '4', memory: '500M' } }
+
+Service :admin,     image: 'frontend', env: {APP: 'admin'},     ports: 5000
+
+Service :backend,   image: 'backend', ports: 3000 do
+  env APP_PORT: 3000, NODE_ENV: 'development', SKIP_GZ: true, DB_URL: '$DB_URL'
+  volume 'database:/var/lib/postgresql/data'
+  command ['postgres',
+           '--max-connections=32',
+           '--superuser-reserved-connections=2',
+           '--shared-buffers=128kB',
+           '--work-mem=128kB',
+           '--temp-buffers=800kB',
+           '--maintenance-work-mem=1024kB',
+           '--wal-buffers=32kB',
+           '--seq-page-cost=0.01',
+           '--random-page-cost=0.01',
+           '--effective-cache-size=128kB'
+          ]
+end
+
+Volume :database, driver: 'zfs', name: 'tank/volume1', driver_opts: { compression: 'lz4', dedup: 'on' }
