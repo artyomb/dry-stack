@@ -42,12 +42,20 @@ module Dry
     def network(names) = (@service[:networks] ||= []) << names
   end
 
+  class SwarmFunction
+    def initialize(swarm, &); @swarm = swarm; instance_exec(&) end
+    def env(variables)= @swarm[:environment].merge! variables
+    def context_host(host)= @swarm[:context_host] = host
+    def context_name(name)= @swarm[:context_name] = name
+    def stack_name(name)= @swarm[:stack_name] = name
+  end
+
   class Stack
     COMPOSE_VERSION = '3.8'
     class << self
       attr_accessor :last_stack
     end
-    attr_accessor :name, :options, :description
+    attr_accessor :name, :options, :description, :swarm_deploy
 
     def Stack(name = nil, &)
       Stack.last_stack = Stack.new name
@@ -69,6 +77,7 @@ module Dry
       @labels = {}
       @configs = {}
       @logging = {}
+      @swarm_deploy = {}
     end
 
     def expand_hash(hash)
@@ -235,9 +244,9 @@ module Dry
       opts[:ports] = [opts[:ports]].flatten if opts.key? :ports
       opts[:environment] = opts.delete(:env) if opts.key? :env
 
-      @services[name] ||= {environment: {}, deploy: {labels: []}}
-      @services[name].merge! opts
-      ServiceFunction.new(@services[name], &)  if block_given?
+      service = @services[name.to_sym] ||= {environment: {}, deploy: {labels: []}}
+      service.merge! opts
+      ServiceFunction.new(service, &)  if block_given?
     end
 
     def Description(string)
@@ -299,6 +308,15 @@ module Dry
       @volumes[name].merge! opts
       yield if block_given?
     end
+
+    def SwarmDeploy(name, opts = {}, &)
+      opts[:environment] = opts.delete(:env) if opts.key? :env
+
+      swarm = @swarm_deploy[name.to_sym] ||= { environment: {} }
+      swarm.merge! opts
+      SwarmFunction.new(swarm, &) if block_given?
+    end
+
   end
 end
 

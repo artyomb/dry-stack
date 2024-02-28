@@ -14,6 +14,14 @@ def exec_i(cmd, input_string = nil)
   end
 end
 
+def exec_o_lines(cmd,&)
+  IO.popen(cmd, 'r') do |f|
+    f.each_line do |line|
+      yield line
+    end
+  end
+end
+
 module Dry
   module CommandLine
     COMMANDS = {}
@@ -74,7 +82,7 @@ module Dry
           safe_eval stack_text # isolate context
 
           Stack.last_stack.name = params[:name] if params[:name]
-          COMMANDS[command.to_sym].run Stack.last_stack, params
+          COMMANDS[command.to_sym].run Stack.last_stack, params, args
         rescue => e
           puts e.message
           ENV['DEBUG'] ? raise : exit(1)

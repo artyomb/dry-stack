@@ -1,0 +1,15 @@
+Description <<~DSC
+  Stack description
+DSC
+
+Options name: 'stack_name'
+
+SwarmDeploy :swarm1 do
+  context_host 'ssh://root@10.100.0.1'
+  stack_name 'remote_stack'
+  env REGISTRY_HOST: '10.100.0.2:5000'
+end
+
+SwarmDeploy :swarm2, context_host: 'root@10.100.0.1', context_name: 'context2'
+
+Service :admin,     image: 'frontend', env: {APP: 'admin'},     ports: 5000
