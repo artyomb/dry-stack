@@ -26,7 +26,7 @@ Dry::CommandLine::COMMANDS[:swarm_deploy] = Class.new do
 
       ENV['DOCKER_CONTEXT'] = name.to_s
       stack.name = context[:stack_name] || stack.name
-      context[:stack_name][:environment].each do |k,v|
+      context[:environment].each do |k,v|
         ENV[k.to_s] = v.to_s
       end
     end
