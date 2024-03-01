@@ -6,7 +6,7 @@ This gem allows ...
 cat simple_stack.drs | dry-stack -e to_compose | docker stack deploy -c - simple_stack
 
 $ dry-stack
-Version: 0.0.69
+Version: 0.0.70
 Usage:
 	dry-stack -s stackfile [options] COMMAND
 	cat stackfile | dry-stack COMMAND
@@ -15,6 +15,7 @@ Usage:
 Commands:
      to_compose -  Print stack in docker compose format
      swarm_deploy -  Call docker stack deploy & add config readme w/ description
+                     [... swarm_deploy sd_name -- --prune  --resolve-image changed]
 
 Options:
     -s, --stack STACK_NAME           Stack file

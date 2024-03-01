@@ -42,7 +42,10 @@ module Dry
       def run(args)
         params = {}
 
+        a, extra = ARGV.join(' ').split( / -- /)
+        ARGV.replace a.split if a
         ARGV << '-h' if ARGV.empty?
+
         OptionParser.new do |o|
           o.version = "#{Dry::Stack::VERSION}"
 
@@ -54,7 +57,7 @@ module Dry
           o.banner = "Version: #{o.version}\nUsage:\n\t#{usage.join "\n\t"}"
           o.separator ''
           o.separator 'Commands:'
-          COMMANDS.each { |name, cmd| o.separator "#{' ' * 5}#{name} -  #{cmd.help}" }
+          COMMANDS.each { |name, cmd| o.separator "#{' ' * 5}#{name} -  #{[cmd.help].flatten.join "\n#{' ' * (5+4 + name.size)}" }" }
 
           o.separator ''
           o.separator 'Options:'
@@ -82,7 +85,7 @@ module Dry
           safe_eval stack_text # isolate context
 
           Stack.last_stack.name = params[:name] if params[:name]
-          COMMANDS[command.to_sym].run Stack.last_stack, params, args
+          COMMANDS[command.to_sym].run Stack.last_stack, params, args, extra
         rescue => e
           puts e.message
           ENV['DEBUG'] ? raise : exit(1)

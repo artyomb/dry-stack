@@ -1,8 +1,9 @@
 require_relative 'command_line'
 
 Dry::CommandLine::COMMANDS[:swarm_deploy] = Class.new do
-  def run(stack, params, args)
+  def run(stack, params, args, extra)
     unless args.empty?
+      c_name = args[0].to_sym
       raise "deploy config not found: #{args[0]}" unless stack.swarm_deploy.key? args[0].to_sym
       context = stack.swarm_deploy[args[0].to_sym]
     end
@@ -37,7 +38,8 @@ Dry::CommandLine::COMMANDS[:swarm_deploy] = Class.new do
     system " echo \"#{yaml.gsub("`", '\\\`')}\"" if _params[:v]
     # system " echo \"#{yaml.gsub("`", '\\\`')}\" | docker stack deploy -c - #{stack.name} --prune --resolve-image changed"
 
-    exec_i "docker stack deploy -c - #{stack.name} --prune  --resolve-image changed", yaml
+    #  --prune  --resolve-image changed
+    exec_i "docker stack deploy -c - #{stack.name} #{extra}", yaml
     system "docker config rm $(docker config ls --filter label=com.docker.stack.namespace=#{stack.name} --format \"{{.ID}}\")"
 
     exec_i "docker config rm #{stack.name}_readme || echo 'failed to remove config #{stack.name}_readme'"
@@ -45,7 +47,9 @@ Dry::CommandLine::COMMANDS[:swarm_deploy] = Class.new do
     exec_i "docker config create #{stack.name}_readme -", stack.description
   end
 
-  def help = 'Call docker stack deploy & add config readme w/ description'
+  def help = ['Call docker stack deploy & add config readme w/ description',
+              '[... swarm_deploy sd_name -- --prune  --resolve-image changed]']
+
 end.new
 
 

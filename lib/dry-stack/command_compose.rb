@@ -1,7 +1,7 @@
 require_relative 'command_line'
 
 Dry::CommandLine::COMMANDS[:to_compose] = Class.new do
-  def run(stack, params, args)
+  def run(stack, params, args, extra)
     raise "unsupported args: #{args}" unless args.empty?
     _params = stack.options.merge params
     stack.name = _params[:name] if _params[:name]
