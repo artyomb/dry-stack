@@ -6,6 +6,9 @@ services:
       STACK_NAME: name1
       STACK_SERVICE_NAME: svc1
     deploy:
+      labels:
+      - traefik.http.middlewares.name1_svc1_auth.basicauth.users=admin:$apr1$i7hdbc9g$Rkocxo9snhmuESvUg0TTv/
+      - traefik.http.routers.name1_svc1.middlewares=name1_svc1_auth
       placement:
         constraints:
         - node.role == manager
@@ -20,6 +23,9 @@ services:
       STACK_NAME: name1
       STACK_SERVICE_NAME: svc2
     deploy:
+      labels:
+      - traefik.http.middlewares.name1_svc2_auth.basicauth.users=admin:$apr1$i7hdbc9g$Rkocxo9snhmuESvUg0TTv/
+      - traefik.http.routers.name1_svc2.middlewares=name1_svc2_auth
       placement:
         constraints:
         - node.role == manager

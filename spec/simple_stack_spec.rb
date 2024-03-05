@@ -20,8 +20,8 @@ describe 'Test simple Stack' do
 
       # expect(stack_compose).to eq(stack_compose_shell)
 
-      # unless stack_compose == compose.to_yaml
-      #   yaml = YAML.load stack_compose, aliases: true
+      # unless stack_compose_shell == compose.to_yaml
+      #   yaml = YAML.load stack_compose_shell, aliases: true
       #   File.write stack_file.gsub('.drs', '-compose.yml'), yaml.to_yaml
       #   compose = YAML.load_file stack_file.gsub('.drs', '-compose.yml'), aliases: true
       # end
