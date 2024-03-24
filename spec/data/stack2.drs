@@ -11,11 +11,15 @@ Stack :name1 do
     'fluentd-address': 'fluentd2:24224',
     'fluentd-async': true
   }
+  Ingress svc1: [
+    {host: 'backend.*'},
+    {host: 'admin.*', path: '/api', port: 4000}
+  ]
 
   Deploy [:svc1, :svc2], 'placement.constraints': ['node.role == manager']
 
   Deploy [:svc1, :svc2], labels: [
-    'traefik.http.middlewares.%{service-name}_auth.basicauth.users=admin:$apr1$i7hdbc9g$Rkocxo9snhmuESvUg0TTv/',
+    'traefik.http.middlewares.%{service-name}_auth.basicauth.users=admin:$$apr1$$i7hdbc9g$$Rkocxo9snhmuESvUg0TTv/',
     "traefik.http.routers.%{service-name}.middlewares=%{service-name}_auth"
   ]
 

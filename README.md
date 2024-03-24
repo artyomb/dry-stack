@@ -6,7 +6,7 @@ This gem allows ...
 cat simple_stack.drs | dry-stack -e to_compose | docker stack deploy -c - simple_stack
 
 $ dry-stack
-Version: 0.0.71
+Version: 0.0.72
 Usage:
 	dry-stack -s stackfile [options] COMMAND
 	cat stackfile | dry-stack COMMAND

@@ -7,12 +7,22 @@ services:
       STACK_SERVICE_NAME: svc1
     deploy:
       labels:
-      - traefik.http.middlewares.name1_svc1_auth.basicauth.users=admin:$apr1$i7hdbc9g$Rkocxo9snhmuESvUg0TTv/
+      - traefik.enable=true
+      - traefik.http.routers.name1_svc1-0.service=name1_svc1-0
+      - traefik.http.services.name1_svc1-0.loadbalancer.server.port=
+      - traefik.http.routers.name1_svc1-0.rule=HostRegexp(`{name:backend\..*}`)
+      - traefik.http.routers.name1_svc1-1.service=name1_svc1-1
+      - traefik.http.services.name1_svc1-1.loadbalancer.server.port=4000
+      - traefik.http.routers.name1_svc1-1.rule=HostRegexp(`{name:admin\..*}`) && PathPrefix(`/api`)
+      - traefik.http.middlewares.name1_svc1_auth.basicauth.users=admin:$$apr1$$i7hdbc9g$$Rkocxo9snhmuESvUg0TTv/
       - traefik.http.routers.name1_svc1.middlewares=name1_svc1_auth
       placement:
         constraints:
         - node.role == manager
     image: service-image
+    networks:
+    - default
+    - ingress_routing
     logging:
       driver: fluentd
       options:
@@ -24,7 +34,7 @@ services:
       STACK_SERVICE_NAME: svc2
     deploy:
       labels:
-      - traefik.http.middlewares.name1_svc2_auth.basicauth.users=admin:$apr1$i7hdbc9g$Rkocxo9snhmuESvUg0TTv/
+      - traefik.http.middlewares.name1_svc2_auth.basicauth.users=admin:$$apr1$$i7hdbc9g$$Rkocxo9snhmuESvUg0TTv/
       - traefik.http.routers.name1_svc2.middlewares=name1_svc2_auth
       placement:
         constraints:
@@ -38,3 +48,7 @@ services:
       options:
         fluentd-address: fluentd3:24224
         fluentd-async: 'true'
+networks:
+  ingress_routing:
+    external: true
+    name: ingress-routing

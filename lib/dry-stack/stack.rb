@@ -13,6 +13,22 @@ require 'digest'
 # end
 
 module Dry
+  class ::Hash
+    def deep_merge!(second)
+      merger = proc { |_, v1, v2|
+        if Hash === v1 && Hash === v2
+          v1.merge!(v2, &merger)
+        else
+          if Array === v1 && Array === v2
+            v1 | v2
+          else
+            [:undefined, nil, :nil].include?(v2) ? v1 : v2
+          end
+        end
+      }
+      merge!(second.to_h, &merger)
+    end
+  end
 
   def each_recursive(parent, each_ =-> { _1.respond_to?(:each) ? _1.each : [] }, path = [], &blk)
     each2_ = each_.is_a?(Array) ? ->(p) { (m = each_.find { p.respond_to? _1 }) ? p.send(m) : [] } : each_
@@ -182,7 +198,7 @@ module Dry
         service[:environment].merge! STACK_NAME: @name.to_s, STACK_SERVICE_NAME: name.to_s
         service[:environment].transform_values! { !!_1 == _1 ? _1.to_s : _1 } # (false|true) to string
 
-        service[:deploy].merge! @deploy[name] if @deploy[name]
+        service[:deploy].deep_merge! @deploy[name] if @deploy[name]
 
         hash = {'service-name': service_name, 'stack-name': @name}
         hash.default = ''
