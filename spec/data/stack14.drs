@@ -1,0 +1,19 @@
+Options traefik: true, ingress: true
+
+PublishPorts reports: 7000
+Deploy admin: {replica: 2, 'resources.limits': {cpus: '4', memory: '500M'}}
+
+Logging admin: {driver: 'loki', options: {'loki-batch-size': 100, 'loki-retries': 2, 'loki-max-backoff': '1000ms', 'loki-timeout': '1s'}}
+
+Service :admin, image: '$REGISTRY_HOST/frontend',  env: {APP: 'admin'}, ports: 5000
+Service :test, image: '$REGISTRY_HOST/test' do
+  logging driver: 'loki', options: {'loki-batch-size': 100, 'loki-retries': 2, 'loki-max-backoff': '1000ms', 'loki-timeout': '1s'}
+end
+
+Logging %i[test2 test3], driver: 'loki', options: {'loki-batch-size': 100, 'loki-retries': 2, 'loki-max-backoff': '1000ms', 'loki-timeout': '1s'}
+
+Service :test2, image: '$REGISTRY_HOST/test'
+Service :test3, image: '$REGISTRY_HOST/test'
+
+
+Network :default, attachable: true

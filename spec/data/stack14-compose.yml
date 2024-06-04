@@ -1,0 +1,61 @@
+---
+version: '3.8'
+services:
+  admin:
+    environment:
+      APP: admin
+      STACK_NAME: stack
+      STACK_SERVICE_NAME: admin
+    deploy:
+      replica: 2
+      resources:
+        limits:
+          cpus: '4'
+          memory: 500M
+    image: "$REGISTRY_HOST/frontend"
+    logging:
+      driver: loki
+      options:
+        loki-batch-size: 100
+        loki-retries: 2
+        loki-max-backoff: 1000ms
+        loki-timeout: 1s
+  test:
+    environment:
+      STACK_NAME: stack
+      STACK_SERVICE_NAME: test
+    image: "$REGISTRY_HOST/test"
+    logging:
+      driver: loki
+      options:
+        loki-batch-size: 100
+        loki-retries: 2
+        loki-max-backoff: 1000ms
+        loki-timeout: 1s
+  test2:
+    environment:
+      STACK_NAME: stack
+      STACK_SERVICE_NAME: test2
+    image: "$REGISTRY_HOST/test"
+    logging:
+      driver: loki
+      options:
+        loki-batch-size: 100
+        loki-retries: 2
+        loki-max-backoff: 1000ms
+        loki-timeout: 1s
+  test3:
+    environment:
+      STACK_NAME: stack
+      STACK_SERVICE_NAME: test3
+    image: "$REGISTRY_HOST/test"
+    logging:
+      driver: loki
+      options:
+        loki-batch-size: 100
+        loki-retries: 2
+        loki-max-backoff: 1000ms
+        loki-timeout: 1s
+networks:
+  default:
+    attachable: true

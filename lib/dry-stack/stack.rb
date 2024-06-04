@@ -313,9 +313,13 @@ module Dry
       yield if block_given?
     end
 
-    def Logging(names, opts = {})
-      [names].flatten.each do |name|
-        @logging[name.to_sym] = opts
+    def Logging(names = nil, opts )
+      if names
+        [names].flatten.each do |name|
+          (@logging[name.to_sym] ||= {}).merge! expand_hash(opts)
+        end
+      else
+        @logging.merge! expand_hash(opts)
       end
     end
 
