@@ -216,10 +216,11 @@ module Dry
         service[:logging] ||= @logging[name.to_sym]
 
         service[:configs]&.each do |config|
-          if config[:file_content]
-            compose[:configs][config[:source].to_sym] = {file_content: config[:file_content]}
-            config.delete :file_content
-          end
+          compose[:configs][config[:source].to_sym] ||= {}
+          compose[:configs][config[:source].to_sym].merge! config.except(:source, :target)
+          config.delete :file_content
+          config.delete :file
+          config.delete :name
         end
       end
 
@@ -229,6 +230,10 @@ module Dry
           fname = "./#{@name}.config.#{name}"
           File.write fname, config[:file_content]
           {name: "#{name}-#{md5}", file: fname}.merge config.except(:file_content)
+        elsif config[:file]
+          body = File.read config[:file] rescue ''
+          md5 = Digest::MD5.hexdigest body
+          {name: "#{name}-#{md5}", file: fname}.merge config
         else
           config
         end

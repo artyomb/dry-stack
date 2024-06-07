@@ -28,6 +28,10 @@ services:
     configs:
     - source: filebeat_cfg
       target: "/usr/share/filebeat/filebeat.yml"
+    - source: config1
+      target: "/usr/share/filebeat/filebeat2.yml"
+    - source: config2
+      target: "/usr/share/filebeat/filebeat3.yml"
     networks:
     - default
     - ingress_routing
@@ -43,3 +47,9 @@ configs:
   filebeat_cfg:
     name: filebeat_cfg-eba65858cd3f7bf18fd5c369b432aa12
     file: "./stack.config.filebeat_cfg"
+  config1:
+    name: config1-d41d8cd98f00b204e9800998ecf8427e
+    file: "./filebeat2.yml"
+  config2:
+    name: fixed
+    file: "./filebeat3.yml"
