@@ -215,13 +215,32 @@ module Dry
 
         service[:logging] ||= @logging[name.to_sym]
 
+        service[:volumes]&.map!&.with_index do |volume, index|
+          if volume.is_a? Hash
+            if (volume.key?(:name) && volume.key?(:source)) || (!volume.key?(:name) && !volume.key?(:source))  
+              $stderr.puts 'Use either :name or :source in volume declaration as a Hash'
+              $stderr.puts ':name will create Volume section automatically'
+              raise 'invalid volume declaration'
+            end
+            if volume.key? :name
+              v_name = "#{service_name}-volume-#{index}".to_sym
+              compose[:volumes][v_name] ||= {}
+              compose[:volumes][v_name].merge! volume.slice(:name, :driver, :driver_opts)
+              volume[:type] ||= 'volume'
+              volume.except(:name, :driver, :driver_opts).merge source: v_name
+            else
+              volume
+            end
+          else
+            volume
+          end
+        end
+
         service[:configs]&.each_with_index do |config, index|
           config[:source] = "#{service_name}-config-#{index}" if config[:source].to_s.empty?
           compose[:configs][config[:source].to_sym] ||= {}
           compose[:configs][config[:source].to_sym].merge! config.except(:source, :target)
-          config.delete :file_content
-          config.delete :file
-          config.delete :name
+          config.replace config.except :file_content, :file, :name
         end
       end
 

@@ -17,6 +17,15 @@ services:
     image: frontend
     ports:
     - 5000:5000
+    volumes:
+    - target: "/data"
+      type: volume
+      source: stack_admin-volume-0
+    - target: "/data2"
+      type: volume
+      volume:
+        nocopy: true
+      source: stack_admin-volume-1
   backend:
     environment:
       APP_PORT: 3000
@@ -47,6 +56,18 @@ volumes:
   database:
     driver: zfs
     name: tank/volume1
+    driver_opts:
+      compression: lz4
+      dedup: 'on'
+  stack_admin-volume-0:
+    name: admin_data
+    driver: zfs
+    driver_opts:
+      compression: lz4
+      dedup: 'on'
+  stack_admin-volume-1:
+    name: admin_data2
+    driver: zfs
     driver_opts:
       compression: lz4
       dedup: 'on'
