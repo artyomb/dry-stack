@@ -14,6 +14,13 @@ Service :reports,   image: '$REGISTRY_HOST/reports', env: { DB_URL: '$DB_URL' } 
   CFG
   config :config1, target: '/usr/share/filebeat/filebeat2.yml', file: './filebeat2.yml'
   config :config2, target: '/usr/share/filebeat/filebeat3.yml', file: './filebeat3.yml', name: 'fixed'
+  config target: '/usr/share/filebeat/filebeat4.yml', file: './filebeat2.yml'
+  config target: '/usr/share/filebeat/filebeat5.yml', file_content: <<~YAML
+    filebeat.inputs:
+      - type: container
+        paths:
+        - '/var/lib/docker/containers/*/*.log'
+  YAML
 end
 
 Network :default, attachable: true

@@ -52,7 +52,7 @@ module Dry
     def command(cmd)= @service[:command] = cmd
     def entrypoint(cmd)= @service[:entrypoint] = cmd
     def deploy_label(str)= @service[:deploy][:labels] << str
-    def config(name, opts)= (@service[:configs] ||= []) << {source: name.to_s }.merge(opts)
+    def config(name = nil, opts)= (@service[:configs] ||= []) << {source: name.to_s }.merge(opts)
     def logging(opts) = (@service[:logging] ||= {}).merge!  opts
     def user(user) = @service[:user] = user #  "${UID}:${GID}", "www-data:www-data"
     def network(names) = (@service[:networks] ||= []) << names
@@ -215,7 +215,8 @@ module Dry
 
         service[:logging] ||= @logging[name.to_sym]
 
-        service[:configs]&.each do |config|
+        service[:configs]&.each_with_index do |config, index|
+          config[:source] = "#{service_name}-config-#{index}" if config[:source].to_s.empty?
           compose[:configs][config[:source].to_sym] ||= {}
           compose[:configs][config[:source].to_sym].merge! config.except(:source, :target)
           config.delete :file_content

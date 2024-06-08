@@ -32,6 +32,10 @@ services:
       target: "/usr/share/filebeat/filebeat2.yml"
     - source: config2
       target: "/usr/share/filebeat/filebeat3.yml"
+    - source: stack_reports-config-3
+      target: "/usr/share/filebeat/filebeat4.yml"
+    - source: stack_reports-config-4
+      target: "/usr/share/filebeat/filebeat5.yml"
     networks:
     - default
     - ingress_routing
@@ -53,3 +57,9 @@ configs:
   config2:
     name: fixed
     file: "./filebeat3.yml"
+  stack_reports-config-3:
+    name: stack_reports-config-3-d41d8cd98f00b204e9800998ecf8427e
+    file: "./filebeat2.yml"
+  stack_reports-config-4:
+    name: stack_reports-config-4-eba65858cd3f7bf18fd5c369b432aa12
+    file: "./stack.config.stack_reports-config-4"
