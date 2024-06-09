@@ -25,7 +25,15 @@ services:
       type: volume
       volume:
         nocopy: true
+      labels:
+        com.example.description: Database volume
       source: stack_admin-volume-1
+    - target: "/data3"
+      type: volume
+      source: stack_admin-volume-2
+    - target: "/data4"
+      type: volume
+      source: admin_data4
   backend:
     environment:
       APP_PORT: 3000
@@ -71,6 +79,12 @@ volumes:
     driver_opts:
       compression: lz4
       dedup: 'on'
+    labels:
+      com.example.description: Database volume
+  stack_admin-volume-2:
+    external: false
+  admin_data4:
+    external: false
 networks:
   ingress_routing:
     external: true

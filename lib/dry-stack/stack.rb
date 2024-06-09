@@ -217,17 +217,18 @@ module Dry
 
         service[:volumes]&.map!&.with_index do |volume, index|
           if volume.is_a? Hash
-            if (volume.key?(:name) && volume.key?(:source)) || (!volume.key?(:name) && !volume.key?(:source))  
+            if volume.key?(:name) && volume.key?(:source)
               $stderr.puts 'Use either :name or :source in volume declaration as a Hash'
               $stderr.puts ':name will create Volume section automatically'
               raise 'invalid volume declaration'
             end
-            if volume.key? :name
-              v_name = "#{service_name}-volume-#{index}".to_sym
+            unless volume.key? :source
+              v_name = (volume[:local_name] || "#{service_name}-volume-#{index}").to_sym
               compose[:volumes][v_name] ||= {}
-              compose[:volumes][v_name].merge! volume.slice(:name, :driver, :driver_opts)
+              compose[:volumes][v_name].merge! volume.slice(:name, :driver, :driver_opts, :labels)
+              compose[:volumes][v_name][:external] = false if compose[:volumes][v_name].empty?
               volume[:type] ||= 'volume'
-              volume.except(:name, :driver, :driver_opts).merge source: v_name
+              volume.except(:name, :driver, :driver_opts, :local_name).merge source: v_name
             else
               volume
             end
