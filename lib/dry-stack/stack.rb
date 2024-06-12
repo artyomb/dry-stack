@@ -61,6 +61,7 @@ module Dry
   class SwarmFunction
     def initialize(swarm, &); @swarm = swarm; instance_exec(&) end
     def env(variables)= @swarm[:environment].merge! variables
+    def options(variables)= @swarm[:options].merge! variables
     def context_host(host)= @swarm[:context_host] = host
     def context_name(name)= @swarm[:context_name] = name
     def stack_name(name)= @swarm[:stack_name] = name
@@ -119,7 +120,12 @@ module Dry
       end
     end
 
-    def to_compose(opts = @options )
+    def to_compose(opts = @options, deploy_name = nil )
+      if deploy_name
+        raise "Deploy not found: #{deploy_name}" unless @swarm_deploy[deploy_name]
+
+        opts.merge! @swarm_deploy[deploy_name][:options]
+      end
       compose = {
         # name: @name.to_s, # https://docs.docker.com/compose/compose-file/#name-top-level-element
         # Not allowed by docker stack deploy
@@ -358,7 +364,7 @@ module Dry
     def SwarmDeploy(name, opts = {}, &)
       opts[:environment] = opts.delete(:env) if opts.key? :env
 
-      swarm = @swarm_deploy[name.to_sym] ||= { environment: {} }
+      swarm = @swarm_deploy[name.to_sym] ||= { environment: {}, options: {} }
       swarm.merge! opts
       SwarmFunction.new(swarm, &) if block_given?
     end

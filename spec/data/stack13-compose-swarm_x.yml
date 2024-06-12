@@ -11,9 +11,15 @@ services:
       - traefik.enable=true
       - traefik.http.routers.stack_name_admin-0.service=stack_name_admin-0
       - traefik.http.services.stack_name_admin-0.loadbalancer.server.port=5000
+      - traefik.http.routers.stack_name_admin-0.tls=true
+      - traefik.http.routers.stack_name_admin-0.tls.certresolver=le
+      - traefik.http.routers.stack_name_admin-0.tls.domains[0].main=admin1.swarm_x.com
       - traefik.http.routers.stack_name_admin-0.rule=HostRegexp(`{name:admin1\..*}`)
       - traefik.http.routers.stack_name_admin-1.service=stack_name_admin-1
       - traefik.http.services.stack_name_admin-1.loadbalancer.server.port=4000
+      - traefik.http.routers.stack_name_admin-1.tls=true
+      - traefik.http.routers.stack_name_admin-1.tls.certresolver=le
+      - traefik.http.routers.stack_name_admin-1.tls.domains[0].main=admin2.swarm_x.com
       - traefik.http.routers.stack_name_admin-1.rule=HostRegexp(`{name:admin2\..*}`)
         && PathPrefix(`/api`)
     image: frontend
