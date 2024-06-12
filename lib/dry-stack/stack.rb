@@ -248,7 +248,7 @@ module Dry
       compose[:configs].update(compose[:configs]) do |name, config|
         if config[:file_content]
           md5 = Digest::MD5.hexdigest config[:file_content]
-          fname = "./#{@name}.config.#{name}"
+          fname = "./#{@name}.config.#{name}.#{md5}" # use MD5, when rn in parallel may have different content
           File.write fname, config[:file_content]
           {name: "#{name}-#{md5}", file: fname}.merge config.except(:file_content)
         elsif config[:file]

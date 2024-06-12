@@ -50,7 +50,7 @@ networks:
 configs:
   filebeat_cfg:
     name: filebeat_cfg-eba65858cd3f7bf18fd5c369b432aa12
-    file: "./stack.config.filebeat_cfg"
+    file: "./stack.config.filebeat_cfg.eba65858cd3f7bf18fd5c369b432aa12"
   config1:
     name: config1-d41d8cd98f00b204e9800998ecf8427e
     file: "./filebeat2.yml"
@@ -62,4 +62,4 @@ configs:
     file: "./filebeat2.yml"
   stack_reports-config-4:
     name: stack_reports-config-4-eba65858cd3f7bf18fd5c369b432aa12
-    file: "./stack.config.stack_reports-config-4"
+    file: "./stack.config.stack_reports-config-4.eba65858cd3f7bf18fd5c369b432aa12"
