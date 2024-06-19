@@ -3,6 +3,7 @@ require 'yaml'
 require 'json'
 require 'optparse'
 require 'digest'
+require 'bcrypt'
 
 # class TrueClass
 #   def encode_with(coder) = coder.represent_scalar('tag:yaml.org,2002:str', 'true')
@@ -56,6 +57,7 @@ module Dry
     def logging(opts) = (@service[:logging] ||= {}).merge!  opts
     def user(user) = @service[:user] = user #  "${UID}:${GID}", "www-data:www-data"
     def network(names) = (@service[:networks] ||= []) << names
+    def basic_auth(user_and_password) = @service[:basic_auth] = user_and_password
   end
 
   class SwarmFunction
@@ -126,6 +128,7 @@ module Dry
 
         opts.merge! @swarm_deploy[deploy_name][:options]
       end
+
       compose = {
         # name: @name.to_s, # https://docs.docker.com/compose/compose-file/#name-top-level-element
         # Not allowed by docker stack deploy
@@ -145,6 +148,14 @@ module Dry
         service[:deploy] ||= {}
         service[:deploy][:labels] ||= []
         service[:deploy][:labels] += @labels.map { "#{_1}=#{_2}" }
+
+        if service[:basic_auth]
+          ba_user, ba_password = service[:basic_auth].split ':'
+          hashed_password = BCrypt::Password.create ba_password
+          service[:deploy][:labels] << "traefik.http.middlewares.%{service-name}_auth.basicauth.users=#{ba_user}:#{hashed_password.gsub('$','$$')}"
+          service[:deploy][:labels] << "traefik.http.routers.%{service-name}.middlewares=%{service-name}_auth"
+          service.delete :basic_auth
+        end
 
         if ingress[0] && (opts[:ingress] || opts[:traefik] || opts[:traefik_tls])
           service[:networks] ||= []

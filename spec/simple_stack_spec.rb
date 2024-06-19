@@ -25,12 +25,17 @@ describe 'Test simple Stack' do
         # expect(stack_compose).to eq(stack_compose_shell)
         compose = YAML.load_file stack_file.gsub('.drs', sufix), aliases: true rescue ''
 
+        compose = compose.to_yaml
+        [compose, stack_compose_shell].each do |s|
+          s.gsub! /(basicauth.users=admin:\$\$2a\$\$12\$\$)(.*)$/,'\1'
+        end
+
         # unless stack_compose_shell == compose.to_yaml
         #   yaml = YAML.load stack_compose_shell, aliases: true
         #   File.write stack_file.gsub('.drs', sufix), yaml.to_yaml
         #   compose = YAML.load_file stack_file.gsub('.drs', sufix), aliases: true
         # end
-        expect(stack_compose_shell).to eq(compose.to_yaml)
+        expect(stack_compose_shell).to eq(compose)
       end
     end
   end
