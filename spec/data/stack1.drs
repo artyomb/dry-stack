@@ -11,6 +11,9 @@ Stack :simple_stack do
     'fluentd-async': true
   } }
 
+  Ingress operator: { host: 'operator.*' },
+         navigator: { host: 'navigator.*' }
+
   Environment [:backend, :reports], {
     OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: 'http://open.tl/v1/traces',
     NODE_ENV: 'production',

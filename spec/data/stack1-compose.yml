@@ -27,12 +27,19 @@ services:
     deploy:
       labels:
       - stack.product=product A
-      - traefik.http.middlewares.simple_stack_operator_auth.basicauth.users=admin:$$apr1$$9asd$$it52ZAcbUdJP0zKFg0TCg/
-      - traefik.http.routers.simple_stack_operator.middlewares=simple_stack_operator_auth
+      - traefik.enable=true
+      - traefik.http.middlewares.simple_stack_operator-0_auth.basicauth.users=admin:$$apr1$$9asd$$it52ZAcbUdJP0zKFg0TCg/
+      - traefik.http.routers.simple_stack_operator-0.middlewares=simple_stack_operator-0_auth
+      - traefik.http.routers.simple_stack_operator-0.service=simple_stack_operator-0
+      - traefik.http.services.simple_stack_operator-0.loadbalancer.server.port=5000
+      - traefik.http.routers.simple_stack_operator-0.rule=HostRegexp(`{name:operator\..*}`)
     image: frontend
     ports:
     - 4001:5000
     - 4002:6000
+    networks:
+    - default
+    - ingress_routing
   navigator:
     environment:
       APP: navigator
@@ -41,11 +48,18 @@ services:
     deploy:
       labels:
       - stack.product=product A
-      - traefik.http.middlewares.simple_stack_navigator_auth.basicauth.users=admin:$$apr1$$976PimCP$$PU7TWdOsyivf.u35yYGsv0
-      - traefik.http.routers.simple_stack_navigator.middlewares=simple_stack_navigator_auth
+      - traefik.enable=true
+      - traefik.http.middlewares.simple_stack_navigator-0_auth.basicauth.users=admin:$$apr1$$976PimCP$$PU7TWdOsyivf.u35yYGsv0
+      - traefik.http.routers.simple_stack_navigator-0.middlewares=simple_stack_navigator-0_auth
+      - traefik.http.routers.simple_stack_navigator-0.service=simple_stack_navigator-0
+      - traefik.http.services.simple_stack_navigator-0.loadbalancer.server.port=5000
+      - traefik.http.routers.simple_stack_navigator-0.rule=HostRegexp(`{name:navigator\..*}`)
     image: frontend
     ports:
     - 4002:5000
+    networks:
+    - default
+    - ingress_routing
   backend:
     environment:
       OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://open.tl/v1/traces

@@ -149,14 +149,6 @@ module Dry
         service[:deploy][:labels] ||= []
         service[:deploy][:labels] += @labels.map { "#{_1}=#{_2}" }
 
-        if service[:basic_auth]
-          ba_user, ba_password, salt = service[:basic_auth].split ':'
-          hashed_password = apr1_crypt ba_password, (salt || rand(36**8).to_s(36))
-          service[:deploy][:labels] << "traefik.http.middlewares.%{service-name}_auth.basicauth.users=#{ba_user}:#{hashed_password.gsub('$','$$')}"
-          service[:deploy][:labels] << "traefik.http.routers.%{service-name}.middlewares=%{service-name}_auth"
-          service.delete :basic_auth
-        end
-
         if ingress[0] && (opts[:ingress] || opts[:traefik] || opts[:traefik_tls])
           service[:networks] ||= []
           service[:networks] << 'default' if service[:networks].empty?
@@ -177,6 +169,13 @@ module Dry
           ingress[0][:port] ||= service[:ports]&.first
 
           ingress.each_with_index do |ing, index|
+            if service[:basic_auth]
+              ba_user, ba_password, salt = service[:basic_auth].split ':'
+              hashed_password = apr1_crypt ba_password, (salt || rand(36**8).to_s(36))
+              service[:deploy][:labels] << "traefik.http.middlewares.#{service_name}-#{index}_auth.basicauth.users=#{ba_user}:#{hashed_password.gsub('$','$$')}"
+              service[:deploy][:labels] << "traefik.http.routers.#{service_name}-#{index}.middlewares=#{service_name}-#{index}_auth"
+            end
+
             ing[:port] ||= service[:ports]&.first
             service[:deploy][:labels] += [
               "traefik.http.routers.#{service_name}-#{index}.service=#{service_name}-#{index}",
@@ -210,6 +209,7 @@ module Dry
             end
           end
         end
+        service.delete :basic_auth
 
         service[:environment] = @environment[name].merge(service[:environment])  if @environment[name]
         service[:environment].merge! STACK_NAME: @name.to_s, STACK_SERVICE_NAME: name.to_s
