@@ -21,7 +21,7 @@ Gem::Specification.new do |s|
 
   s.required_ruby_version = ">= " + File.read(File.dirname(__FILE__)+'/.ruby-version').strip
 
-  s.add_runtime_dependency 'bcrypt'
+  # s.add_runtime_dependency ''
 
   s.add_development_dependency "rake", "~> 13.0"
   s.add_development_dependency "rspec", "~> 3.10"

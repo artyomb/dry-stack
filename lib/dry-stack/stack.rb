@@ -3,7 +3,7 @@ require 'yaml'
 require 'json'
 require 'optparse'
 require 'digest'
-require 'bcrypt'
+require_relative 'apache_specific_md5'
 
 # class TrueClass
 #   def encode_with(coder) = coder.represent_scalar('tag:yaml.org,2002:str', 'true')
@@ -150,8 +150,8 @@ module Dry
         service[:deploy][:labels] += @labels.map { "#{_1}=#{_2}" }
 
         if service[:basic_auth]
-          ba_user, ba_password = service[:basic_auth].split ':'
-          hashed_password = BCrypt::Password.create ba_password
+          ba_user, ba_password, salt = service[:basic_auth].split ':'
+          hashed_password = apr1_crypt ba_password, (salt || rand(36**8).to_s(36))
           service[:deploy][:labels] << "traefik.http.middlewares.%{service-name}_auth.basicauth.users=#{ba_user}:#{hashed_password.gsub('$','$$')}"
           service[:deploy][:labels] << "traefik.http.routers.%{service-name}.middlewares=%{service-name}_auth"
           service.delete :basic_auth

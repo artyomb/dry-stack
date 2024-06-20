@@ -27,7 +27,7 @@ services:
     deploy:
       labels:
       - stack.product=product A
-      - traefik.http.middlewares.simple_stack_operator_auth.basicauth.users=admin:$$2a$$12$$x8Qbko9SV.wSmoIKgOI.qOvNn593hCttcm8.EeHqcykl56dYgaKqW
+      - traefik.http.middlewares.simple_stack_operator_auth.basicauth.users=admin:$$apr1$$9asd$$it52ZAcbUdJP0zKFg0TCg/
       - traefik.http.routers.simple_stack_operator.middlewares=simple_stack_operator_auth
     image: frontend
     ports:
@@ -41,7 +41,7 @@ services:
     deploy:
       labels:
       - stack.product=product A
-      - traefik.http.middlewares.simple_stack_navigator_auth.basicauth.users=admin:$$2a$$12$$gas86OQwpoRpeuEo2pPKyOcyCt8cRqF0P23KaDJs3fwzW8OcHKGTm
+      - traefik.http.middlewares.simple_stack_navigator_auth.basicauth.users=admin:$$apr1$$976PimCP$$PU7TWdOsyivf.u35yYGsv0
       - traefik.http.routers.simple_stack_navigator.middlewares=simple_stack_navigator_auth
     image: frontend
     ports:

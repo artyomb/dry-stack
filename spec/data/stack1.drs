@@ -28,9 +28,9 @@ Stack :simple_stack do
     logging SYSLOG
   end
   Service :operator,  image: 'frontend', env: {APP: 'operator'}, ports: [5000, 6000] do
-    basic_auth 'admin:admin'
+    basic_auth 'admin:admin:9asd'
   end
-  Service :navigator, image: 'frontend', env: {APP: 'navigator'}, ports: 5000, basic_auth: 'admin:admin'
+  Service :navigator, image: 'frontend', env: {APP: 'navigator'}, ports: 5000, basic_auth: 'admin:admin:976PimCP'
 
   Service :backend,   image: 'backend', ports: 3000 do
     user :root

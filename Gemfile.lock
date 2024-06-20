@@ -1,14 +1,12 @@
 PATH
   remote: .
   specs:
-    dry-stack (0.0.81)
-      bcrypt
+    dry-stack (0.0.82)
 
 GEM
   remote: https://rubygems.org/
   specs:
     ast (2.4.2)
-    bcrypt (3.1.20)
     diff-lcs (1.5.0)
     json (2.6.2)
     parallel (1.22.1)
