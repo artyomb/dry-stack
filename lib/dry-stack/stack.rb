@@ -58,6 +58,7 @@ module Dry
     def user(user) = @service[:user] = user #  "${UID}:${GID}", "www-data:www-data"
     def network(names) = (@service[:networks] ||= []) << names
     def basic_auth(user_and_password) = @service[:basic_auth] = user_and_password
+    def ingress(ing) = ((@service[:ingress] ||=[]) << ing).flatten!
   end
 
   class SwarmFunction
@@ -144,7 +145,9 @@ module Dry
       end
 
       compose[:services].each do |name, service|
-        ingress = [@ingress[name]].flatten.compact
+
+        ingress = [@ingress[name], service[:ingress] || [] ].flatten.compact
+
         service[:deploy] ||= {}
         service[:deploy][:labels] ||= []
         service[:deploy][:labels] += @labels.map { "#{_1}=#{_2}" }
@@ -169,6 +172,7 @@ module Dry
           ingress[0][:port] ||= service[:ports]&.first
 
           ingress.each_with_index do |ing, index|
+
             if service[:basic_auth]
               ba_user, ba_password, salt = service[:basic_auth].split ':'
               hashed_password = apr1_crypt ba_password, (salt || rand(36**8).to_s(36))
@@ -210,6 +214,7 @@ module Dry
           end
         end
         service.delete :basic_auth
+        service.delete :ingress
 
         service[:environment] = @environment[name].merge(service[:environment])  if @environment[name]
         service[:environment].merge! STACK_NAME: @name.to_s, STACK_SERVICE_NAME: name.to_s

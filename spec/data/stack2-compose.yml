@@ -34,6 +34,10 @@ services:
       STACK_SERVICE_NAME: svc2
     deploy:
       labels:
+      - traefik.enable=true
+      - traefik.http.routers.name1_svc2-0.service=name1_svc2-0
+      - traefik.http.services.name1_svc2-0.loadbalancer.server.port=3000
+      - traefik.http.routers.name1_svc2-0.rule=HostRegexp(`{name:svc2\..*}`)
       - traefik.http.middlewares.name1_svc2_auth.basicauth.users=admin:$$apr1$$i7hdbc9g$$Rkocxo9snhmuESvUg0TTv/
       - traefik.http.routers.name1_svc2.middlewares=name1_svc2_auth
       placement:
@@ -48,6 +52,77 @@ services:
       options:
         fluentd-address: fluentd3:24224
         fluentd-async: 'true'
+    networks:
+    - default
+    - ingress_routing
+  svc3:
+    environment:
+      STACK_NAME: name1
+      STACK_SERVICE_NAME: svc3
+    deploy:
+      labels:
+      - traefik.enable=true
+      - traefik.http.routers.name1_svc3-0.service=name1_svc3-0
+      - traefik.http.services.name1_svc3-0.loadbalancer.server.port=3000
+      - traefik.http.routers.name1_svc3-0.rule=HostRegexp(`{name:svc3\..*}`)
+      - traefik.http.routers.name1_svc3-1.service=name1_svc3-1
+      - traefik.http.services.name1_svc3-1.loadbalancer.server.port=4000
+      - traefik.http.routers.name1_svc3-1.rule=HostRegexp(`{name:svc3-1\..*}`)
+    image: service-image
+    networks:
+    - default
+    - ingress_routing
+  svc4:
+    environment:
+      STACK_NAME: name1
+      STACK_SERVICE_NAME: svc4
+    deploy:
+      labels:
+      - traefik.enable=true
+      - traefik.http.routers.name1_svc4-0.service=name1_svc4-0
+      - traefik.http.services.name1_svc4-0.loadbalancer.server.port=3000
+      - traefik.http.routers.name1_svc4-0.rule=HostRegexp(`{name:svc4\..*}`)
+      - traefik.http.routers.name1_svc4-1.service=name1_svc4-1
+      - traefik.http.services.name1_svc4-1.loadbalancer.server.port=4000
+      - traefik.http.routers.name1_svc4-1.rule=HostRegexp(`{name:svc4-1\..*}`)
+    image: service-image
+    networks:
+    - default
+    - ingress_routing
+  svc5:
+    environment:
+      STACK_NAME: name1
+      STACK_SERVICE_NAME: svc5
+    deploy:
+      labels:
+      - traefik.enable=true
+      - traefik.http.routers.name1_svc5-0.service=name1_svc5-0
+      - traefik.http.services.name1_svc5-0.loadbalancer.server.port=3000
+      - traefik.http.routers.name1_svc5-0.rule=HostRegexp(`{name:svc5\..*}`)
+      - traefik.http.routers.name1_svc5-1.service=name1_svc5-1
+      - traefik.http.services.name1_svc5-1.loadbalancer.server.port=4000
+      - traefik.http.routers.name1_svc5-1.rule=HostRegexp(`{name:svc5-1\..*}`)
+    image: postgres:13.5-alpine
+    networks:
+    - default
+    - ingress_routing
+  svc6:
+    environment:
+      STACK_NAME: name1
+      STACK_SERVICE_NAME: svc6
+    deploy:
+      labels:
+      - traefik.enable=true
+      - traefik.http.routers.name1_svc6-0.service=name1_svc6-0
+      - traefik.http.services.name1_svc6-0.loadbalancer.server.port=3000
+      - traefik.http.routers.name1_svc6-0.rule=HostRegexp(`{name:svc6\..*}`)
+      - traefik.http.routers.name1_svc6-1.service=name1_svc6-1
+      - traefik.http.services.name1_svc6-1.loadbalancer.server.port=4000
+      - traefik.http.routers.name1_svc6-1.rule=HostRegexp(`{name:svc6-1\..*}`)
+    image: postgres:13.5-alpine
+    networks:
+    - default
+    - ingress_routing
 networks:
   ingress_routing:
     external: true

@@ -24,7 +24,7 @@ Stack :name1 do
   ]
 
   Service :svc1, image: 'service-image'
-  Service :svc2, image: 'postgres:13.5-alpine' do
+  Service :svc2, image: 'postgres:13.5-alpine', ingress: {host: 'svc2.*', port: 3000} do
     command 'bash -c "apk add curl && docker-entrypoint.sh -c \"shared_buffers=256MB\" -c \"max_connections=200\" "'
     entrypoint '/usr/bin/tini -- wait-for-it opensearch:9200 --  /docker-entrypoint.sh'
 
@@ -32,5 +32,20 @@ Stack :name1 do
       'fluentd-address': 'fluentd3:24224',
       'fluentd-async': true
     }
+  end
+
+  Service :svc3, image: 'service-image' do
+    ingress host: 'svc3.*', port: 3000
+    ingress host: 'svc3-1.*', port: 4000
+  end
+
+  Service :svc4, image: 'service-image' do
+    ingress [{ host: 'svc4.*', port: 3000 }, { host: 'svc4-1.*', port: 4000 }]
+  end
+
+  Service :svc5, image: 'postgres:13.5-alpine', ingress: [{ host: 'svc5.*', port: 3000 }, { host: 'svc5-1.*', port: 4000 }]
+
+  Service :svc6, image: 'postgres:13.5-alpine', ingress: [{ host: 'svc6.*', port: 3000 }] do
+    ingress host: 'svc6-1.*', port: 4000
   end
 end
