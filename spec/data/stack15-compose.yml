@@ -1,0 +1,12 @@
+---
+version: '3.8'
+services:
+  admin:
+    environment:
+      APP: admin
+      STACK_NAME: stack_name
+      STACK_SERVICE_NAME: admin
+    image: frontend
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
