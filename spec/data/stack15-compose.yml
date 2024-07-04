@@ -8,5 +8,7 @@ services:
       STACK_SERVICE_NAME: admin
     image: frontend
     dns:
-      - 8.8.8.8
-      - 8.8.4.4
+    - 8.8.8.8
+    - 8.8.4.4
+    - 7.7.4.4
+    - 6.6.4.4
