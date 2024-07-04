@@ -1,0 +1,10 @@
+Description <<~DSC
+  Stack description
+DSC
+
+Options name: 'stack_name', traefik: true
+
+Service :admin,     image: 'frontend', env: {APP: 'admin'}, ports: 5000 do
+  dns '8.8.8.8'
+  dns '8.8.4.4'
+end

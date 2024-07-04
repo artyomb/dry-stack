@@ -47,6 +47,7 @@ module Dry
   class ServiceFunction
     def initialize(service, &); @service = service; instance_exec(&) end
     def env(variables)= @service[:environment].merge! variables
+    def dns(dns)= ((@service[:dns] ||= []) << dns).flatten!
     def volume(opts)= ((@service[:volumes] ||= []) << opts).flatten!
     def image(name)= @service[:image] = name
     def ports(ports)= ((@service[:ports] ||= []) << ports).flatten!
