@@ -58,7 +58,6 @@ module Dry
     def logging(opts) = (@service[:logging] ||= {}).merge!  opts
     def user(user) = @service[:user] = user #  "${UID}:${GID}", "www-data:www-data"
     def network(names) = (@service[:networks] ||= []) << names
-    def basic_auth(user_and_password) = @service[:basic_auth] = user_and_password
     def ingress(ing) = ((@service[:ingress] ||=[]) << ing).flatten!
   end
 
@@ -173,14 +172,6 @@ module Dry
           ingress[0][:port] ||= service[:ports]&.first
 
           ingress.each_with_index do |ing, index|
-
-            if service[:basic_auth]
-              ba_user, ba_password, salt = service[:basic_auth].split ':'
-              hashed_password = apr1_crypt ba_password, (salt || rand(36**8).to_s(36))
-              service[:deploy][:labels] << "traefik.http.middlewares.#{service_name}-#{index}_auth.basicauth.users=#{ba_user}:#{hashed_password.gsub('$','$$')}"
-              service[:deploy][:labels] << "traefik.http.routers.#{service_name}-#{index}.middlewares=#{service_name}-#{index}_auth"
-            end
-
             ing[:port] ||= service[:ports]&.first
             service[:deploy][:labels] += [
               "traefik.http.routers.#{service_name}-#{index}.service=#{service_name}-#{index}",
@@ -200,8 +191,17 @@ module Dry
 
             rule = []
             rule << "HostRegexp(`{name:#{nginx_host2regexp ing[:host]}}`)" if ing[:host]
+            rule << "ClientIP(#{[ing[:client_ip]].flatten.map{ "`#{_1}`" }.join ','})" if ing[:client_ip]
             rule << "PathPrefix(`#{nginx_host2regexp ing[:path]}`)" if ing[:path]
             rule << "#{ing[:rule]}" if ing[:rule]
+
+            if ing[:basic_auth]
+              ba_user, ba_password, salt = ing[:basic_auth].split ':'
+              hashed_password = apr1_crypt ba_password, (salt || rand(36**8).to_s(36))
+              service[:deploy][:labels] << "traefik.http.middlewares.#{service_name}-#{index}_auth.basicauth.users=#{ba_user}:#{hashed_password.gsub('$','$$')}"
+              service[:deploy][:labels] << "traefik.http.routers.#{service_name}-#{index}.middlewares=#{service_name}-#{index}_auth"
+            end
+
 
             service[:deploy][:labels] << "traefik.http.routers.#{service_name}-#{index}.rule=#{rule.join ' && '}"
 
@@ -214,7 +214,6 @@ module Dry
             end
           end
         end
-        service.delete :basic_auth
         service.delete :ingress
 
         service[:environment] = @environment[name].merge(service[:environment])  if @environment[name]

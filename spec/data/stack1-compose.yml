@@ -28,8 +28,6 @@ services:
       labels:
       - stack.product=product A
       - traefik.enable=true
-      - traefik.http.middlewares.simple_stack_operator-0_auth.basicauth.users=admin:$$apr1$$9asd$$it52ZAcbUdJP0zKFg0TCg/
-      - traefik.http.routers.simple_stack_operator-0.middlewares=simple_stack_operator-0_auth
       - traefik.http.routers.simple_stack_operator-0.service=simple_stack_operator-0
       - traefik.http.services.simple_stack_operator-0.loadbalancer.server.port=5000
       - traefik.http.routers.simple_stack_operator-0.rule=HostRegexp(`{name:operator\..*}`)
@@ -49,8 +47,6 @@ services:
       labels:
       - stack.product=product A
       - traefik.enable=true
-      - traefik.http.middlewares.simple_stack_navigator-0_auth.basicauth.users=admin:$$apr1$$976PimCP$$PU7TWdOsyivf.u35yYGsv0
-      - traefik.http.routers.simple_stack_navigator-0.middlewares=simple_stack_navigator-0_auth
       - traefik.http.routers.simple_stack_navigator-0.service=simple_stack_navigator-0
       - traefik.http.services.simple_stack_navigator-0.loadbalancer.server.port=5000
       - traefik.http.routers.simple_stack_navigator-0.rule=HostRegexp(`{name:navigator\..*}`)

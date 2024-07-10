@@ -30,10 +30,8 @@ Stack :simple_stack do
     deploy_label "traefik.http.routers.%{service-name}.middlewares=%{service-name}_auth"
     logging SYSLOG
   end
-  Service :operator,  image: 'frontend', env: {APP: 'operator'}, ports: [5000, 6000] do
-    basic_auth 'admin:admin:9asd'
-  end
-  Service :navigator, image: 'frontend', env: {APP: 'navigator'}, ports: 5000, basic_auth: 'admin:admin:976PimCP'
+  Service :operator,  image: 'frontend', env: {APP: 'operator'}, ports: [5000, 6000]
+  Service :navigator, image: 'frontend', env: {APP: 'navigator'}, ports: 5000
 
   Service :backend,   image: 'backend', ports: 3000 do
     user :root

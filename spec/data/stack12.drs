@@ -3,9 +3,12 @@ Description <<~DSC
 DSC
 
 Labels 'stack.product': 'product A'
-
+Options traefik: true
 PublishPorts admin: 5000
-Ingress admin: { host: 'admin.*' }
+Ingress admin: [
+  { host: 'admin.*', client_ip: '127.0.0.0/24' },
+  { host: 'admin2.*', client_ip: ['127.0.0.0/24', '128.0.0.0/24'], basic_auth: 'admin:admin:salt' }
+]
 Deploy admin: { replica: 2, 'resources.limits': { cpus: '4', memory: '500M' } }
 
 Service :admin,     image: 'frontend', env: {APP: 'admin'},     ports: 5000 do
