@@ -146,6 +146,8 @@ module Dry
 
       compose[:services].each do |name, service|
 
+        service[:image].gsub!(/:latest$/, '') # let docker swarm to create tag: :latest@sha265:0000...
+
         ingress = [@ingress[name], service[:ingress] || [] ].flatten.compact
 
         service[:deploy] ||= {}

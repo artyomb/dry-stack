@@ -4,7 +4,7 @@ DSC
 
 Options name: 'stack_name', traefik: true
 
-Service :admin,     image: 'frontend', env: {APP: 'admin'}, ports: 5000 do
+Service :admin,     image: 'frontend:latest', env: {APP: 'admin'}, ports: 5000 do
   dns '8.8.8.8'
   dns '8.8.4.4'
   dns ['7.7.4.4','6.6.4.4']
