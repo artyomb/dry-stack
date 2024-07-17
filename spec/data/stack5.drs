@@ -23,4 +23,14 @@ Service :reports,   image: '$REGISTRY_HOST/reports', env: { DB_URL: '$DB_URL' } 
   YAML
 end
 
+Service :test_very_very_long_service_name_to_exced_64_characters_limit_of_docker_swarm_config_name, image: '$REGISTRY_HOST/frontend' do
+  config target: '/usr/share/filebeat/filebeat4.yml', file: './filebeat2.yml'
+  config target: '/usr/share/filebeat/filebeat5.yml', file_content: <<~YAML
+    filebeat.inputs:
+      - type: container
+        paths:
+        - '/var/lib/docker/containers/*/*.log'
+  YAML
+end
+
 Network :default, attachable: true

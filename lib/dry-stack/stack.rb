@@ -270,15 +270,18 @@ module Dry
       end
 
       compose[:configs].update(compose[:configs]) do |name, config|
+        # total config name must be max 64 characters length. MD5 - 32 characters
+        short_name = name[0..30]
+
         if config[:file_content]
           md5 = Digest::MD5.hexdigest config[:file_content]
-          fname = "./#{@name}.config.#{name}.#{md5}" # use MD5, when rn in parallel may have different content
+          fname = "./#{@name}.config.#{name}.#{md5}" # use MD5, when run in parallel may have different content
           File.write fname, config[:file_content]
-          {name: "#{name}-#{md5}", file: fname}.merge config.except(:file_content)
+          {name: "#{short_name}-#{md5}", file: fname}.merge config.except(:file_content)
         elsif config[:file]
           body = File.read config[:file] rescue ''
           md5 = Digest::MD5.hexdigest body
-          {name: "#{name}-#{md5}", file: fname}.merge config
+          {name: "#{short_name}-#{md5}", file: fname}.merge config
         else
           config
         end

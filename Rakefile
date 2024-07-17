@@ -37,6 +37,12 @@ task push: %i[spec readme] do |t|
   system 'gem list -r dry-stack' or exit 1
 end
 
+desc 'Build new version'
+task build: %i[spec readme] do |t|
+  puts 'Build&push new version'
+  system 'gem build dry-stack.gemspec' or exit 1
+end
+
 # To RuboCop the current commit -
 # git diff-tree --no-commit-id --name-only -r HEAD --diff-filter AMT | xargs bundle exec rubocop
 # To RuboCop the working tree changes -

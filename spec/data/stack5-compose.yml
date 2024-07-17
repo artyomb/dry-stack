@@ -41,6 +41,16 @@ services:
     - ingress_routing
     ports:
     - 7000:7000
+  test_very_very_long_service_name_to_exced_64_characters_limit_of_docker_swarm_config_name:
+    environment:
+      STACK_NAME: stack
+      STACK_SERVICE_NAME: test_very_very_long_service_name_to_exced_64_characters_limit_of_docker_swarm_config_name
+    image: "$REGISTRY_HOST/frontend"
+    configs:
+    - source: stack_test_very_very_long_service_name_to_exced_64_characters_limit_of_docker_swarm_config_name-config-0
+      target: "/usr/share/filebeat/filebeat4.yml"
+    - source: stack_test_very_very_long_service_name_to_exced_64_characters_limit_of_docker_swarm_config_name-config-1
+      target: "/usr/share/filebeat/filebeat5.yml"
 networks:
   default:
     attachable: true
@@ -63,3 +73,9 @@ configs:
   stack_reports-config-4:
     name: stack_reports-config-4-eba65858cd3f7bf18fd5c369b432aa12
     file: "./stack.config.stack_reports-config-4.eba65858cd3f7bf18fd5c369b432aa12"
+  stack_test_very_very_long_service_name_to_exced_64_characters_limit_of_docker_swarm_config_name-config-0:
+    name: stack_test_very_very_long_servi-d41d8cd98f00b204e9800998ecf8427e
+    file: "./filebeat2.yml"
+  stack_test_very_very_long_service_name_to_exced_64_characters_limit_of_docker_swarm_config_name-config-1:
+    name: stack_test_very_very_long_servi-eba65858cd3f7bf18fd5c369b432aa12
+    file: "./stack.config.stack_test_very_very_long_service_name_to_exced_64_characters_limit_of_docker_swarm_config_name-config-1.eba65858cd3f7bf18fd5c369b432aa12"
