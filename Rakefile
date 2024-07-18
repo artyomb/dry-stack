@@ -39,7 +39,7 @@ end
 
 desc 'Build new version'
 task build: %i[spec readme] do |t|
-  puts 'Build&push new version'
+  puts 'Build new version'
   system 'gem build dry-stack.gemspec' or exit 1
 end
 
