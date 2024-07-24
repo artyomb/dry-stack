@@ -22,6 +22,12 @@ services:
       - traefik.http.routers.stack_name_admin-1.tls.domains[0].main=admin2.swarm_x.com
       - traefik.http.routers.stack_name_admin-1.rule=HostRegexp(`{name:admin2\..*}`)
         && PathPrefix(`/api`)
+      - traefik.http.routers.stack_name_admin-2.service=stack_name_admin-2
+      - traefik.http.services.stack_name_admin-2.loadbalancer.server.port=5000
+      - traefik.http.routers.stack_name_admin-2.tls=true
+      - traefik.http.routers.stack_name_admin-2.tls.certresolver=le
+      - traefik.http.routers.stack_name_admin-2.tls.domains[0].main=prod_admin.swarm_x.com
+      - traefik.http.routers.stack_name_admin-2.rule=HostRegexp(`{name:prod_admin\..*}`)
     image: frontend
     networks:
     - default

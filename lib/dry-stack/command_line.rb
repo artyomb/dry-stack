@@ -37,7 +37,9 @@ module Dry
          raise 'Invalid .env file'
       end
 
-      def safe_eval(str) = Dry::Stack() { eval str, self.binding }
+      def safe_eval(drs, params)
+        Dry::Stack(params[:name], params[:configuration]) { eval drs, self.binding }
+      end
 
       def run(args)
         params = {}
@@ -68,9 +70,12 @@ module Dry
           o.on('',   '--name STACK_NAME', 'Define stack name')
           o.on('',   '--ingress', 'Generate ingress labels') { true }
           o.on('',   '--traefik', 'Generate traefik labels') { true }
-          o.on('',   '--traefik_tls', 'Generate traefik tls labels') { true }
-          o.on('',   '--host_sed /from/to/', 'Sed ingress host  /\\*/dev.*/')
-          o.on('-n', '--no-env', 'Do not process env variables') { true }
+          o.on('',   '--traefik-tls', 'Generate traefik tls labels') { true }
+          o.on('',   '--host-sed /from/to/', 'Sed ingress host  /\\*/dev.*/')
+          o.on('-n', '--no-env', 'Deprecated') { $stderr.puts 'warning: deprecated option: -n' } # TODO: remove
+          o.on('-c', '--configuration name', 'Configuration name')
+          COMMANDS.values.select{_1.options(o) if _1.respond_to? :options }
+
           o.on('-h', '--help') { puts o; exit }
           o.parse! args, into: params
 
@@ -82,7 +87,8 @@ module Dry
           stack_text = File.read(params[:stack]) if params[:stack]
           stack_text ||= STDIN.read unless $stdin.tty?
 
-          safe_eval stack_text # isolate context
+
+          safe_eval stack_text, params # isolate context
 
           Stack.last_stack.name = params[:name] if params[:name]
           COMMANDS[command.to_sym].run Stack.last_stack, params, args, extra

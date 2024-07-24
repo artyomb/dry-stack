@@ -39,9 +39,10 @@ module Dry
     end
   end
 
-  def Stack(name = nil, &)
+  def Stack(name = nil, configuration = nil, &)
     Stack.last_stack = Stack.new name
     Stack.last_stack.instance_exec(&) if block_given?
+    Stack.last_stack.apply_configuration configuration if configuration
   end
 
   class ServiceFunction
@@ -61,13 +62,8 @@ module Dry
     def ingress(ing) = ((@service[:ingress] ||=[]) << ing).flatten!
   end
 
-  class SwarmFunction
-    def initialize(swarm, &); @swarm = swarm; instance_exec(&) end
-    def env(variables)= @swarm[:environment].merge! variables
-    def options(variables)= @swarm[:options].merge! variables
-    def context_host(host)= @swarm[:context_host] = host
-    def context_name(name)= @swarm[:context_name] = name
-    def stack_name(name)= @swarm[:stack_name] = name
+  class ConfigurationFunction
+    def initialize(configuration, &); @configuration = configuration; instance_exec(&) end
   end
 
   class Stack
@@ -75,12 +71,13 @@ module Dry
     class << self
       attr_accessor :last_stack
     end
-    attr_accessor :name, :options, :description, :swarm_deploy
+    attr_accessor :name, :options, :description, :configuration
 
-    def Stack(name = nil, &)
-      Stack.last_stack = Stack.new name
-      Stack.last_stack.instance_exec(&) if block_given?
-    end
+    def Stack(...) = Dry::Stack(...)
+
+    # def self.new(*args, &block)
+    #   super
+    # end
 
     def initialize(name)
       @name = name || 'stack'
@@ -97,7 +94,7 @@ module Dry
       @labels = {}
       @configs = {}
       @logging = {}
-      @swarm_deploy = {}
+      @configurations = {}
     end
 
     def expand_hash(hash)
@@ -123,12 +120,13 @@ module Dry
       end
     end
 
-    def to_compose(opts = @options, deploy_name = nil )
-      if deploy_name
-        raise "Deploy not found: #{deploy_name}" unless @swarm_deploy[deploy_name]
+    def apply_configuration(configuration)
+      raise "Configuration not found: #{configuration}" unless @configurations[configuration.to_sym]
+      @configurations[configuration.to_sym][:block_function].call @configurations[configuration.to_sym]
+    end
 
-        opts.merge! @swarm_deploy[deploy_name][:options]
-      end
+    def to_compose(opts = @options)
+      @name = @options[:name] || @name
 
       compose = {
         # name: @name.to_s, # https://docs.docker.com/compose/compose-file/#name-top-level-element
@@ -323,8 +321,8 @@ module Dry
     end
 
     def Options(opts)
-      warn 'WARN: Options command is used for testing purpose.\
-            Not recommended in real life configurations.' unless $0 =~ /rspec/
+      # warn 'WARN: Options command is used for testing purpose.\
+      #       Not recommended in real life configurations.' unless $0 =~ /rspec/
       @options.merge! opts
     end
 
@@ -333,7 +331,9 @@ module Dry
     end
 
     def Ingress(services)
-      @ingress.merge! services
+      services.each do |name, ing|
+        @ingress[name] = ((@ingress[name] || [] ) | [ing]).flatten
+      end
     end
 
     def Config(name, opts)
@@ -382,12 +382,12 @@ module Dry
       yield if block_given?
     end
 
-    def SwarmDeploy(name, opts = {}, &)
-      opts[:environment] = opts.delete(:env) if opts.key? :env
-
-      swarm = @swarm_deploy[name.to_sym] ||= { environment: {}, options: {} }
-      swarm.merge! opts
-      SwarmFunction.new(swarm, &) if block_given?
+    def Configuration(name, opts = {}, &)
+      configuration = @configurations[name.to_sym] ||= { }
+      configuration.merge! opts
+      configuration.merge! block_function: ->(*args){
+        self.instance_exec(&) if block_given?
+      }
     end
 
   end

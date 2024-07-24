@@ -1,41 +1,35 @@
 require_relative 'command_line'
 
 Dry::CommandLine::COMMANDS[:swarm_deploy] = Class.new do
+  def options(parser)
+    parser.on('-x', '--context-endpoint host', 'Docker context host. Created if not exists')
+  end
+
   def run(stack, params, args, extra)
-    unless args.empty?
-      c_name = args[0].to_sym
-      raise "deploy config not found: #{args[0]}" unless stack.swarm_deploy.key? args[0].to_sym
-      context = stack.swarm_deploy[args[0].to_sym]
-    end
     _params = stack.options.merge params
     stack.name = _params[:name] if _params[:name]
 
-    if context
-      name = context[:context_name]&.to_sym || args[0].to_sym
-      host = context[:context_host]
+    if params[:'context-endpoint']
+      name = params[:'context-endpoint'].gsub( /[\/.:@]/,'_').gsub( '__','_')
+      name = "dry-#{name}".to_sym
+      endpoint = params[:'context-endpoint']
       contexts = {}
-      exec_o_lines "docker context ls --format json" do |line|
+      exec_o_lines 'docker context ls --format json' do |line|
         ctx = JSON.parse line, symbolize_names: true
         contexts[ctx[:Name].to_sym] = ctx # {"Current":false,"Description":"","DockerEndpoint":"ssh://root@x.x.x.x","Error":"","Name":"prod-swarm"}
       end
 
-      if contexts[name] && contexts[name][:DockerEndpoint] != host
-        raise "context '#{name}' has different host value: #{contexts[name][:DockerEndpoint]} != #{host}"
+      if contexts[name] && contexts[name][:DockerEndpoint] != endpoint
+        raise "context '#{name}' has different host value: #{contexts[name][:DockerEndpoint]} != #{endpoint}"
       end
 
-      exec_i "docker context create #{name} --docker host=#{host}" unless contexts[name]
+      exec_i "docker context create #{name} --docker host=#{endpoint}" unless contexts[name]
 
       ENV['DOCKER_CONTEXT'] = name.to_s
-      stack.name = context[:stack_name] || stack.name
-      context[:environment].each do |k,v|
-        ENV[k.to_s] = v.to_s
-      end
     end
 
     # substitute ENV variables
-    yaml = stack.to_compose(_params, c_name).lines[1..].join
-    yaml = _params[:'no-env'] ? yaml : `echo \"#{yaml.gsub("`", '\\\`')}\"`
-    system " echo \"#{yaml.gsub("`", '\\\`')}\"" if _params[:v]
+    yaml = stack.to_compose(_params).lines[1..].join
     # system " echo \"#{yaml.gsub("`", '\\\`')}\" | docker stack deploy -c - #{stack.name} --prune --resolve-image changed"
 
     #  --prune  --resolve-image changed
@@ -48,7 +42,7 @@ Dry::CommandLine::COMMANDS[:swarm_deploy] = Class.new do
   end
 
   def help = ['Call docker stack deploy & add config readme w/ description',
-              '[... swarm_deploy sd_name -- --prune  --resolve-image changed]']
+              '[... swarm_deploy -- --prune  --resolve-image changed]']
 
 end.new
 

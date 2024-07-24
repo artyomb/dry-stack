@@ -6,7 +6,7 @@ This gem allows ...
 cat simple_stack.drs | dry-stack -e to_compose | docker stack deploy -c - simple_stack
 
 $ dry-stack
-Version: 0.0.88
+Version: 0.1.0
 Usage:
 	dry-stack -s stackfile [options] COMMAND
 	cat stackfile | dry-stack COMMAND
@@ -16,7 +16,7 @@ Commands:
      to_compose -  Print stack in docker compose format
                    [... to_compose <deploy name>] 
      swarm_deploy -  Call docker stack deploy & add config readme w/ description
-                     [... swarm_deploy sd_name -- --prune  --resolve-image changed]
+                     [... swarm_deploy -- --prune  --resolve-image changed]
 
 Options:
     -s, --stack STACK_NAME           Stack file
@@ -27,11 +27,13 @@ Options:
                                      Generate ingress labels
         --traefik
                                      Generate traefik labels
-        --traefik_tls
+        --traefik-tls
                                      Generate traefik tls labels
-        --host_sed /from/to/
+        --host-sed /from/to/
                                      Sed ingress host  /\*/dev.*/
-    -n, --no-env                     Do not process env variables
+    -n, --no-env                     Deprecated
+    -c, --configuration name         Configuration name
+    -x, --context-endpoint host      Docker context host. Created if not exists
     -h, --help
 
 ```

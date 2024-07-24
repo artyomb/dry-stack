@@ -4,20 +4,17 @@ DSC
 
 Options name: 'stack_name', traefik: true
 
-SwarmDeploy :swarm1 do
-  context_host 'ssh://root@10.100.0.1'
-  stack_name 'remote_stack'
-  env REGISTRY_HOST: '10.100.0.2:5000'
+Configuration :prod do
+  Options tls_domain: 'swarm_x.com', traefik: true, traefik_tls: true
+  Ingress admin: {host: 'prod_admin.*'}
 end
 
-SwarmDeploy :swarm_x do
-  options tls_domain: "swarm_x.com", traefik: true, traefik_tls: true
-  context_host  'ssh://root@123.1127.127.121'
-  env REGISTRY_HOST: '10.100.0.2:5000'
+Configuration :dev do
+  Options name: 'stack_name_dev'
 end
-
-SwarmDeploy :swarm2, context_host: 'root@10.100.0.1', context_name: 'context2'
 
 Ingress admin: [{host: 'admin1.*'}, {host: 'admin2.*', path: '/api', port: 4000}]
 
-Service :admin,     image: 'frontend', env: {APP: 'admin'},     ports: 5000
+Service :admin,     image: 'frontend', env: {APP: 'admin'},     ports: 5000 do
+  # env deploy: __configuration_name__
+end
