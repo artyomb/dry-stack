@@ -55,7 +55,7 @@ module Dry
     def command(cmd)= @service[:command] = cmd
     def entrypoint(cmd)= @service[:entrypoint] = cmd
     def deploy_label(str)= @service[:deploy][:labels] << str
-    def config(name = nil, opts)= (@service[:configs] ||= []) << {source: name.to_s }.merge(opts)
+    def config(name = nil, opts)= (@service[:configs] ||= []) << {source: name.to_s}.merge(opts)
     def logging(opts) = (@service[:logging] ||= {}).merge!  opts
     def user(user) = @service[:user] = user #  "${UID}:${GID}", "www-data:www-data"
     def network(names) = (@service[:networks] ||= []) << names
@@ -122,7 +122,7 @@ module Dry
 
     def apply_configuration(configuration)
       raise "Configuration not found: #{configuration}" unless @configurations[configuration.to_sym]
-      @configurations[configuration.to_sym][:block_function].call @configurations[configuration.to_sym]
+      @configurations[configuration.to_sym][:block_function].call
     end
 
     def to_compose(opts = @options)
@@ -383,10 +383,10 @@ module Dry
     end
 
     def Configuration(name, opts = {}, &)
-      configuration = @configurations[name.to_sym] ||= { }
+      configuration = @configurations[name.to_sym] ||= {}
       configuration.merge! opts
-      configuration.merge! block_function: ->(*args){
-        self.instance_exec(&) if block_given?
+      configuration.merge! block_function: -> {
+        instance_exec(&) if block_given? # https://rubyreferences.github.io/rubychanges/3.3.html#anonymous-parameters-forwarding-inside-blocks-are-disallowed
       }
     end
 
