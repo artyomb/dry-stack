@@ -71,6 +71,7 @@ module Dry
           o.on('',   '--ingress', 'Generate ingress labels') { true }
           o.on('',   '--traefik', 'Generate traefik labels') { true }
           o.on('',   '--traefik-tls', 'Generate traefik tls labels') { true }
+          o.on('',   '--tls-domain domain', 'Domain for the traefik labels')
           o.on('',   '--host-sed /from/to/', 'Sed ingress host  /\\*/dev.*/')
           o.on('-n', '--no-env', 'Deprecated') { $stderr.puts 'warning: deprecated option: -n' } # TODO: remove
           o.on('-c', '--configuration name', 'Configuration name')
@@ -78,6 +79,9 @@ module Dry
 
           o.on('-h', '--help') { puts o; exit }
           o.parse! args, into: params
+
+          params.transform_keys!{_1.to_s.gsub('-','_').to_sym}
+          params[:traefik_tls] = true if params[:tls_domain]
 
           raise 'Stack file not defined' if $stdin.tty? && !params[:stack]
 
