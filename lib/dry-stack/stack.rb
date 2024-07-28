@@ -382,11 +382,11 @@ module Dry
       yield if block_given?
     end
 
-    def Configuration(name, opts = {}, &)
+    def Configuration(name, opts = {}, &b)
       configuration = @configurations[name.to_sym] ||= {}
       configuration.merge! opts
       configuration.merge! block_function: -> {
-        instance_exec(&) if block_given? # https://rubyreferences.github.io/rubychanges/3.3.html#anonymous-parameters-forwarding-inside-blocks-are-disallowed
+        instance_exec(&b) if block_given? # https://rubyreferences.github.io/rubychanges/3.3.html#anonymous-parameters-forwarding-inside-blocks-are-disallowed
       }
     end
 
