@@ -9,10 +9,10 @@ Dry::CommandLine::COMMANDS[:swarm_deploy] = Class.new do
     _params = stack.options.merge params
     stack.name = _params[:name] if _params[:name]
 
-    if params[:'context-endpoint']
-      name = params[:'context-endpoint'].gsub( /[\/.:@]/,'_').gsub( '__','_')
+    if params[:context_endpoint]
+      name = params[:context_endpoint].gsub( /[\/.:@]/,'_').gsub( '__','_')
       name = "dry-#{name}".to_sym
-      endpoint = params[:'context-endpoint']
+      endpoint = params[:context_endpoint]
       contexts = {}
       exec_o_lines 'docker context ls --format json' do |line|
         ctx = JSON.parse line, symbolize_names: true
