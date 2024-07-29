@@ -39,6 +39,9 @@ module Dry
     end
   end
 
+  attr_accessor :cmd_params
+  @cmd_params = {}
+
   def Stack(name = nil, configuration = nil, &)
     Stack.last_stack = Stack.new name
     Stack.last_stack.instance_exec(&) if block_given?
@@ -301,6 +304,15 @@ module Dry
 
       # compose.to_yaml
       JSON.parse(compose.to_json).to_yaml
+    end
+
+    def Include(file_name)
+      dir = Dry.cmd_params[:stack] ? File.dirname(Dry.cmd_params[:stack]) : '.'
+      eval IO.read( File.join dir, file_name )
+    end
+
+    def After(&block)
+      (@after_blocks ||=[]) << block
     end
 
     def PublishPorts(ports)

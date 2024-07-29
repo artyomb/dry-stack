@@ -38,7 +38,10 @@ module Dry
       end
 
       def safe_eval(drs, params)
-        Dry::Stack(params[:name], params[:configuration]) { eval drs, self.binding }
+        Dry::Stack(params[:name], params[:configuration]) do
+          eval drs, self.binding
+          @after_blocks&.each { instance_exec &_1 }
+        end
       end
 
       def run(args)
@@ -82,6 +85,7 @@ module Dry
 
           params.transform_keys!{_1.to_s.gsub('-','_').to_sym}
           params[:traefik_tls] = true if params[:tls_domain]
+          Dry.cmd_params = params
 
           raise 'Stack file not defined' if $stdin.tty? && !params[:stack]
 

@@ -1,0 +1,16 @@
+After do
+  Logging @services.keys, driver: 'loki', options: {
+    'loki-url': 'http://localhost:3100/loki/api/v1/push',
+    'loki-batch-size': 100, 'loki-retries': 2, 'loki-max-backoff': '1000ms', 'loki-timeout': '1s',
+    # 'loki-pipeline-stages': %{ [{regex: {expression: "(level|lvl|severity)=(?P<level>\\\\\\w+)"}}, {labels: {level: null}}]}
+  }
+
+  Environment @services.keys, {
+    OTEL_EXPORTER_OTLP_ENDPOINT_FRONT: '/otel',
+    OTEL_EXPORTER_OTLP_ENDPOINT: 'http://otel/',
+    OTEL_RESOURCE_ATTRIBUTES: 'deployment.environment=%{stack-name},service.name=%{service-name}',
+    OTEL_LOG_LEVEL: 'error',
+    OTEL_TRACES_EXPORTER:'otlp',
+    REPLICA: "{{.Task.Slot}}"
+  }
+end

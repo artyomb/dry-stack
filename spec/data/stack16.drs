@@ -1,0 +1,12 @@
+Description <<~DSC
+  Stack description
+DSC
+
+Options name: 'stack_name', traefik: true
+Include 'base.drs'
+
+Service :admin, image: 'frontend:latest', ports: 5000 do
+  dns '8.8.8.8'
+  dns '8.8.4.4'
+  dns ['7.7.4.4','6.6.4.4']
+end
