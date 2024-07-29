@@ -85,6 +85,8 @@ module Dry
 
           params.transform_keys!{_1.to_s.gsub('-','_').to_sym}
           params[:traefik_tls] = true if params[:tls_domain]
+          params[:traefik] = true unless params.key? :traefik
+
           Dry.cmd_params = params
 
           raise 'Stack file not defined' if $stdin.tty? && !params[:stack]
