@@ -11,6 +11,7 @@ Deploy [:admin, :reports],
 
 Service :admin,     image: '$REGISTRY_HOST/frontend',  env: { APP: 'admin' },      ports: 5000 do
   network :outside
+  network name: 'app-network', external: true
 end
 Service :reports,   image: '$REGISTRY_HOST/reports', env: { DB_URL: '$DB_URL' }
 

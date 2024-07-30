@@ -262,6 +262,22 @@ module Dry
           end
         end
 
+        service[:networks]&.map! do |network|
+          if network.is_a? Hash
+            if network.key?(:name)
+              n_name= network[:name].gsub('-','_').to_sym
+              compose[:networks][n_name] ||= {}
+              compose[:networks][n_name].merge! network.slice(:name, :driver, :driver_opts, :attachable, :external, :labels)
+              n_name
+            else
+              $stderr.puts ':name must be specified in network declaration'
+              raise 'invalid network declaration'
+            end
+          else
+            network
+          end
+        end
+
         service[:configs]&.each_with_index do |config, index|
           config[:source] = "#{service_name}-config-#{index}" if config[:source].to_s.empty?
           compose[:configs][config[:source].to_sym] ||= {}

@@ -26,6 +26,7 @@ services:
     image: "$REGISTRY_HOST/frontend"
     networks:
     - outside
+    - app_network
     - ingress_routing
   reports:
     environment:
@@ -59,3 +60,6 @@ networks:
   ingress_routing:
     external: true
     name: ingress-routing
+  app_network:
+      name: app-network
+      external: true
