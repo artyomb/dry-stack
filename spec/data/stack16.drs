@@ -7,6 +7,8 @@ Include 'base.drs'
 
 
 
+Service :front, image: 'frontend:latest', ports: 5000
+
 Service :admin, image: 'frontend:latest', ports: 5000 do
   dns '8.8.8.8'
   dns '8.8.4.4'
@@ -35,4 +37,17 @@ ServicesEach do
       OTEL_TRACES_EXPORTER:'otlp',
       SERVICE_INFO:'true',
       REPLICA: "{{.Task.Slot}}"
+end
+
+ServicesEach :front do
+  env FRONT_CONF: 'base1'
+end
+
+ServicesEach :front, env: {FRONT_CONF2: 'base_1'} do
+  env FRONT_CONF: 'base2'
+end
+
+ServicesEach [:front, :admin], env: {FRONT_CONF: 'base_3'} do
+  env CONF: 'base1'
+  env FRONT_CONF: 'base4'
 end

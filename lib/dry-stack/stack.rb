@@ -31,7 +31,7 @@ module Dry
     end
   end
 
-  def each_recursive(parent, each_ =-> { _1.respond_to?(:each) ? _1.each : [] }, path = [], &blk)
+  def each_recursive(parent, each_ = -> { _1.respond_to?(:each) ? _1.each : [] }, path = [], &blk)
     each2_ = each_.is_a?(Array) ? ->(p) { (m = each_.find { p.respond_to? _1 }) ? p.send(m) : [] } : each_
     (each2_[parent] || []).each do |(k,v)|
       blk.call [path + [parent], k, v, path]
@@ -332,13 +332,11 @@ module Dry
       (@after_blocks ||=[]) << block
     end
 
-    # TODO: latter
-    # def ServicesEach(names, &)
-    # def ServicesEach(names, opts, &)
-    def ServicesEach(&block)
+    def ServicesEach(name = nil, opts = {}, &block)
       After do
-        @services.values.each do |svc|
-          ServiceFunction.new(svc, &block) if block_given?
+        name ||= @services.keys
+        [name].flatten.each do |s_name|
+          Service s_name, opts, &block
         end
       end
     end
@@ -348,12 +346,13 @@ module Dry
     end
 
     def Service(name, opts = {}, &)
+      opts = opts.dup
       opts[:ports] = [opts[:ports]].flatten if opts.key? :ports
       opts[:environment] = opts.delete(:env) if opts.key? :env
 
       service = @services[name.to_sym] ||= {environment: {}, deploy: {labels: []}}
-      service.merge! opts
-      ServiceFunction.new(service, &)  if block_given?
+      service.deep_merge! opts
+      ServiceFunction.new(service, &) if block_given?
     end
 
     def Description(string)
