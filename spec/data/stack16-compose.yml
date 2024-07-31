@@ -4,11 +4,13 @@ services:
   admin:
     environment:
       OTEL_EXPORTER_OTLP_ENDPOINT_FRONT: "/otel"
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel/
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otlp_collector:4318/
       OTEL_RESOURCE_ATTRIBUTES: deployment.environment=stack_name,service.name=stack_name_admin
       OTEL_LOG_LEVEL: error
       OTEL_TRACES_EXPORTER: otlp
       REPLICA: "{{.Task.Slot}}"
+      CONSOLE_LEVEL: error
+      SERVICE_INFO: 'true'
       STACK_NAME: stack_name
       STACK_SERVICE_NAME: admin
     image: frontend
@@ -17,11 +19,18 @@ services:
     - 8.8.4.4
     - 7.7.4.4
     - 6.6.4.4
+    networks:
+    - grafana_network
+    - default
     logging:
       driver: loki
       options:
-        loki-url: http://localhost:3100/loki/api/v1/push
+        loki-url: http://loki:3100/loki/api/v1/push
         loki-batch-size: 100
         loki-retries: 2
         loki-max-backoff: 1000ms
         loki-timeout: 1s
+networks:
+  grafana_network:
+    name: grafana-network
+    external: true

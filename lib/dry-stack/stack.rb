@@ -263,11 +263,12 @@ module Dry
         end
 
         service[:networks]&.map! do |network|
-          if network.is_a? Hash
+          if network.is_a?(Hash)
             if network.key?(:name)
-              n_name= network[:name].gsub('-','_').to_sym
-              compose[:networks][n_name] ||= {}
-              compose[:networks][n_name].merge! network.slice(:name, :driver, :driver_opts, :attachable, :external, :labels)
+              n_name = network[:name].gsub('-','_').to_sym
+              if n_name != :default
+                (compose[:networks][n_name] ||= {}).merge! network
+              end
               n_name
             else
               $stderr.puts ':name must be specified in network declaration'
@@ -329,6 +330,17 @@ module Dry
 
     def After(&block)
       (@after_blocks ||=[]) << block
+    end
+
+    # TODO: latter
+    # def ServicesEach(names, &)
+    # def ServicesEach(names, opts, &)
+    def ServicesEach(&)
+      After do
+        @services.values.each do |svc|
+          ServiceFunction.new(svc,&) if block_given?
+        end
+      end
     end
 
     def PublishPorts(ports)

@@ -5,8 +5,34 @@ DSC
 Options name: 'stack_name', traefik: true
 Include 'base.drs'
 
+
+
 Service :admin, image: 'frontend:latest', ports: 5000 do
   dns '8.8.8.8'
   dns '8.8.4.4'
   dns ['7.7.4.4','6.6.4.4']
+end
+
+# TODO: latter
+# ServicesEach :admin, env: {A:1}
+# ServicesEach [:admin], env: {A:1}
+# ServicesEach env: {A:1}
+
+ServicesEach do
+  network name: 'grafana-network', external: true
+  network :default
+
+  logging driver: 'loki', options: {
+    'loki-url': 'http://loki:3100/loki/api/v1/push',
+    'loki-batch-size': 100, 'loki-retries': 2, 'loki-max-backoff': '1000ms', 'loki-timeout': '1s',
+  }
+
+  env OTEL_EXPORTER_OTLP_ENDPOINT_FRONT: '/otel',
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://otlp_collector:4318/",
+      OTEL_RESOURCE_ATTRIBUTES: 'deployment.environment=%{stack-name},service.name=%{service-name}',
+      OTEL_LOG_LEVEL: 'error',
+      CONSOLE_LEVEL: 'error',
+      OTEL_TRACES_EXPORTER:'otlp',
+      SERVICE_INFO:'true',
+      REPLICA: "{{.Task.Slot}}"
 end
