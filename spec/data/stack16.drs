@@ -5,8 +5,6 @@ DSC
 Options name: 'stack_name', traefik: true
 Include 'base.drs'
 
-
-
 Service :front, image: 'frontend:latest', ports: 5000
 
 Service :admin, image: 'frontend:latest', ports: 5000 do
@@ -14,11 +12,6 @@ Service :admin, image: 'frontend:latest', ports: 5000 do
   dns '8.8.4.4'
   dns ['7.7.4.4','6.6.4.4']
 end
-
-# TODO: latter
-# ServicesEach :admin, env: {A:1}
-# ServicesEach [:admin], env: {A:1}
-# ServicesEach env: {A:1}
 
 ServicesEach do
   network name: 'grafana-network', external: true
