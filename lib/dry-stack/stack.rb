@@ -335,10 +335,10 @@ module Dry
     # TODO: latter
     # def ServicesEach(names, &)
     # def ServicesEach(names, opts, &)
-    def ServicesEach(&)
+    def ServicesEach(&block)
       After do
         @services.values.each do |svc|
-          ServiceFunction.new(svc,&) if block_given?
+          ServiceFunction.new(svc, &block) if block_given?
         end
       end
     end
