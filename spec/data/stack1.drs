@@ -1,45 +1,43 @@
-Stack :simple_stack do
-  Options traefik: true, ingress: true
-  Labels 'stack.product': 'product A'
+Options name: :simple_stack, traefik: true, ingress: true
+Labels 'stack.product': 'product A'
 
-  SYSLOG = { driver: 'syslog', options: {
-    'syslog-address': 'tcp://swarm.next:5005',
-    'tag': 'image:{{.ImageName}}/service:{{.Name}}/container:{{.ID}}'
-  } }
-  FLUENTD = { driver: 'fluentd', options: {
-    'fluentd-address': 'fluentd:24224',
-    'fluentd-async': true
-  } }
+SYSLOG = { driver: 'syslog', options: {
+  'syslog-address': 'tcp://swarm.next:5005',
+  'tag': 'image:{{.ImageName}}/service:{{.Name}}/container:{{.ID}}'
+} }
+FLUENTD = { driver: 'fluentd', options: {
+  'fluentd-address': 'fluentd:24224',
+  'fluentd-async': true
+} }
 
-  Ingress operator: { host: 'operator.*' },
-         navigator: { host: 'navigator.*' }
+Ingress operator: { host: 'operator.*' },
+       navigator: { host: 'navigator.*' }
 
-  Environment [:backend, :reports], {
-    OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: 'http://open.tl/v1/traces',
-    NODE_ENV: 'production',
-    OTEL_RESOURCE_ATTRIBUTES: "deployment.environment=%{stack-name},service.name=%{service-name}"
-  }
+Environment [:backend, :reports], {
+  OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: 'http://open.tl/v1/traces',
+  NODE_ENV: 'production',
+  OTEL_RESOURCE_ATTRIBUTES: "deployment.environment=%{stack-name},service.name=%{service-name}"
+}
 
-  PublishPorts admin: 4000, operator: [4001,4002]
-  PublishPorts navigator: '4002:5000', reports: [7000,'2000:3000'] # mode: ingress, protocol: tcp
-  Deploy backend: { replica: 2, 'resources.limits': { cpus: 4, memory: '500M' } }
-  Ingress backend: [{host: 'backend.*'}, {host: 'admin.*', path: '/api', port: 4000}]
+PublishPorts admin: 4000, operator: [4001,4002]
+PublishPorts navigator: '4002:5000', reports: [7000,'2000:3000'] # mode: ingress, protocol: tcp
+Deploy backend: { replica: 2, 'resources.limits': { cpus: 4, memory: '500M' } }
+Ingress backend: [{host: 'backend.*'}, {host: 'admin.*', path: '/api', port: 4000}]
 
-  Service :admin,     image: 'frontend', env: {APP: 'admin'},     ports: 5000 do
-    deploy_label 'traefik.http.middlewares.%{service-name}_auth.basicauth.users=admin:$apr1$i7hdbc9g$Rkocxo9snhmuESvUg0TTv/'
-    deploy_label "traefik.http.routers.%{service-name}.middlewares=%{service-name}_auth"
-    logging SYSLOG
-  end
-  Service :operator,  image: 'frontend', env: {APP: 'operator'}, ports: [5000, 6000]
-  Service :navigator, image: 'frontend', env: {APP: 'navigator'}, ports: 5000
-
-  Service :backend,   image: 'backend', ports: 3000 do
-    user :root
-    env APP_PORT: 3000, NODE_ENV: 'development', SKIP_GZ: true, DB_URL: '$DB_URL'
-    logging FLUENTD
-  end
-
-  Service :reports, image: 'reports:0.1', env: {DB_URL: '$DB_URL'}, ports: 7000
-
-  Network :default, attachable: true
+Service :admin,     image: 'frontend', env: {APP: 'admin'},     ports: 5000 do
+  deploy_label 'traefik.http.middlewares.%{service-name}_auth.basicauth.users=admin:$apr1$i7hdbc9g$Rkocxo9snhmuESvUg0TTv/'
+  deploy_label "traefik.http.routers.%{service-name}.middlewares=%{service-name}_auth"
+  logging SYSLOG
 end
+Service :operator,  image: 'frontend', env: {APP: 'operator'}, ports: [5000, 6000]
+Service :navigator, image: 'frontend', env: {APP: 'navigator'}, ports: 5000
+
+Service :backend,   image: 'backend', ports: 3000 do
+  user :root
+  env APP_PORT: 3000, NODE_ENV: 'development', SKIP_GZ: true, DB_URL: '$DB_URL'
+  logging FLUENTD
+end
+
+Service :reports, image: 'reports:0.1', env: {DB_URL: '$DB_URL'}, ports: 7000
+
+Network :default, attachable: true

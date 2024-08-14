@@ -13,7 +13,7 @@ Service :admin, image: 'frontend:latest', ports: 5000 do
   dns ['7.7.4.4','6.6.4.4']
 end
 
-ServicesEach do
+AfterService do
   network name: 'grafana-network', external: true
   network :default
 
@@ -32,15 +32,27 @@ ServicesEach do
       REPLICA: "{{.Task.Slot}}"
 end
 
-ServicesEach :front do
+AfterService :front do
   env FRONT_CONF: 'base1'
+  env FRONT_OVER: 'over'
 end
 
-ServicesEach :front, env: {FRONT_CONF2: 'base_1'} do
+AfterService :front, env: { FRONT_CONF2: 'base_1'} do
   env FRONT_CONF: 'base2'
 end
 
-ServicesEach [:front, :admin], env: {FRONT_CONF: 'base_3'} do
+AfterService :front, env: { FRONT_CONF2: 'base_1'} do
+  env FRONT_OVER: 'over2'
+  env FRONT_CONF2: 'base2'
+end
+
+BeforeService :front, env: { FRONT_CONF2: 'base_1'} do
+  env FRONT_BEFORE: 'before'
+  env FRONT_OVER: 'before'
+  env FRONT_CONF2: 'before'
+end
+
+AfterService [:front, :admin], env: { FRONT_CONF: 'base_3'} do
   env CONF: 'base1'
   env FRONT_CONF: 'base4'
 end

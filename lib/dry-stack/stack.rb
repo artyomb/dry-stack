@@ -45,6 +45,10 @@ module Dry
   def Stack(name = nil, configuration = nil, &)
     Stack.last_stack = Stack.new name
     Stack.last_stack.instance_exec(&) if block_given?
+    Stack.last_stack.instance_exec do
+      @services_blocks&.each { instance_exec &_1 }
+      @after_blocks&.each { instance_exec &_1 }
+    end
     Stack.last_stack.apply_configuration configuration if configuration
   end
 
@@ -147,7 +151,7 @@ module Dry
 
       compose[:services].each do |name, service|
 
-        service[:image].gsub!(/:latest$/, '') # let docker swarm to create tag: :latest@sha265:0000...
+        service[:image].gsub!(/:latest$/, '') if service[:image] # let docker swarm to create tag: :latest@sha265:0000...
 
         ingress = [@ingress[name], service[:ingress] || [] ].flatten.compact
 
@@ -332,11 +336,19 @@ module Dry
       (@after_blocks ||=[]) << block
     end
 
-    def ServicesEach(name = nil, opts = {}, &block)
+    def BeforeService(name = nil, opts = {}, &block)
+      (@before_blocks ||=[]).push names: [name].flatten.compact, except: opts[:except],
+                                  block: ->(s_name) {
+        _ServiceImplementation s_name, opts, &block
+      }
+    end
+
+    def AfterService(name = nil, opts = {}, &block)
       After do
-        name ||= @services.keys
-        [name].flatten.each do |s_name|
-          Service s_name, opts, &block
+        names = [name || @services.keys].flatten
+        names -= [opts[:except]].flatten if opts.key? :except
+        names.each do |s_name|
+          _ServiceImplementation s_name, opts, &block
         end
       end
     end
@@ -345,7 +357,21 @@ module Dry
       @publish_ports.merge! ports.to_h { |k, v| [k,[v].flatten] }
     end
 
-    def Service(name, opts = {}, &)
+    def Service(name, opts = {}, &block)
+      @services_blocks ||=[]
+      (@services_blocks ||=[]).push -> { _ServiceDeferred(name, opts, &block) }
+    end
+
+    def _ServiceDeferred(name, opts = {}, &block)
+      (@before_blocks || []).each do |before|
+        next unless before[:names].empty? || before[:names].include?(name)
+        next if before[:except]&.include? name
+        before[:block].call(name)
+      end
+      _ServiceImplementation(name, opts, &block)
+    end
+
+    def _ServiceImplementation(name, opts = {}, &)
       opts = opts.dup
       opts[:ports] = [opts[:ports]].flatten if opts.key? :ports
       opts[:environment] = opts.delete(:env) if opts.key? :env

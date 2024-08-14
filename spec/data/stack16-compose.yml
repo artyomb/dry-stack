@@ -9,10 +9,12 @@ services:
       OTEL_LOG_LEVEL: error
       OTEL_TRACES_EXPORTER: otlp
       REPLICA: "{{.Task.Slot}}"
+      FRONT_CONF2: base2
+      FRONT_BEFORE: before
+      FRONT_OVER: over2
       CONSOLE_LEVEL: error
       SERVICE_INFO: 'true'
       FRONT_CONF: base4
-      FRONT_CONF2: base_1
       CONF: base1
       STACK_NAME: stack_name
       STACK_SERVICE_NAME: front

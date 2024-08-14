@@ -1,51 +1,48 @@
+Options name: :name1, traefik: true, ingress: true
 
-Stack :name1 do
-  Options traefik: true, ingress: true
+Logging :svc1, driver: 'fluentd', options: {
+  'fluentd-address': 'fluentd1t:24224',
+  'fluentd-async': true
+}
 
-  Logging :svc1, driver: 'fluentd', options: {
-    'fluentd-address': 'fluentd1t:24224',
+Logging [:svc1, :svc2], driver: 'fluentd', options: {
+  'fluentd-address': 'fluentd2:24224',
+  'fluentd-async': true
+}
+Ingress svc1: [
+  {host: 'backend.*'},
+  {host: 'admin.*', path: '/api', port: 4000}
+]
+
+Deploy [:svc1, :svc2], 'placement.constraints': ['node.role == manager']
+
+Deploy [:svc1, :svc2], labels: [
+  'traefik.http.middlewares.%{service-name}_auth.basicauth.users=admin:$$apr1$$i7hdbc9g$$Rkocxo9snhmuESvUg0TTv/',
+  "traefik.http.routers.%{service-name}.middlewares=%{service-name}_auth"
+]
+
+Service :svc1, image: 'service-image'
+Service :svc2, image: 'postgres:13.5-alpine', ingress: {host: 'svc2.*', port: 3000} do
+  command 'bash -c "apk add curl && docker-entrypoint.sh -c \"shared_buffers=256MB\" -c \"max_connections=200\" "'
+  entrypoint '/usr/bin/tini -- wait-for-it opensearch:9200 --  /docker-entrypoint.sh'
+
+  logging driver: 'fluentd', options: {
+    'fluentd-address': 'fluentd3:24224',
     'fluentd-async': true
   }
+end
 
-  Logging [:svc1, :svc2], driver: 'fluentd', options: {
-    'fluentd-address': 'fluentd2:24224',
-    'fluentd-async': true
-  }
-  Ingress svc1: [
-    {host: 'backend.*'},
-    {host: 'admin.*', path: '/api', port: 4000}
-  ]
+Service :svc3, image: 'service-image' do
+  ingress host: 'svc3.*', port: 3000
+  ingress host: 'svc3-1.*', port: 4000
+end
 
-  Deploy [:svc1, :svc2], 'placement.constraints': ['node.role == manager']
+Service :svc4, image: 'service-image' do
+  ingress [{ host: 'svc4.*', port: 3000 }, { host: 'svc4-1.*', port: 4000 }]
+end
 
-  Deploy [:svc1, :svc2], labels: [
-    'traefik.http.middlewares.%{service-name}_auth.basicauth.users=admin:$$apr1$$i7hdbc9g$$Rkocxo9snhmuESvUg0TTv/',
-    "traefik.http.routers.%{service-name}.middlewares=%{service-name}_auth"
-  ]
+Service :svc5, image: 'postgres:13.5-alpine', ingress: [{ host: 'svc5.*', port: 3000 }, { host: 'svc5-1.*', port: 4000 }]
 
-  Service :svc1, image: 'service-image'
-  Service :svc2, image: 'postgres:13.5-alpine', ingress: {host: 'svc2.*', port: 3000} do
-    command 'bash -c "apk add curl && docker-entrypoint.sh -c \"shared_buffers=256MB\" -c \"max_connections=200\" "'
-    entrypoint '/usr/bin/tini -- wait-for-it opensearch:9200 --  /docker-entrypoint.sh'
-
-    logging driver: 'fluentd', options: {
-      'fluentd-address': 'fluentd3:24224',
-      'fluentd-async': true
-    }
-  end
-
-  Service :svc3, image: 'service-image' do
-    ingress host: 'svc3.*', port: 3000
-    ingress host: 'svc3-1.*', port: 4000
-  end
-
-  Service :svc4, image: 'service-image' do
-    ingress [{ host: 'svc4.*', port: 3000 }, { host: 'svc4-1.*', port: 4000 }]
-  end
-
-  Service :svc5, image: 'postgres:13.5-alpine', ingress: [{ host: 'svc5.*', port: 3000 }, { host: 'svc5-1.*', port: 4000 }]
-
-  Service :svc6, image: 'postgres:13.5-alpine', ingress: [{ host: 'svc6.*', port: 3000 }] do
-    ingress host: 'svc6-1.*', port: 4000
-  end
+Service :svc6, image: 'postgres:13.5-alpine', ingress: [{ host: 'svc6.*', port: 3000 }] do
+  ingress host: 'svc6-1.*', port: 4000
 end

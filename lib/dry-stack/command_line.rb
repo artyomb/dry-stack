@@ -40,7 +40,6 @@ module Dry
       def safe_eval(drs, params)
         Dry::Stack(params[:name], params[:configuration]) do
           eval drs, self.binding
-          @after_blocks&.each { instance_exec &_1 }
         end
       end
 
