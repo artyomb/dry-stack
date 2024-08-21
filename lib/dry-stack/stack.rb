@@ -305,6 +305,10 @@ module Dry
         end
       end
 
+      compose[:networks].transform_values! do |network|
+        network.empty? ? EMPTY_HASH : network
+      end
+
       prune = ->(o) {
         o.each { prune[_2] }  if o.is_a? Hash
         o.delete_if { _2.nil? || ( _2.respond_to?(:empty?) && _2.empty?) } if o.is_a? Hash

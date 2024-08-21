@@ -65,6 +65,7 @@ services:
         loki-max-backoff: 1000ms
         loki-timeout: 1s
 networks:
+  hello.world: 
   grafana_network:
     external: true
     name: grafana-network

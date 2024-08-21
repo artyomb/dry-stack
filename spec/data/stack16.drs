@@ -14,6 +14,8 @@ Service :admin, image: 'frontend:latest', ports: 5000 do
   network :test, aliases: [:admin2]
 end
 
+Network :'hello.world'
+
 AfterService do
   network :grafana_network, external: true, name: 'grafana-network'
   network :default
