@@ -25,6 +25,9 @@ services:
         limits:
           cpus: '4'
           memory: 500M
+    networks:
+      default: 
+      ingress_routing: 
     image: frontend
     ports:
     - 5000:5000
@@ -45,9 +48,6 @@ services:
     - target: "/data4"
       type: volume
       source: admin_data4
-    networks:
-    - default
-    - ingress_routing
   backend:
     environment:
       APP_PORT: 3000

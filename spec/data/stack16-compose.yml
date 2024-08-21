@@ -18,10 +18,10 @@ services:
       CONF: base1
       STACK_NAME: stack_name
       STACK_SERVICE_NAME: front
-    image: frontend
     networks:
-    - grafana_network
-    - default
+      grafana_network: 
+      default: 
+    image: frontend
     logging:
       driver: loki
       options:
@@ -44,15 +44,18 @@ services:
       CONF: base1
       STACK_NAME: stack_name
       STACK_SERVICE_NAME: admin
+    networks:
+      test:
+        aliases:
+        - admin2
+      grafana_network: 
+      default: 
     image: frontend
     dns:
     - 8.8.8.8
     - 8.8.4.4
     - 7.7.4.4
     - 6.6.4.4
-    networks:
-    - grafana_network
-    - default
     logging:
       driver: loki
       options:
@@ -63,5 +66,5 @@ services:
         loki-timeout: 1s
 networks:
   grafana_network:
-    name: grafana-network
     external: true
+    name: grafana-network

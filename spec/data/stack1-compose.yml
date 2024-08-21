@@ -31,13 +31,13 @@ services:
       - traefik.http.routers.simple_stack_operator-0.service=simple_stack_operator-0
       - traefik.http.services.simple_stack_operator-0.loadbalancer.server.port=5000
       - traefik.http.routers.simple_stack_operator-0.rule=HostRegexp(`{name:operator\..*}`)
+    networks:
+      default: 
+      ingress_routing: 
     image: frontend
     ports:
     - 4001:5000
     - 4002:6000
-    networks:
-    - default
-    - ingress_routing
   navigator:
     environment:
       APP: navigator
@@ -50,12 +50,12 @@ services:
       - traefik.http.routers.simple_stack_navigator-0.service=simple_stack_navigator-0
       - traefik.http.services.simple_stack_navigator-0.loadbalancer.server.port=5000
       - traefik.http.routers.simple_stack_navigator-0.rule=HostRegexp(`{name:navigator\..*}`)
+    networks:
+      default: 
+      ingress_routing: 
     image: frontend
     ports:
     - 4002:5000
-    networks:
-    - default
-    - ingress_routing
   backend:
     environment:
       OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://open.tl/v1/traces
@@ -82,6 +82,9 @@ services:
         limits:
           cpus: 4
           memory: 500M
+    networks:
+      default: 
+      ingress_routing: 
     image: backend
     user: root
     logging:
@@ -89,9 +92,6 @@ services:
       options:
         fluentd-address: fluentd:24224
         fluentd-async: 'true'
-    networks:
-    - default
-    - ingress_routing
   reports:
     environment:
       OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://open.tl/v1/traces

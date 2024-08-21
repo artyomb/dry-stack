@@ -23,11 +23,13 @@ services:
       placement:
         constraints:
         - node.role == manager
-    image: "$REGISTRY_HOST/frontend"
     networks:
-    - outside
-    - app_network
-    - ingress_routing
+      outside: 
+      app_network:
+        aliases:
+        - a1
+      ingress_routing: 
+    image: "$REGISTRY_HOST/frontend"
   reports:
     environment:
       DB_URL: "$DB_URL"
@@ -45,10 +47,10 @@ services:
       placement:
         constraints:
         - node.role == manager
-    image: "$REGISTRY_HOST/reports"
     networks:
-    - default
-    - ingress_routing
+      default: 
+      ingress_routing: 
+    image: "$REGISTRY_HOST/reports"
     ports:
     - 7000:7000
 networks:
@@ -61,5 +63,5 @@ networks:
     external: true
     name: ingress-routing
   app_network:
-      name: app-network
-      external: true
+    name: app.network.me
+    external: true

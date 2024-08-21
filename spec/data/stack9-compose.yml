@@ -16,10 +16,10 @@ services:
       - traefik.http.routers.stack_admin-0.tls.domains[0].main=admin.test.com
       - traefik.http.routers.stack_admin-0.rule=HostRegexp(`{name:(admin|some)\..*}`)
         && PathPrefix(`/bar`)
-    image: "$REGISTRY_HOST/frontend"
     networks:
-    - default
-    - ingress_routing
+      default: 
+      ingress_routing: 
+    image: "$REGISTRY_HOST/frontend"
 networks:
   ingress_routing:
     external: true

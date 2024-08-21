@@ -14,6 +14,8 @@ require_relative 'apache_specific_md5'
 # end
 
 module Dry
+  EMPTY_HASH = :empty_hash
+
   class ::Hash
     def deep_merge!(second)
       merger = proc { |_, v1, v2|
@@ -65,7 +67,7 @@ module Dry
     def config(name = nil, opts)= (@service[:configs] ||= []) << {source: name.to_s}.merge(opts)
     def logging(opts) = (@service[:logging] ||= {}).merge!  opts
     def user(user) = @service[:user] = user #  "${UID}:${GID}", "www-data:www-data"
-    def network(names) = (@service[:networks] ||= []) << names
+    def network(name, opts = {}) = (@service[:networks][name] ||={}).merge! opts
     def ingress(ing) = ((@service[:ingress] ||=[]) << ing).flatten!
   end
 
@@ -160,9 +162,9 @@ module Dry
         service[:deploy][:labels] += @labels.map { "#{_1}=#{_2}" }
 
         if ingress[0] && (opts[:ingress] || opts[:traefik] || opts[:traefik_tls])
-          service[:networks] ||= []
-          service[:networks] << 'default' if service[:networks].empty?
-          service[:networks] << 'ingress_routing'
+          service[:networks] ||= {}
+          service[:networks][:default] ||= {} if service[:networks].empty?
+          service[:networks][:ingress_routing] ||= {}
         end
 
         ingress.each do |rule|
@@ -266,21 +268,15 @@ module Dry
           end
         end
 
-        service[:networks]&.map! do |network|
-          if network.is_a?(Hash)
-            if network.key?(:name)
-              n_name = network[:name].gsub('-','_').to_sym
-              if n_name != :default
-                (compose[:networks][n_name] ||= {}).merge! network
-              end
-              n_name
-            else
-              $stderr.puts ':name must be specified in network declaration'
-              raise 'invalid network declaration'
-            end
-          else
-            network
+        service[:networks]&.each do |name, network|
+          next unless network.is_a? Hash
+
+          if network[:name]
+            (compose[:networks][name] ||= {}).merge! network.except(:aliases).merge(name: network[:name])
           end
+          network.delete :external
+          network.delete :name
+          service[:networks][name] = EMPTY_HASH if network.empty?
         end
 
         service[:configs]&.each_with_index do |config, index|
@@ -311,14 +307,16 @@ module Dry
 
       prune = ->(o) {
         o.each { prune[_2] }  if o.is_a? Hash
-        o.delete_if { _2.nil? || (_2.respond_to?(:empty?) && _2.empty?) } if o.is_a? Hash
+        o.delete_if { _2.nil? || ( _2.respond_to?(:empty?) && _2.empty?) } if o.is_a? Hash
       }
       prune[compose]
 
       each_recursive _root: compose do |_path, node, v|
+
         v.transform_keys!(&:to_s) if v.is_a? Hash
         node.transform_keys!(&:to_s) if node.is_a? Hash
         _path.last[node] = v.to_s if v.is_a? Symbol
+        _path.last[node] = nil if v == EMPTY_HASH
 
         _path.last[node] = v.to_s if node.to_s == 'fluentd-async'
       end
@@ -376,7 +374,7 @@ module Dry
       opts[:ports] = [opts[:ports]].flatten if opts.key? :ports
       opts[:environment] = opts.delete(:env) if opts.key? :env
 
-      service = @services[name.to_sym] ||= {environment: {}, deploy: {labels: []}}
+      service = @services[name.to_sym] ||= {environment: {}, deploy: {labels: []}, networks: {}}
       service.deep_merge! opts
       ServiceFunction.new(service, &) if block_given?
     end

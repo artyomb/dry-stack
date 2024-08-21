@@ -26,10 +26,10 @@ services:
       - traefik.http.routers.stack_admin-1.middlewares=stack_admin-1-path_sub
       - traefik.http.middlewares.stack_admin-1-path_sub.replacepathregex.regex=^/api/(.*)
       - traefik.http.middlewares.stack_admin-1-path_sub.replacepathregex.replacement=/bar/$$1
-    image: "$REGISTRY_HOST/frontend"
     networks:
-    - default
-    - ingress_routing
+      default: 
+      ingress_routing: 
+    image: "$REGISTRY_HOST/frontend"
 networks:
   ingress_routing:
     external: true

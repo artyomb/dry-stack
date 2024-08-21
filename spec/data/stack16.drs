@@ -11,10 +11,11 @@ Service :admin, image: 'frontend:latest', ports: 5000 do
   dns '8.8.8.8'
   dns '8.8.4.4'
   dns ['7.7.4.4','6.6.4.4']
+  network :test, aliases: [:admin2]
 end
 
 AfterService do
-  network name: 'grafana-network', external: true
+  network :grafana_network, external: true, name: 'grafana-network'
   network :default
 
   logging driver: 'loki', options: {

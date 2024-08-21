@@ -28,10 +28,10 @@ services:
       - traefik.http.routers.stack_name_admin-2.tls.certresolver=le
       - traefik.http.routers.stack_name_admin-2.tls.domains[0].main=prod_admin.swarm_x.com
       - traefik.http.routers.stack_name_admin-2.rule=HostRegexp(`{name:prod_admin\..*}`)
-    image: frontend
     networks:
-    - default
-    - ingress_routing
+      default: 
+      ingress_routing: 
+    image: frontend
 networks:
   ingress_routing:
     external: true

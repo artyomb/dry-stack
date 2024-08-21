@@ -24,6 +24,9 @@ services:
       - traefik.http.routers.stack_reports-0.service=stack_reports-0
       - traefik.http.services.stack_reports-0.loadbalancer.server.port=7000
       - traefik.http.routers.stack_reports-0.rule=HostRegexp(`{name:reports\..*}`)
+    networks:
+      default: 
+      ingress_routing: 
     image: "$REGISTRY_HOST/reports"
     configs:
     - source: filebeat_cfg
@@ -36,9 +39,6 @@ services:
       target: "/usr/share/filebeat/filebeat4.yml"
     - source: stack_reports-config-4
       target: "/usr/share/filebeat/filebeat5.yml"
-    networks:
-    - default
-    - ingress_routing
     ports:
     - 7000:7000
   test_very_very_long_service_name_to_exced_64_characters_limit_of_docker_swarm_config_name:
