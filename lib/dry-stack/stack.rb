@@ -231,13 +231,15 @@ module Dry
 
         service[:deploy].deep_merge! @deploy[name] if @deploy[name]
 
-        hash = {'service-name': service_name, 'stack-name': @name}
-        hash.default = ''
-        original_verbosity = $VERBOSE
-        $VERBOSE = nil
-        service[:deploy][:labels] = service[:deploy][:labels].map{ _1 % hash }
-        service[:environment].transform_values!{ _1.is_a?(String) ? (_1 % hash) : _1 }
-        $VERBOSE = original_verbosity
+        # hash = {'service-name': service_name, 'stack-name': @name}
+        env_sub = ->(s) {
+          s = s.to_s.dup
+          s.gsub!('%{stack-name}', @name.to_s)
+          s.gsub!('%{service-name}', service_name)
+          s
+        }
+        service[:deploy][:labels] = service[:deploy][:labels].map{ env_sub[_1] }
+        service[:environment].transform_values!{ _1.is_a?(String) ? (env_sub[_1]) : _1 }
 
         pp_i = @publish_ports[name]&.reject { _1.class == String }
         pp_s = @publish_ports[name]&.select { _1.class == String }
