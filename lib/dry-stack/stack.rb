@@ -147,15 +147,15 @@ module Dry
         configs: YAML.load(@configs.to_yaml, aliases: true)
       }
 
-      if @ingress.any?
-        compose[:networks].merge! ingress_routing: {external: true, name: 'ingress-routing'}
-      end
-
       compose[:services].each do |name, service|
 
         service[:image].gsub!(/:latest$/, '') if service[:image] # let docker swarm to create tag: :latest@sha265:0000...
 
         ingress = [@ingress[name], service[:ingress] || [] ].flatten.compact
+
+        if ingress.any?
+          compose[:networks].merge! ingress_routing: {external: true, name: 'ingress-routing'}
+        end
 
         service[:deploy] ||= {}
         service[:deploy][:labels] ||= []
