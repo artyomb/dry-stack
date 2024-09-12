@@ -6,7 +6,7 @@ This gem allows ...
 cat simple_stack.drs | dry-stack -e to_compose | docker stack deploy -c - simple_stack
 
 $ dry-stack
-Version: 0.1.15
+Version: 0.1.16
 Usage:
 	dry-stack -s stackfile [options] COMMAND
 	cat stackfile | dry-stack COMMAND
@@ -100,8 +100,8 @@ services:
           cpus: '4'
           memory: 500M
     networks:
-      default: 
-      ingress_routing: 
+      default:
+      ingress_routing:
     image: frontend
     ports:
     - 5000:5000
