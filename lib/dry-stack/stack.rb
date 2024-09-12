@@ -15,6 +15,7 @@ require_relative 'apache_specific_md5'
 
 module Dry
   EMPTY_HASH = :empty_hash
+  DEFAULT_INIT_SERVICE = true # add "init: true" option
 
   class ::Hash
     def deep_merge!(second)
@@ -381,7 +382,11 @@ module Dry
       opts[:ports] = [opts[:ports]].flatten if opts.key? :ports
       opts[:environment] = opts.delete(:env) if opts.key? :env
 
-      service = @services[name.to_sym] ||= {environment: {}, deploy: {labels: []}, networks: {}}
+      service = @services[name.to_sym] ||= begin
+        s = {environment: {}, deploy: {labels: []}, networks: {}}
+        DEFAULT_INIT_SERVICE ? s.merge(init: true) : s
+      end
+
       service.deep_merge! opts
       ServiceFunction.new(service, &) if block_given?
     end

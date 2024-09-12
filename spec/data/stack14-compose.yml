@@ -12,6 +12,7 @@ services:
         limits:
           cpus: '4'
           memory: 500M
+    init: true
     image: "$REGISTRY_HOST/frontend"
     logging:
       driver: loki
@@ -24,6 +25,7 @@ services:
     environment:
       STACK_NAME: stack
       STACK_SERVICE_NAME: test
+    init: true
     image: "$REGISTRY_HOST/test"
     logging:
       driver: loki
@@ -36,6 +38,7 @@ services:
     environment:
       STACK_NAME: stack
       STACK_SERVICE_NAME: test2
+    init: true
     image: "$REGISTRY_HOST/test"
     logging:
       driver: loki
@@ -48,6 +51,7 @@ services:
     environment:
       STACK_NAME: stack
       STACK_SERVICE_NAME: test3
+    init: true
     image: "$REGISTRY_HOST/test"
     logging:
       driver: loki

@@ -9,6 +9,7 @@ services:
       PGDATA: "/var/lib/postgresql/data/pgdata"
       STACK_NAME: stack
       STACK_SERVICE_NAME: db
+    init: true
     image: postgres:13.5
     volumes:
     - database:/var/lib/postgresql/data

@@ -17,8 +17,9 @@ services:
       - traefik.http.routers.stack_name_dev_admin-1.rule=HostRegexp(`{name:admin2\..*}`)
         && PathPrefix(`/api`)
     networks:
-      default: 
-      ingress_routing: 
+      default:
+      ingress_routing:
+    init: true
     image: frontend
 networks:
   ingress_routing:

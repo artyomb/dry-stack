@@ -29,8 +29,9 @@ services:
       - traefik.http.routers.stack_name_admin-2.tls.domains[0].main=prod_admin.swarm_x.com
       - traefik.http.routers.stack_name_admin-2.rule=HostRegexp(`{name:prod_admin\..*}`)
     networks:
-      default: 
-      ingress_routing: 
+      default:
+      ingress_routing:
+    init: true
     image: frontend
 networks:
   ingress_routing:

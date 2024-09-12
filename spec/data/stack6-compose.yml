@@ -24,11 +24,12 @@ services:
         constraints:
         - node.role == manager
     networks:
-      outside: 
+      outside:
       app_network:
         aliases:
         - a1
-      ingress_routing: 
+      ingress_routing:
+    init: true
     image: "$REGISTRY_HOST/frontend"
   reports:
     environment:
@@ -48,8 +49,9 @@ services:
         constraints:
         - node.role == manager
     networks:
-      default: 
-      ingress_routing: 
+      default:
+      ingress_routing:
+    init: true
     image: "$REGISTRY_HOST/reports"
     ports:
     - 7000:7000

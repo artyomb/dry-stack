@@ -19,8 +19,9 @@ services:
       STACK_NAME: stack_name
       STACK_SERVICE_NAME: front
     networks:
-      grafana_network: 
-      default: 
+      grafana_network:
+      default:
+    init: true
     image: frontend
     logging:
       driver: loki
@@ -48,8 +49,9 @@ services:
       test:
         aliases:
         - admin2
-      grafana_network: 
-      default: 
+      grafana_network:
+      default:
+    init: true
     image: frontend
     dns:
     - 8.8.8.8
@@ -65,7 +67,7 @@ services:
         loki-max-backoff: 1000ms
         loki-timeout: 1s
 networks:
-  hello.world: 
+  hello.world:
   grafana_network:
     external: true
     name: grafana-network

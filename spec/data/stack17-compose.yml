@@ -12,8 +12,9 @@ services:
       - traefik.http.services.stack_name_admin-0.loadbalancer.server.port=5000
       - traefik.http.routers.stack_name_admin-0.rule=PathPrefix(`frontend\..*`)
     networks:
-      default: 
-      ingress_routing: 
+      default:
+      ingress_routing:
+    init: true
     image: admin
 networks:
   ingress_routing:

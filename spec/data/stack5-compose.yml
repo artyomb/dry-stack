@@ -12,6 +12,7 @@ services:
         limits:
           cpus: '4'
           memory: 500M
+    init: true
     image: "$REGISTRY_HOST/frontend"
   admin2:
     environment:
@@ -24,6 +25,7 @@ services:
         limits:
           cpus: '4'
           memory: 500M
+    init: true
     image: "$REGISTRY_HOST/frontend"
   reports:
     environment:
@@ -39,6 +41,7 @@ services:
     networks:
       default:
       ingress_routing:
+    init: true
     image: "$REGISTRY_HOST/reports"
     configs:
     - source: filebeat_cfg
@@ -57,6 +60,7 @@ services:
     environment:
       STACK_NAME: stack
       STACK_SERVICE_NAME: test_very_very_long_service_name_to_exced_64_characters_limit_of_docker_swarm_config_name
+    init: true
     image: "$REGISTRY_HOST/frontend"
     configs:
     - source: stack_test_very_very_long_service_name_to_exced_64_characters_limit_of_docker_swarm_config_name-config-0

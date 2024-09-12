@@ -5,4 +5,5 @@ services:
     environment:
       STACK_NAME: stack
       STACK_SERVICE_NAME: hidden
+    init: true
     image: dummy/hidden

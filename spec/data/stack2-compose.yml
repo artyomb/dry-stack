@@ -20,8 +20,9 @@ services:
         constraints:
         - node.role == manager
     networks:
-      default: 
-      ingress_routing: 
+      default:
+      ingress_routing:
+    init: true
     image: service-image
     logging:
       driver: fluentd
@@ -44,8 +45,9 @@ services:
         constraints:
         - node.role == manager
     networks:
-      default: 
-      ingress_routing: 
+      default:
+      ingress_routing:
+    init: true
     image: postgres:13.5-alpine
     command: bash -c "apk add curl && docker-entrypoint.sh -c \"shared_buffers=256MB\"
       -c \"max_connections=200\" "
@@ -69,8 +71,9 @@ services:
       - traefik.http.services.name1_svc3-1.loadbalancer.server.port=4000
       - traefik.http.routers.name1_svc3-1.rule=HostRegexp(`{name:svc3-1\..*}`)
     networks:
-      default: 
-      ingress_routing: 
+      default:
+      ingress_routing:
+    init: true
     image: service-image
   svc4:
     environment:
@@ -86,8 +89,9 @@ services:
       - traefik.http.services.name1_svc4-1.loadbalancer.server.port=4000
       - traefik.http.routers.name1_svc4-1.rule=HostRegexp(`{name:svc4-1\..*}`)
     networks:
-      default: 
-      ingress_routing: 
+      default:
+      ingress_routing:
+    init: true
     image: service-image
   svc5:
     environment:
@@ -103,8 +107,9 @@ services:
       - traefik.http.services.name1_svc5-1.loadbalancer.server.port=4000
       - traefik.http.routers.name1_svc5-1.rule=HostRegexp(`{name:svc5-1\..*}`)
     networks:
-      default: 
-      ingress_routing: 
+      default:
+      ingress_routing:
+    init: true
     image: postgres:13.5-alpine
   svc6:
     environment:
@@ -120,8 +125,9 @@ services:
       - traefik.http.services.name1_svc6-1.loadbalancer.server.port=4000
       - traefik.http.routers.name1_svc6-1.rule=HostRegexp(`{name:svc6-1\..*}`)
     networks:
-      default: 
-      ingress_routing: 
+      default:
+      ingress_routing:
+    init: true
     image: postgres:13.5-alpine
 networks:
   ingress_routing:

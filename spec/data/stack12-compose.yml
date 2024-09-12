@@ -26,8 +26,9 @@ services:
           cpus: '4'
           memory: 500M
     networks:
-      default: 
-      ingress_routing: 
+      default:
+      ingress_routing:
+    init: true
     image: frontend
     ports:
     - 5000:5000
@@ -59,6 +60,7 @@ services:
     deploy:
       labels:
       - stack.product=product A
+    init: true
     image: backend
     volumes:
     - database:/var/lib/postgresql/data

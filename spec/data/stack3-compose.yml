@@ -6,4 +6,5 @@ services:
       DB_URL: "$DB_URL"
       STACK_NAME: stack
       STACK_SERVICE_NAME: reports
+    init: true
     image: reports

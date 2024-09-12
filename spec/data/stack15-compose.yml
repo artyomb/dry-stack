@@ -6,6 +6,7 @@ services:
       APP: admin
       STACK_NAME: stack_name
       STACK_SERVICE_NAME: admin
+    init: true
     image: frontend
     dns:
     - 8.8.8.8

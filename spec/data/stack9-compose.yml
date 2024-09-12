@@ -17,8 +17,9 @@ services:
       - traefik.http.routers.stack_admin-0.rule=HostRegexp(`{name:(admin|some)\..*}`)
         && PathPrefix(`/bar`)
     networks:
-      default: 
-      ingress_routing: 
+      default:
+      ingress_routing:
+    init: true
     image: "$REGISTRY_HOST/frontend"
 networks:
   ingress_routing:
