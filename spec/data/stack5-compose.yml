@@ -13,6 +13,18 @@ services:
           cpus: '4'
           memory: 500M
     image: "$REGISTRY_HOST/frontend"
+  admin2:
+    environment:
+      APP: admin
+      STACK_NAME: stack
+      STACK_SERVICE_NAME: admin2
+    deploy:
+      replica: 2
+      resources:
+        limits:
+          cpus: '4'
+          memory: 500M
+    image: "$REGISTRY_HOST/frontend"
   reports:
     environment:
       DB_URL: "$DB_URL"
@@ -25,8 +37,8 @@ services:
       - traefik.http.services.stack_reports-0.loadbalancer.server.port=7000
       - traefik.http.routers.stack_reports-0.rule=HostRegexp(`{name:reports\..*}`)
     networks:
-      default: 
-      ingress_routing: 
+      default:
+      ingress_routing:
     image: "$REGISTRY_HOST/reports"
     configs:
     - source: filebeat_cfg

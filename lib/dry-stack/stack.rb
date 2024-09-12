@@ -41,6 +41,19 @@ module Dry
     end
   end
 
+  def expand_hash(hash)
+    hash.select { _1.to_s =~ /\./ }.each do |k, v|
+      name = k.to_s.scan(/([^\.]*)\.(.*)/).flatten
+      hash.delete k
+      hash[name[0]] ||= {}
+      hash[name[0]][name[1]] ||= {}
+      hash[name[0]][name[1]].merge! v if v.is_a?(Hash)
+      hash[name[0]][name[1]] = v unless v.is_a?(Hash)
+    end
+    hash.each { expand_hash(_2) if _2.is_a?(Hash) }
+    hash
+  end
+
   attr_accessor :cmd_params
   @cmd_params = {}
 
@@ -64,6 +77,7 @@ module Dry
     def command(cmd)= @service[:command] = cmd
     def entrypoint(cmd)= @service[:entrypoint] = cmd
     def deploy_label(str)= @service[:deploy][:labels] << str
+    def deploy(opts)=@service[:deploy].merge! expand_hash(opts)
     def config(name = nil, opts)= (@service[:configs] ||= []) << {source: name.to_s}.merge(opts)
     def logging(opts) = (@service[:logging] ||= {}).merge!  opts
     def user(user) = @service[:user] = user #  "${UID}:${GID}", "www-data:www-data"
@@ -104,19 +118,6 @@ module Dry
       @configs = {}
       @logging = {}
       @configurations = {}
-    end
-
-    def expand_hash(hash)
-      hash.select { _1.to_s =~ /\./ }.each do |k, v|
-        name = k.to_s.scan(/([^\.]*)\.(.*)/).flatten
-        hash.delete k
-        hash[name[0]] ||= {}
-        hash[name[0]][name[1]] ||= {}
-        hash[name[0]][name[1]].merge! v if v.is_a?(Hash)
-        hash[name[0]][name[1]] = v unless v.is_a?(Hash)
-      end
-      hash.each { expand_hash(_2) if _2.is_a?(Hash) }
-      hash
     end
 
     def nginx_host2regexp(str)
