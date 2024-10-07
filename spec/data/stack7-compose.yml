@@ -23,9 +23,9 @@ services:
       - traefik.http.routers.stack_admin-1.tls.domains[0].main=admin.example.com
       - traefik.http.routers.stack_admin-1.rule=HostRegexp(`{name:admin\..*}`) &&
         PathPrefix(`/api`)
-      - traefik.http.routers.stack_admin-1.middlewares=stack_admin-1-path_sub
       - traefik.http.middlewares.stack_admin-1-path_sub.replacepathregex.regex=^/api/(.*)
       - traefik.http.middlewares.stack_admin-1-path_sub.replacepathregex.replacement=/bar/$$1
+      - traefik.http.routers.stack_admin-1.middlewares=stack_admin-1-path_sub
     networks:
       default:
       ingress_routing:

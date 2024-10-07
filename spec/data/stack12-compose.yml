@@ -17,9 +17,9 @@ services:
       - traefik.http.routers.stack_admin-1.service=stack_admin-1
       - traefik.http.services.stack_admin-1.loadbalancer.server.port=5000
       - traefik.http.middlewares.stack_admin-1_auth.basicauth.users=admin:$$apr1$$salt$$Pen1RIQw88lXnMv5UdR8P/
-      - traefik.http.routers.stack_admin-1.middlewares=stack_admin-1_auth
       - traefik.http.routers.stack_admin-1.rule=HostRegexp(`{name:admin2\..*}`) &&
         ClientIP(`127.0.0.0/24`,`128.0.0.0/24`)
+      - traefik.http.routers.stack_admin-1.middlewares=stack_admin-1_auth
       replica: 2
       resources:
         limits:

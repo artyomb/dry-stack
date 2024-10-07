@@ -206,23 +206,26 @@ module Dry
             rule << "PathPrefix(`#{nginx_host2regexp ing[:path]}`)" if ing[:path]
             rule << "#{ing[:rule]}" if ing[:rule]
 
+            middlewares = []
+
             if ing[:basic_auth]
               ba_user, ba_password, salt = ing[:basic_auth].split ':'
               hashed_password = apr1_crypt ba_password, (salt || rand(36**8).to_s(36))
               service[:deploy][:labels] << "traefik.http.middlewares.#{service_name}-#{index}_auth.basicauth.users=#{ba_user}:#{hashed_password.gsub('$','$$')}"
-              service[:deploy][:labels] << "traefik.http.routers.#{service_name}-#{index}.middlewares=#{service_name}-#{index}_auth"
+              middlewares << "#{service_name}-#{index}_auth"
             end
-
 
             service[:deploy][:labels] << "traefik.http.routers.#{service_name}-#{index}.rule=#{rule.join ' && '}"
 
             if ing[:path_sub]
+              middlewares << "#{service_name}-#{index}-path_sub"
               service[:deploy][:labels] += [
-                "traefik.http.routers.#{service_name}-#{index}.middlewares=#{service_name}-#{index}-path_sub",
                 "traefik.http.middlewares.#{service_name}-#{index}-path_sub.replacepathregex.regex=#{ing[:path_sub][0]}",
                 "traefik.http.middlewares.#{service_name}-#{index}-path_sub.replacepathregex.replacement=#{ing[:path_sub][1].gsub('$','$$')}"
               ]
             end
+
+            service[:deploy][:labels] << "traefik.http.routers.#{service_name}-#{index}.middlewares=#{middlewares.join ","}" unless middlewares.empty?
           end
         end
         service.delete :ingress
