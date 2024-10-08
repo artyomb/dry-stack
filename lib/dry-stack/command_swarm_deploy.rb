@@ -35,7 +35,7 @@ Dry::CommandLine::COMMANDS[:swarm_deploy] = Class.new do
     # system " echo \"#{yaml.gsub("`", '\\\`')}\" | docker stack deploy -c - #{stack.name} --prune --resolve-image changed"
 
     #  --prune  --resolve-image changed
-    exec_i "docker stack deploy -c - --with-registry-auth #{extra}" #{stack.name} , yaml
+    exec_i "docker stack deploy -c - --with-registry-auth #{extra} #{stack.name}" , yaml
     system "docker config rm $(docker config ls --filter label=com.docker.stack.namespace=#{stack.name} --format \"{{.ID}}\")"
 
     exec_i "docker config rm #{stack.name}_readme || echo 'failed to remove config #{stack.name}_readme'"
