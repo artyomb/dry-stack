@@ -25,6 +25,7 @@ services:
         - node.role == manager
     networks:
       outside:
+      outside-2:
       app_network:
         aliases:
         - a1
@@ -64,6 +65,9 @@ networks:
   ingress_routing:
     external: true
     name: ingress-routing
+  outside-2:
+    external: true
+    name: not-outside.long.long.domain.mane.com
   app_network:
     name: app.network.me
     external: true

@@ -11,6 +11,7 @@ Deploy [:admin, :reports],
 
 Service :admin,     image: '$REGISTRY_HOST/frontend',  env: { APP: 'admin' },      ports: 5000 do
   network :outside
+  network 'outside-2', external: true, name: 'not-outside.long.long.domain.mane.com'
   network :app_network, name: 'app.network.me', external: true
   network :app_network, aliases: ['a1']
 end

@@ -71,3 +71,4 @@ networks:
   grafana_network:
     external: true
     name: grafana-network
+  test:

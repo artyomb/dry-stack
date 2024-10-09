@@ -278,11 +278,12 @@ module Dry
         service[:networks]&.each do |name, network|
           next unless network.is_a? Hash
 
-          if network[:name]
-            (compose[:networks][name] ||= {}).merge! network.except(:aliases).merge(name: network[:name])
-          end
+          (compose[:networks][name] ||= {}).merge! network.except(:aliases)
+          compose[:networks][name].merge(name: network[:name]) if network[:name]
           network.delete :external
           network.delete :name
+          network.delete :attachable
+
           service[:networks][name] = EMPTY_HASH if network.empty?
         end
 
@@ -312,6 +313,7 @@ module Dry
         end
       end
 
+      compose[:networks].delete_if{ |k,v| k == :default && v.empty? }
       compose[:networks].transform_values! do |network|
         network.empty? ? EMPTY_HASH : network
       end
