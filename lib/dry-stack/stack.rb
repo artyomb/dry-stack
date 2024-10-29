@@ -277,7 +277,7 @@ module Dry
 
         service[:networks]&.each do |name, network|
           # raise "network name is invalid: #{name}" unless name.is_a? String, Symbol # https://bugs.ruby-lang.org/issues/20793
-          raise "network name is invalid: #{name}" unless [String, Symbol].include?(name.class)
+          raise "network name is invalid: #{name}" unless name in String | Symbol
           next unless network.is_a? Hash
 
           (compose[:networks][name] ||= {}).merge! network.except(:aliases)
