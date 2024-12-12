@@ -10,7 +10,7 @@ services:
       - traefik.enable=true
       - traefik.http.routers.stack_name_admin-0.service=stack_name_admin-0
       - traefik.http.services.stack_name_admin-0.loadbalancer.server.port=5000
-      - traefik.http.routers.stack_name_admin-0.rule=PathPrefix(`frontend\..*`)
+      - traefik.http.routers.stack_name_admin-0.rule=PathPrefix(`/frontend`)
     networks:
       default:
       ingress_routing:

@@ -1,5 +1,5 @@
 Options name: 'stack_name'
 
 Service :admin, image: 'admin:latest', ports: 5000,
-        ingress: { path: 'frontend.*' }
+        ingress: { path: '/frontend' }
 
