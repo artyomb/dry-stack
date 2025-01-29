@@ -189,7 +189,7 @@ module Dry
               domain = ing[:host_sni].gsub('.*', ".#{domain}")
               domain = ing[:tls_domain] if ing[:tls_domain]
 
-              ing[:passthrough] = true unless ing.key? :passthrough
+              ing[:passthrough] = false unless ing.key? :passthrough
 
               service[:deploy][:labels] += [
                 "traefik.tcp.routers.#{service_name}-#{index}.tls=true",

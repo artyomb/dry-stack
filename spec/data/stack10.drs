@@ -1,5 +1,5 @@
 Ingress db: [
-  {host_sni: 'pgsql.*', passthrough: false, port: 5432},
+  {host_sni: 'pgsql.*', passthrough: true, port: 5432},
   {host_sni: 'test.*', port: 1111}
 ]
 
