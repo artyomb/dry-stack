@@ -1,6 +1,6 @@
 Ingress db: [
-  {host_sni: 'pgsql.*', passthrough: true, port: 5432},
-  {host_sni: 'test.*', port: 1111}
+  {host_sni: 'pgsql.*', passthrough: true, port: 5432, entrypoints: 'postgres'},
+  {host_sni: 'test.*', port: 1111, entrypoints: 'postgres'}
 ]
 
 Service :db, image: 'postgres:13.5' do

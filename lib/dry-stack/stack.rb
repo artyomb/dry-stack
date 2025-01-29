@@ -190,6 +190,8 @@ module Dry
               domain = ing[:tls_domain] if ing[:tls_domain]
 
               ing[:passthrough] = false unless ing.key? :passthrough
+              # Without specifying entrypoints any/all are user by traefik to to connectio to the service
+              raise "'entrypoints' required for SNI tcp route" if ing[:entrypoints].to_s.empty?
 
               service[:deploy][:labels] += [
                 "traefik.tcp.routers.#{service_name}-#{index}.tls=true",
@@ -197,6 +199,7 @@ module Dry
                 "traefik.tcp.routers.#{service_name}-#{index}.tls.domains[0].main=#{domain}",
 
                 "traefik.tcp.routers.#{service_name}-#{index}.service=#{service_name}-#{index}",
+                "traefik.tcp.routers.#{service_name}-#{index}.entrypoints=#{ing[:entrypoints]}",
                 "traefik.tcp.services.#{service_name}-#{index}.loadbalancer.server.port=#{ing[:port]}",
 
                 "traefik.tcp.routers.#{service_name}-#{index}.rule=HostSNI(`#{domain}`)",
