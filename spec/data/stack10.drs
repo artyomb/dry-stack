@@ -1,3 +1,8 @@
+Ingress db: [
+  {host_sni: 'pgsql.*', passthrough: false, port: 5432},
+  {host_sni: 'test.*', port: 1111}
+]
+
 Service :db, image: 'postgres:13.5' do
   env POSTGRES_DB: 'dbname', POSTGRES_USER: 'user', POSTGRES_PASSWORD: 'password'
   env PGDATA: '/var/lib/postgresql/data/pgdata'

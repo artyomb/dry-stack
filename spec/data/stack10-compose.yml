@@ -9,6 +9,26 @@ services:
       PGDATA: "/var/lib/postgresql/data/pgdata"
       STACK_NAME: stack
       STACK_SERVICE_NAME: db
+    deploy:
+      labels:
+      - traefik.enable=true
+      - traefik.tcp.routers.stack_db-0.tls=true
+      - traefik.tcp.routers.stack_db-0.tls.certresolver=le
+      - traefik.tcp.routers.stack_db-0.tls.domains[0].main=pgsql.example.com
+      - traefik.tcp.routers.stack_db-0.service=stack_db-0
+      - traefik.tcp.services.stack_db-0.loadbalancer.server.port=5432
+      - traefik.tcp.routers.stack_db-0.rule=HostSNI(`pgsql.example.com`)
+      - traefik.tcp.routers.stack_db-0.tls.passthrough=false
+      - traefik.tcp.routers.stack_db-1.tls=true
+      - traefik.tcp.routers.stack_db-1.tls.certresolver=le
+      - traefik.tcp.routers.stack_db-1.tls.domains[0].main=test.example.com
+      - traefik.tcp.routers.stack_db-1.service=stack_db-1
+      - traefik.tcp.services.stack_db-1.loadbalancer.server.port=1111
+      - traefik.tcp.routers.stack_db-1.rule=HostSNI(`test.example.com`)
+      - traefik.tcp.routers.stack_db-1.tls.passthrough=true
+    networks:
+      default:
+      ingress_routing:
     init: true
     image: postgres:13.5
     volumes:
@@ -25,3 +45,7 @@ volumes:
     driver_opts:
       compression: lz4
       dedup: 'on'
+networks:
+  ingress_routing:
+    external: true
+    name: ingress-routing

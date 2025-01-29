@@ -184,48 +184,69 @@ module Dry
 
           ingress.each_with_index do |ing, index|
             ing[:port] ||= service[:ports]&.first
-            service[:deploy][:labels] += [
-              "traefik.http.routers.#{service_name}-#{index}.service=#{service_name}-#{index}",
-              "traefik.http.services.#{service_name}-#{index}.loadbalancer.server.port=#{ing[:port]}"
-            ]
-
-            if opts[:traefik_tls]
+            if ing[:host_sni]
               domain = opts[:tls_domain] || 'example.com'
-              domain = ing[:host].gsub('.*', ".#{domain}") if ing[:host]
+              domain = ing[:host_sni].gsub('.*', ".#{domain}")
               domain = ing[:tls_domain] if ing[:tls_domain]
+
+              ing[:passthrough] = true unless ing.key? :passthrough
+
               service[:deploy][:labels] += [
-                "traefik.http.routers.#{service_name}-#{index}.tls=true",
-                "traefik.http.routers.#{service_name}-#{index}.tls.certresolver=le",
-                "traefik.http.routers.#{service_name}-#{index}.tls.domains[0].main=#{domain}"
+                "traefik.tcp.routers.#{service_name}-#{index}.tls=true",
+                "traefik.tcp.routers.#{service_name}-#{index}.tls.certresolver=le",
+                "traefik.tcp.routers.#{service_name}-#{index}.tls.domains[0].main=#{domain}",
+
+                "traefik.tcp.routers.#{service_name}-#{index}.service=#{service_name}-#{index}",
+                "traefik.tcp.services.#{service_name}-#{index}.loadbalancer.server.port=#{ing[:port]}",
+
+                "traefik.tcp.routers.#{service_name}-#{index}.rule=HostSNI(`#{domain}`)",
+                "traefik.tcp.routers.#{service_name}-#{index}.tls.passthrough=#{ing[:passthrough]}"
               ]
-            end
 
-            rule = []
-            rule << "HostRegexp(`{name:#{nginx_host2regexp ing[:host]}}`)" if ing[:host]
-            rule << "ClientIP(#{[ing[:client_ip]].flatten.map{ "`#{_1}`" }.join ','})" if ing[:client_ip]
-            rule << "PathPrefix(`#{ing[:path]}`)" if ing[:path]
-            rule << "#{ing[:rule]}" if ing[:rule]
-
-            middlewares = []
-
-            if ing[:basic_auth]
-              ba_user, ba_password, salt = ing[:basic_auth].split ':'
-              hashed_password = apr1_crypt ba_password, (salt || rand(36**8).to_s(36))
-              service[:deploy][:labels] << "traefik.http.middlewares.#{service_name}-#{index}_auth.basicauth.users=#{ba_user}:#{hashed_password.gsub('$','$$')}"
-              middlewares << "#{service_name}-#{index}_auth"
-            end
-
-            service[:deploy][:labels] << "traefik.http.routers.#{service_name}-#{index}.rule=#{rule.join ' && '}"
-
-            if ing[:path_sub]
-              middlewares << "#{service_name}-#{index}-path_sub"
+            else
               service[:deploy][:labels] += [
-                "traefik.http.middlewares.#{service_name}-#{index}-path_sub.replacepathregex.regex=#{ing[:path_sub][0]}",
-                "traefik.http.middlewares.#{service_name}-#{index}-path_sub.replacepathregex.replacement=#{ing[:path_sub][1].gsub('$','$$')}"
+                "traefik.http.routers.#{service_name}-#{index}.service=#{service_name}-#{index}",
+                "traefik.http.services.#{service_name}-#{index}.loadbalancer.server.port=#{ing[:port]}"
               ]
-            end
 
-            service[:deploy][:labels] << "traefik.http.routers.#{service_name}-#{index}.middlewares=#{middlewares.join ","}" unless middlewares.empty?
+              if opts[:traefik_tls]
+                domain = opts[:tls_domain] || 'example.com'
+                domain = ing[:host].gsub('.*', ".#{domain}") if ing[:host]
+                domain = ing[:tls_domain] if ing[:tls_domain]
+                service[:deploy][:labels] += [
+                  "traefik.http.routers.#{service_name}-#{index}.tls=true",
+                  "traefik.http.routers.#{service_name}-#{index}.tls.certresolver=le",
+                  "traefik.http.routers.#{service_name}-#{index}.tls.domains[0].main=#{domain}"
+                ]
+              end
+
+              rule = []
+              rule << "HostRegexp(`{name:#{nginx_host2regexp ing[:host]}}`)" if ing[:host]
+              rule << "ClientIP(#{[ing[:client_ip]].flatten.map{ "`#{_1}`" }.join ','})" if ing[:client_ip]
+              rule << "PathPrefix(`#{ing[:path]}`)" if ing[:path]
+              rule << "#{ing[:rule]}" if ing[:rule]
+
+              middlewares = []
+
+              if ing[:basic_auth]
+                ba_user, ba_password, salt = ing[:basic_auth].split ':'
+                hashed_password = apr1_crypt ba_password, (salt || rand(36**8).to_s(36))
+                service[:deploy][:labels] << "traefik.http.middlewares.#{service_name}-#{index}_auth.basicauth.users=#{ba_user}:#{hashed_password.gsub('$','$$')}"
+                middlewares << "#{service_name}-#{index}_auth"
+              end
+
+              service[:deploy][:labels] << "traefik.http.routers.#{service_name}-#{index}.rule=#{rule.join ' && '}"
+
+              if ing[:path_sub]
+                middlewares << "#{service_name}-#{index}-path_sub"
+                service[:deploy][:labels] += [
+                  "traefik.http.middlewares.#{service_name}-#{index}-path_sub.replacepathregex.regex=#{ing[:path_sub][0]}",
+                  "traefik.http.middlewares.#{service_name}-#{index}-path_sub.replacepathregex.replacement=#{ing[:path_sub][1].gsub('$','$$')}"
+                ]
+              end
+
+              service[:deploy][:labels] << "traefik.http.routers.#{service_name}-#{index}.middlewares=#{middlewares.join ","}" unless middlewares.empty?
+            end
           end
         end
         service.delete :ingress
