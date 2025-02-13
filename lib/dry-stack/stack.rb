@@ -270,10 +270,22 @@ module Dry
         service[:deploy][:labels] = service[:deploy][:labels].map{ env_sub[_1] }
         service[:environment].transform_values!{ _1.is_a?(String) ? (env_sub[_1]) : _1 }
 
-        pp_i = @publish_ports[name]&.reject { _1.class == String }
+        pp_h = @publish_ports[name]&.select { _1.class == Hash }
+        pp_i = @publish_ports[name]&.select { _1.class == Integer }
         pp_s = @publish_ports[name]&.select { _1.class == String }
         service[:ports] = pp_i&.zip(service[:ports] || pp_i)&.map { _1.join ':' }
         service[:ports] = (service[:ports] || []) + pp_s unless pp_s.nil?
+
+        if pp_h&.any?
+          service[:ports] = service[:ports].map { |s|
+            if s.class == String
+              published, target = s.split(':').map(&:to_i)
+              { published:, target:, protocol: 'tcp', mode: 'ingress'}
+            else
+              s
+            end
+          } + pp_h
+        end
 
         service[:logging] ||= @logging[name.to_sym]
 
@@ -391,7 +403,7 @@ module Dry
     end
 
     def PublishPorts(ports)
-      @publish_ports.merge! ports.to_h { |k, v| [k,[v].flatten] }
+      @publish_ports.merge! ports.to_h { |k, v| [k,@publish_ports[k].to_a + [v].flatten] }
     end
 
     def Service(name, opts = {}, &block)

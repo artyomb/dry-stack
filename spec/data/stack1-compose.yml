@@ -38,8 +38,18 @@ services:
     init: true
     image: frontend
     ports:
-    - 4001:5000
-    - 4002:6000
+    - published: 4001
+      target: 5000
+      protocol: tcp
+      mode: ingress
+    - published: 4002
+      target: 6000
+      protocol: tcp
+      mode: ingress
+    - target: 8912
+      published: 8912
+      protocol: tcp
+      mode: host
   navigator:
     environment:
       APP: navigator
@@ -90,6 +100,15 @@ services:
       ingress_routing:
     init: true
     image: backend
+    ports:
+    - published: 1080
+      target: 3000
+      protocol: tcp
+      mode: ingress
+    - target: 8912
+      published: 8912
+      protocol: tcp
+      mode: host
     user: root
     logging:
       driver: fluentd
