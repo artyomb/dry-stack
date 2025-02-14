@@ -35,14 +35,14 @@ Dry::CommandLine::COMMANDS[:swarm_deploy] = Class.new do
     # system " echo \"#{yaml.gsub("`", '\\\`')}\" | docker stack deploy -c - #{stack.name} --prune --resolve-image changed"
 
     #  --prune  --resolve-image changed
-    exec_i "docker stack deploy -c - --with-registry-auth #{extra} #{stack.name}", yaml
+    exec_i "docker --context #{name} stack deploy -c - --with-registry-auth #{extra} #{stack.name}", yaml
     # Hide messages like:
     # Error response from daemon: rpc error: code = InvalidArgument desc = config 'grafana_dashboards_yaml-206a34dc77dc394d78a207c7abde327d' is in use by the following service: grafana_grafana
-    system "docker config rm $(docker config ls --filter label=com.docker.stack.namespace=#{stack.name} --format \"{{.ID}}\") 2>&1 | grep -v \"is in use\""
+    system "docker --context #{name} config rm $(docker config ls --filter label=com.docker.stack.namespace=#{stack.name} --format \"{{.ID}}\") 2>&1 | grep -v \"is in use\""
 
-    exec_i "docker config rm #{stack.name}_readme || echo 'failed to remove config #{stack.name}_readme'"
+    exec_i "docker --context #{name} config rm #{stack.name}_readme || echo 'failed to remove config #{stack.name}_readme'"
     puts "stack description: #{stack.description}"
-    exec_i "docker config create #{stack.name}_readme -", stack.description
+    exec_i "docker --context #{name} config create #{stack.name}_readme -", stack.description
   end
 
   def help = ['Call docker stack deploy & add config readme w/ description',
