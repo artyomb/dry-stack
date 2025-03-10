@@ -185,7 +185,7 @@ module Dry
           ingress.each_with_index do |ing, index|
             ing[:port] ||= service[:ports]&.first
             load_balancer = if ing[:url]
-              "loadbalancer.server.url=#{ing[:url]}"
+              "loadbalancer.servers[0].url=#{ing[:url]}"
             else
               "loadbalancer.server.port=#{ing[:port]}"
             end
