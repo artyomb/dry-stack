@@ -4,4 +4,7 @@ Service :admin, image: 'admin:latest', ports: 5000,
         ingress: { path: '/frontend' }
 
 Service :proxy_pass, image: 'alpine', command: 'sh -c "sleep inf"',
-        ingress: { path: '/google', url: 'https://google.com' }
+        ingress: [
+          { path: '/google', url: 'https://google.com' },
+          { path: '/my', port: 80, url: 'http://my.com' }
+        ]

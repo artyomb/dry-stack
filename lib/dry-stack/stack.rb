@@ -184,11 +184,9 @@ module Dry
 
           ingress.each_with_index do |ing, index|
             ing[:port] ||= service[:ports]&.first
-            load_balancer = if ing[:url]
-              "loadbalancer.servers[0].url=#{ing[:url]}"
-            else
-              "loadbalancer.server.port=#{ing[:port]}"
-            end
+            load_balancer = []
+            load_balancer << "server.url=#{ing[:url]}" if ing[:url]
+            load_balancer << "server.port=#{ing[:port]}" if ing[:port]
 
             if ing[:host_sni]
               domain = opts[:tls_domain] || 'example.com'
@@ -204,19 +202,19 @@ module Dry
                 "traefik.tcp.routers.#{service_name}-#{index}.tls.certresolver=le",
                 "traefik.tcp.routers.#{service_name}-#{index}.tls.domains[0].main=#{domain}",
 
-                "traefik.tcp.routers.#{service_name}-#{index}.service=#{service_name}-#{index}",
-                "traefik.tcp.routers.#{service_name}-#{index}.entrypoints=#{ing[:entrypoints]}",
-                "traefik.tcp.services.#{service_name}-#{index}.#{load_balancer}",
-
                 "traefik.tcp.routers.#{service_name}-#{index}.rule=HostSNI(`#{domain}`)",
-                "traefik.tcp.routers.#{service_name}-#{index}.tls.passthrough=#{ing[:passthrough]}"
+                "traefik.tcp.routers.#{service_name}-#{index}.tls.passthrough=#{ing[:passthrough]}",
+
+                "traefik.tcp.routers.#{service_name}-#{index}.service=#{service_name}-#{index}",
+                "traefik.tcp.routers.#{service_name}-#{index}.entrypoints=#{ing[:entrypoints]}"
               ]
+              service[:deploy][:labels] += load_balancer.map { "traefik.tcp.services.#{service_name}-#{index}.loadbalancer.#{_1}" }
 
             else
               service[:deploy][:labels] += [
                 "traefik.http.routers.#{service_name}-#{index}.service=#{service_name}-#{index}",
-                "traefik.http.services.#{service_name}-#{index}.#{load_balancer}"
               ]
+              service[:deploy][:labels] += load_balancer.map { "traefik.http.services.#{service_name}-#{index}.loadbalancer.#{_1}" }
 
               if opts[:traefik_tls]
                 domain = opts[:tls_domain] || 'example.com'

@@ -24,8 +24,12 @@ services:
       labels:
       - traefik.enable=true
       - traefik.http.routers.stack_name_proxy_pass-0.service=stack_name_proxy_pass-0
-      - traefik.http.services.stack_name_proxy_pass-0.loadbalancer.servers[0].url=https://google.com
+      - traefik.http.services.stack_name_proxy_pass-0.loadbalancer.server.url=https://google.com
       - traefik.http.routers.stack_name_proxy_pass-0.rule=PathPrefix(`/google`)
+      - traefik.http.routers.stack_name_proxy_pass-1.service=stack_name_proxy_pass-1
+      - traefik.http.services.stack_name_proxy_pass-1.loadbalancer.server.url=http://my.com
+      - traefik.http.services.stack_name_proxy_pass-1.loadbalancer.server.port=80
+      - traefik.http.routers.stack_name_proxy_pass-1.rule=PathPrefix(`/my`)
     networks:
       default:
       ingress_routing:

@@ -9,7 +9,6 @@ services:
       labels:
       - traefik.enable=true
       - traefik.http.routers.name1_svc1-0.service=name1_svc1-0
-      - traefik.http.services.name1_svc1-0.loadbalancer.server.port=
       - traefik.http.routers.name1_svc1-0.rule=HostRegexp(`{name:backend\..*}`)
       - traefik.http.routers.name1_svc1-1.service=name1_svc1-1
       - traefik.http.services.name1_svc1-1.loadbalancer.server.port=4000
