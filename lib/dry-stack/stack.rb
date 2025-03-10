@@ -184,6 +184,12 @@ module Dry
 
           ingress.each_with_index do |ing, index|
             ing[:port] ||= service[:ports]&.first
+            load_balancer = if ing[:url]
+              "loadbalancer.server.url=#{ing[:url]}"
+            else
+              "loadbalancer.server.port=#{ing[:port]}"
+            end
+
             if ing[:host_sni]
               domain = opts[:tls_domain] || 'example.com'
               domain = ing[:host_sni].gsub('.*', ".#{domain}")
@@ -200,7 +206,7 @@ module Dry
 
                 "traefik.tcp.routers.#{service_name}-#{index}.service=#{service_name}-#{index}",
                 "traefik.tcp.routers.#{service_name}-#{index}.entrypoints=#{ing[:entrypoints]}",
-                "traefik.tcp.services.#{service_name}-#{index}.loadbalancer.server.port=#{ing[:port]}",
+                "traefik.tcp.services.#{service_name}-#{index}.#{load_balancer}",
 
                 "traefik.tcp.routers.#{service_name}-#{index}.rule=HostSNI(`#{domain}`)",
                 "traefik.tcp.routers.#{service_name}-#{index}.tls.passthrough=#{ing[:passthrough]}"
@@ -209,7 +215,7 @@ module Dry
             else
               service[:deploy][:labels] += [
                 "traefik.http.routers.#{service_name}-#{index}.service=#{service_name}-#{index}",
-                "traefik.http.services.#{service_name}-#{index}.loadbalancer.server.port=#{ing[:port]}"
+                "traefik.http.services.#{service_name}-#{index}.#{load_balancer}"
               ]
 
               if opts[:traefik_tls]

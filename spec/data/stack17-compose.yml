@@ -16,6 +16,22 @@ services:
       ingress_routing:
     init: true
     image: admin
+  proxy_pass:
+    environment:
+      STACK_NAME: stack_name
+      STACK_SERVICE_NAME: proxy_pass
+    deploy:
+      labels:
+      - traefik.enable=true
+      - traefik.http.routers.stack_name_proxy_pass-0.service=stack_name_proxy_pass-0
+      - traefik.http.services.stack_name_proxy_pass-0.loadbalancer.server.url=https://google.com
+      - traefik.http.routers.stack_name_proxy_pass-0.rule=PathPrefix(`/google`)
+    networks:
+      default:
+      ingress_routing:
+    init: true
+    image: alpine
+    command: sh -c "sleep inf"
 networks:
   ingress_routing:
     external: true
