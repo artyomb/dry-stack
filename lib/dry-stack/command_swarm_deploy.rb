@@ -27,6 +27,7 @@ Dry::CommandLine::COMMANDS[:swarm_deploy] = Class.new do
     end
 
     exec_i "docker context create #{name} --docker host=#{endpoint}" unless contexts[name]
+    # TODO: o: context "dry-ssh__gis-master_ru" already exists
 
     ENV['DOCKER_CONTEXT'] = name.to_s
 

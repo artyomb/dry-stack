@@ -41,6 +41,12 @@ Service :backend,   image: 'backend', ports: 3000 do
   logging FLUENTD
 end
 
-Service :reports, image: 'reports:0.1', env: {DB_URL: '$DB_URL'}, ports: 7000
+Service :reports, image: 'reports:0.1', env: {DB_URL: '$DB_URL'}, ports: 7000 do
+  volume source: '', type: 'tmpfs', target: '/dev/shm', tmpfs: { size: 4096000000 }
+end
+
+Service :reports2, image: 'reports:0.1', env: {DB_URL: '$DB_URL'}, ports: 7000 do
+  volume source: nil, type: 'tmpfs', target: '/dev/shm', tmpfs: { size: 4096000000 }
+end
 
 Network :default, attachable: true

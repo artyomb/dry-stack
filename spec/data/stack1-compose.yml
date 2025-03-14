@@ -131,6 +131,28 @@ services:
     ports:
     - 7000:7000
     - 2000:3000
+    volumes:
+    - source: ''
+      type: tmpfs
+      target: "/dev/shm"
+      tmpfs:
+        size: 4096000000
+  reports2:
+    environment:
+      DB_URL: "$DB_URL"
+      STACK_NAME: simple_stack
+      STACK_SERVICE_NAME: reports2
+    deploy:
+      labels:
+      - stack.product=product A
+    init: true
+    image: reports:0.1
+    volumes:
+    - source:
+      type: tmpfs
+      target: "/dev/shm"
+      tmpfs:
+        size: 4096000000
 networks:
   default:
     attachable: true
