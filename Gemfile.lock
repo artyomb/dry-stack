@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    dry-stack (0.1.32)
+    dry-stack (0.1.33)
 
 GEM
   remote: https://rubygems.org/
