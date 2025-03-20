@@ -27,9 +27,10 @@ Dry::CommandLine::COMMANDS[:swarm_deploy] = Class.new do
     end
 
     unless contexts[name]
-      exec_i "docker context create #{name} --docker host=#{endpoint}" do |return_value, _o, e|
-        exit return_value.exitstatus unless return_value.success? || e !~ /already exists/m
-      end
+      system "docker context create #{name} --docker host=#{endpoint}"
+      # exec_i "docker context create #{name} --docker host=#{endpoint}" do |return_value, _o, e|
+      #   exit return_value.exitstatus unless return_value.success? || e !~ /already exists/m
+      # end
     end
 
     ENV['DOCKER_CONTEXT'] = name.to_s
