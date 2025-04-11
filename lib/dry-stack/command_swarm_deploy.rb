@@ -39,7 +39,7 @@ Dry::CommandLine::COMMANDS[:swarm_deploy] = Class.new do
     yaml = stack.to_compose(_params).lines[1..].join
     # system " echo \"#{yaml.gsub("`", '\\\`')}\" | docker stack deploy -c - #{stack.name} --prune --resolve-image changed"
 
-    #  --prune  --resolve-image changed
+    extra += ' --resolve-image=never' unless extra.include? '--resolve-image'
     exec_i "docker --context #{name} stack deploy -c - --with-registry-auth #{extra} #{stack.name}", yaml
     # Hide messages like:
     # Error response from daemon: rpc error: code = InvalidArgument desc = config 'grafana_dashboards_yaml-206a34dc77dc394d78a207c7abde327d' is in use by the following service: grafana_grafana
