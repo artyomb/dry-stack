@@ -42,7 +42,8 @@ Dry::CommandLine::COMMANDS[:swarm_deploy] = Class.new do
     begin
       deploy_status = 'unknown'
       extra += ' --resolve-image=never' unless extra.include? '--resolve-image'
-      exec_i "docker --context #{name} stack deploy -c - --with-registry-auth #{extra} #{stack.name}", yaml
+      deploy_command = "docker --context #{name} stack deploy -c - --with-registry-auth #{extra} #{stack.name}"
+      exec_i deploy_command, yaml
       # Hide messages like:
       # Error response from daemon: rpc error: code = InvalidArgument desc = config 'grafana_dashboards_yaml-206a34dc77dc394d78a207c7abde327d' is in use by the following service: grafana_grafana
       conf_list = `docker config ls --filter label=com.docker.stack.namespace=#{stack.name} --format \"{{.ID}}\"`
@@ -61,6 +62,7 @@ Dry::CommandLine::COMMANDS[:swarm_deploy] = Class.new do
         data = {
           deploy_host: endpoint,
           docker_context: name,
+          deploy_command:,
           stack_name: stack.name,
           deploy_status:,
           stack: YAML.load(yaml, aliases: true)
