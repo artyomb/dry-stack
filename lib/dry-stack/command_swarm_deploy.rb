@@ -58,8 +58,8 @@ Dry::CommandLine::COMMANDS[:swarm_deploy] = Class.new do
       exec_i "docker --context #{name} config create #{stack.name}_readme -", stack.description
       deploy_status = 'deployed'
     ensure
-      if ENV['DEPLOY_REGISTRY'] || ENV['CI_DEPLOY_REGISTRY']
-        deploy_registry = ENV['DEPLOY_REGISTRY'] || ENV['CI_DEPLOY_REGISTRY']
+      if ENV['CI_DEPLOY_REGISTRY']
+        deploy_registry = ENV['CI_DEPLOY_REGISTRY']
         puts "Sending deploy status to #{deploy_registry}"
         data = {
           deploy_host: endpoint,
@@ -70,16 +70,20 @@ Dry::CommandLine::COMMANDS[:swarm_deploy] = Class.new do
           stack: YAML.load(yaml, aliases: true)
         }
 
-        uri = URI("#{deploy_registry}/api/v1/swarm_deploy")
-        http = Net::HTTP.new(uri.host, uri.port)
-        http.use_ssl = uri.scheme == 'https'
+        begin
+          uri = URI("#{deploy_registry}/api/v1/swarm_deploy")
+          http = Net::HTTP.new(uri.host, uri.port)
+          http.use_ssl = uri.scheme == 'https'
 
-        request = Net::HTTP::Post.new(uri)
-        request['Content-Type'] = 'application/json'
-        request.body = data.to_json
+          request = Net::HTTP::Post.new(uri)
+          request['Content-Type'] = 'application/json'
+          request.body = data.to_json
 
-        response = http.request(request)
-        puts "POST Return value: #{response.code}"
+          response = http.request(request)
+          puts "POST Return value: #{response.code}"
+        rescue => e
+          puts "Error: #{e.message}"
+        end
       end
     end
   end
