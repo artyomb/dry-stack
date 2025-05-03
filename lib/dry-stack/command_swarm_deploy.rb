@@ -56,8 +56,8 @@ Dry::CommandLine::COMMANDS[:swarm_deploy] = Class.new do
       exec_i "docker --context #{name} config create #{stack.name}_readme -", stack.description
       deploy_status = 'deployed'
     ensure
-      if ENV['DEPLOY_REGISTRY']
-        deploy_registry = ENV['DEPLOY_REGISTRY']
+      if ENV['DEPLOY_REGISTRY'] || ENV['CI_DEPLOY_REGISTRY']
+        deploy_registry = ENV['DEPLOY_REGISTRY'] || ENV['CI_DEPLOY_REGISTRY']
         puts "Sending deploy status to #{deploy_registry}"
         data = {
           deploy_host: endpoint,
