@@ -39,18 +39,35 @@ Dry::CommandLine::COMMANDS[:swarm_deploy] = Class.new do
     yaml = stack.to_compose(_params).lines[1..].join
     # system " echo \"#{yaml.gsub("`", '\\\`')}\" | docker stack deploy -c - #{stack.name} --prune --resolve-image changed"
 
-    extra += ' --resolve-image=never' unless extra.include? '--resolve-image'
-    exec_i "docker --context #{name} stack deploy -c - --with-registry-auth #{extra} #{stack.name}", yaml
-    # Hide messages like:
-    # Error response from daemon: rpc error: code = InvalidArgument desc = config 'grafana_dashboards_yaml-206a34dc77dc394d78a207c7abde327d' is in use by the following service: grafana_grafana
-    conf_list = `docker config ls --filter label=com.docker.stack.namespace=#{stack.name} --format \"{{.ID}}\"`
-    unless conf_list.strip.empty?
-      system "docker --context #{name} config rm $(docker config ls --filter label=com.docker.stack.namespace=#{stack.name} --format \"{{.ID}}\") 2>&1 | grep -v \"is in use\""
-    end
+    begin
+      deploy_status = 'unknown'
+      extra += ' --resolve-image=never' unless extra.include? '--resolve-image'
+      exec_i "docker --context #{name} stack deploy -c - --with-registry-auth #{extra} #{stack.name}", yaml
+      # Hide messages like:
+      # Error response from daemon: rpc error: code = InvalidArgument desc = config 'grafana_dashboards_yaml-206a34dc77dc394d78a207c7abde327d' is in use by the following service: grafana_grafana
+      conf_list = `docker config ls --filter label=com.docker.stack.namespace=#{stack.name} --format \"{{.ID}}\"`
+      unless conf_list.strip.empty?
+        system "docker --context #{name} config rm $(docker config ls --filter label=com.docker.stack.namespace=#{stack.name} --format \"{{.ID}}\") 2>&1 | grep -v \"is in use\""
+      end
 
-    exec_i "docker --context #{name} config rm #{stack.name}_readme || echo 'failed to remove config #{stack.name}_readme'"
-    puts "stack description: #{stack.description}"
-    exec_i "docker --context #{name} config create #{stack.name}_readme -", stack.description
+      exec_i "docker --context #{name} config rm #{stack.name}_readme || echo 'failed to remove config #{stack.name}_readme'"
+      puts "stack description: #{stack.description}"
+      exec_i "docker --context #{name} config create #{stack.name}_readme -", stack.description
+      deploy_status = 'deployed'
+    ensure
+      if ENV['DEPLOY_REGISTRY']
+        deploy_registry = ENV['DEPLOY_REGISTRY']
+        puts "Sending deploy status to #{deploy_registry}"
+        data = {
+          deploy_host: endpoint,
+          docker_context: name,
+          stack_name: stack.name,
+          deploy_status:,
+          stack: YAML.load(yaml, aliases: true)
+        }
+        exec_i "curl -x POST #{deploy_registry}/api/v1/swarm_deploy -H 'Content-Type: application/json' -d @-", data.to_json
+      end
+    end
   end
 
   def help = ['Call docker stack deploy & add config readme w/ description',
