@@ -67,7 +67,7 @@ Dry::CommandLine::COMMANDS[:swarm_deploy] = Class.new do
           deploy_status:,
           stack: YAML.load(yaml, aliases: true)
         }
-        exec_i "curl -x POST #{deploy_registry}/api/v1/swarm_deploy -H 'Content-Type: application/json' -d @-", data.to_json
+        exec_i "curl -X POST #{deploy_registry}/api/v1/swarm_deploy -H 'Content-Type: application/json' -d @-", data.to_json
       end
     end
   end
