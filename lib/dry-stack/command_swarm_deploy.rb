@@ -1,4 +1,6 @@
 require_relative 'command_line'
+require 'net/http'
+require 'uri'
 
 Dry::CommandLine::COMMANDS[:swarm_deploy] = Class.new do
   def options(parser)
@@ -67,9 +69,17 @@ Dry::CommandLine::COMMANDS[:swarm_deploy] = Class.new do
           deploy_status:,
           stack: YAML.load(yaml, aliases: true)
         }
-        exec_i "curl -s -X POST #{deploy_registry}/api/v1/swarm_deploy -H 'Content-Type: application/json' -d @-", data.to_json do |return_value, std_out, std_err|
-          puts "POST Return value: #{return_value}"
-        end
+
+        uri = URI("#{deploy_registry}/api/v1/swarm_deploy")
+        http = Net::HTTP.new(uri.host, uri.port)
+        http.use_ssl = uri.scheme == 'https'
+
+        request = Net::HTTP::Post.new(uri)
+        request['Content-Type'] = 'application/json'
+        request.body = data.to_json
+
+        response = http.request(request)
+        puts "POST Return value: #{response.code}"
       end
     end
   end
