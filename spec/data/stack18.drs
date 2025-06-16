@@ -1,0 +1,3 @@
+Options traefik_tls: true, tls_domain: 'my.com', ingress: true
+
+Service :front, image: 'reports:0.1', ports: 7000, ingress: { host: '*' }

@@ -153,22 +153,6 @@ services:
       target: "/dev/shm"
       tmpfs:
         size: 4096000000
-  front:
-    environment:
-      STACK_NAME: simple_stack
-      STACK_SERVICE_NAME: front
-    deploy:
-      labels:
-      - stack.product=product A
-      - traefik.enable=true
-      - traefik.http.routers.simple_stack_front-0.service=simple_stack_front-0
-      - traefik.http.services.simple_stack_front-0.loadbalancer.server.port=7000
-      - traefik.http.routers.simple_stack_front-0.rule=HostRegexp(`{name:.*}`)
-    networks:
-      default:
-      ingress_routing:
-    init: true
-    image: reports:0.1
 networks:
   default:
     attachable: true

@@ -218,7 +218,7 @@ module Dry
 
               if opts[:traefik_tls]
                 domain = opts[:tls_domain] || 'example.com'
-                domain = ing[:host].gsub('.*', ".#{domain}") if ing[:host]&.include?('*')
+                domain = ing[:host].gsub('.*', ".#{domain}") if ing[:host]&.include?('.*')
                 domain = ing[:tls_domain] if ing[:tls_domain]
                 service[:deploy][:labels] += [
                   "traefik.http.routers.#{service_name}-#{index}.tls=true",
