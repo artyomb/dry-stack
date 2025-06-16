@@ -1,5 +1,5 @@
 module Dry
   class Stack
-    VERSION = '0.1.43'
+    VERSION = '0.1.44'
   end
 end
