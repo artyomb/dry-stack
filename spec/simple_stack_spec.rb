@@ -27,11 +27,11 @@ describe 'Test simple Stack' do
           compose = YAML.load_file stack_file.gsub('.drs', sufix), aliases: true rescue ''
           # puts stack_compose_shell
 
-          # unless stack_compose_shell == compose.to_yaml
-          #   yaml = YAML.load stack_compose_shell, aliases: true
-          #   File.write stack_file.gsub('.drs', sufix), yaml.to_yaml
-          #   compose = YAML.load_file stack_file.gsub('.drs', sufix), aliases: true
-          # end
+          unless stack_compose_shell == compose.to_yaml
+            yaml = YAML.load stack_compose_shell, aliases: true
+            File.write stack_file.gsub('.drs', sufix), yaml.to_yaml
+            compose = YAML.load_file stack_file.gsub('.drs', sufix), aliases: true
+          end
           expect(stack_compose_shell).to eq(compose.to_yaml)
         end
       end

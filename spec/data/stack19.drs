@@ -1,0 +1,13 @@
+
+# "traefik.http.middlewares.auth-0.forwardauth.address=http://oauth_provider:7000/auth"
+# "traefik.http.routers.%{service-name}-0.middlewares=auth-0"
+
+Service :odata1, ingress: { path: '/odata', oauth_provider: 'stack_name_oauth_provider:7000/auth' }
+Service :odata2, ingress: { path: '/odata', oauth_provider: 'stack_name_oauth_provider_override' }
+Service :odata3, ingress: { path: '/odata' }
+
+BeforeService [:odata2, :odata3] do
+  oauth_provider 'stack_name_oauth_provider_global'
+end
+
+Service :odata4, ingress: { path: '/odata' }, oauth_provider: 'stack_name_oauth_provider:7000/auth'

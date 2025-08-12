@@ -84,6 +84,7 @@ module Dry
     def user(user) = @service[:user] = user #  "${UID}:${GID}", "www-data:www-data"
     def network(name, opts = {}) = (@service[:networks][name] ||={}).merge! opts
     def ingress(ing) = ((@service[:ingress] ||=[]) << ing).flatten!
+    def oauth_provider(address) = (@service[:oauth_provider] = address)
   end
 
   class ConfigurationFunction
@@ -234,6 +235,13 @@ module Dry
               rule << "#{ing[:rule]}" if ing[:rule]
 
               middlewares = []
+              if ing[:oauth_provider] || service[:oauth_provider]
+                pname = "#{service_name}-#{index}_oauth_provider"
+                value = ing[:oauth_provider] || service[:oauth_provider]
+                value = "http://#{value}" unless value =~ /^http/
+                middlewares << pname
+                service[:deploy][:labels] << "traefik.http.middlewares.#{pname}.forwardauth.address=#{value}"
+              end
 
               if ing[:basic_auth]
                 ba_user, ba_password, salt = ing[:basic_auth].split ':'
@@ -257,6 +265,7 @@ module Dry
           end
         end
         service.delete :ingress
+        service.delete :oauth_provider
 
         service[:environment] = @environment[name].merge(service[:environment])  if @environment[name]
         service[:environment].merge! STACK_NAME: @name.to_s, STACK_SERVICE_NAME: name.to_s

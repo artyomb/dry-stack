@@ -19,6 +19,24 @@ services:
       ingress_routing:
     init: true
     image: reports:0.1
+  front2:
+    environment:
+      STACK_NAME: stack
+      STACK_SERVICE_NAME: front2
+    deploy:
+      labels:
+      - traefik.enable=true
+      - traefik.http.routers.stack_front2-0.service=stack_front2-0
+      - traefik.http.services.stack_front2-0.loadbalancer.server.port=7000
+      - traefik.http.routers.stack_front2-0.tls=true
+      - traefik.http.routers.stack_front2-0.tls.certresolver=le
+      - traefik.http.routers.stack_front2-0.tls.domains[0].main=my.com
+      - traefik.http.routers.stack_front2-0.rule=PathPrefix(`/test`)
+    networks:
+      default:
+      ingress_routing:
+    init: true
+    image: reports:0.1
 networks:
   ingress_routing:
     external: true
