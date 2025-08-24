@@ -232,6 +232,7 @@ module Dry
               rule << "HostRegexp(`{name:#{nginx_host2regexp ing[:host]}}`)" if ing[:host]
               rule << "ClientIP(#{[ing[:client_ip]].flatten.map{ "`#{_1}`" }.join ','})" if ing[:client_ip]
               rule << "PathPrefix(`#{ing[:path]}`)" if ing[:path]
+              rule << "PathRegexp(`#{ing[:path_regexp]}`)" if ing[:path_regexp]
               rule << "#{ing[:rule]}" if ing[:rule]
 
               middlewares = []

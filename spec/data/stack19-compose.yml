@@ -55,8 +55,23 @@ services:
       - traefik.enable=true
       - traefik.http.routers.stack_odata4-0.service=stack_odata4-0
       - traefik.http.middlewares.stack_odata4-0_oauth_provider.forwardauth.address=http://stack_name_oauth_provider:7000/auth
-      - traefik.http.routers.stack_odata4-0.rule=PathPrefix(`/odata`)
+      - traefik.http.routers.stack_odata4-0.rule=PathRegexp(`\.(jpeg|jpg|png)$`)
       - traefik.http.routers.stack_odata4-0.middlewares=stack_odata4-0_oauth_provider
+    networks:
+      default:
+      ingress_routing:
+    init: true
+  odata5:
+    environment:
+      STACK_NAME: stack
+      STACK_SERVICE_NAME: odata5
+    deploy:
+      labels:
+      - traefik.enable=true
+      - traefik.http.routers.stack_odata5-0.service=stack_odata5-0
+      - traefik.http.middlewares.stack_odata5-0_oauth_provider.forwardauth.address=http://stack_name_oauth_provider:7000/auth
+      - traefik.http.routers.stack_odata5-0.rule=PathRegexp(`^/products/(shoes|socks)/[0-9]+$`)
+      - traefik.http.routers.stack_odata5-0.middlewares=stack_odata5-0_oauth_provider
     networks:
       default:
       ingress_routing:

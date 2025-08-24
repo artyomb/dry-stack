@@ -10,4 +10,5 @@ BeforeService [:odata2, :odata3] do
   oauth_provider 'stack_name_oauth_provider_global'
 end
 
-Service :odata4, ingress: { path: '/odata' }, oauth_provider: 'stack_name_oauth_provider:7000/auth'
+Service :odata4, ingress: { path_regexp: '\.(jpeg|jpg|png)$' }, oauth_provider: 'stack_name_oauth_provider:7000/auth'
+Service :odata5, ingress: { path_regexp: '^/products/(shoes|socks)/[0-9]+$' }, oauth_provider: 'stack_name_oauth_provider:7000/auth'
