@@ -10,6 +10,7 @@ services:
       - traefik.enable=true
       - traefik.http.routers.stack_odata1-0.service=stack_odata1-0
       - traefik.http.middlewares.stack_odata1-0_oauth_provider.forwardauth.address=http://stack_name_oauth_provider:7000/auth
+      - traefik.http.middlewares.stack_odata1-0_oauth_provider.forwardauth.authResponseHeadersRegex=^X-
       - traefik.http.routers.stack_odata1-0.rule=PathPrefix(`/odata`)
       - traefik.http.routers.stack_odata1-0.middlewares=stack_odata1-0_oauth_provider
     networks:
@@ -25,6 +26,7 @@ services:
       - traefik.enable=true
       - traefik.http.routers.stack_odata2-0.service=stack_odata2-0
       - traefik.http.middlewares.stack_odata2-0_oauth_provider.forwardauth.address=http://stack_name_oauth_provider_override
+      - traefik.http.middlewares.stack_odata2-0_oauth_provider.forwardauth.authResponseHeadersRegex=^X-
       - traefik.http.routers.stack_odata2-0.rule=PathPrefix(`/odata`)
       - traefik.http.routers.stack_odata2-0.middlewares=stack_odata2-0_oauth_provider
     networks:
@@ -40,6 +42,7 @@ services:
       - traefik.enable=true
       - traefik.http.routers.stack_odata3-0.service=stack_odata3-0
       - traefik.http.middlewares.stack_odata3-0_oauth_provider.forwardauth.address=http://stack_name_oauth_provider_global
+      - traefik.http.middlewares.stack_odata3-0_oauth_provider.forwardauth.authResponseHeadersRegex=^X-
       - traefik.http.routers.stack_odata3-0.rule=PathPrefix(`/odata`)
       - traefik.http.routers.stack_odata3-0.middlewares=stack_odata3-0_oauth_provider
     networks:
@@ -55,6 +58,7 @@ services:
       - traefik.enable=true
       - traefik.http.routers.stack_odata4-0.service=stack_odata4-0
       - traefik.http.middlewares.stack_odata4-0_oauth_provider.forwardauth.address=http://stack_name_oauth_provider:7000/auth
+      - traefik.http.middlewares.stack_odata4-0_oauth_provider.forwardauth.authResponseHeadersRegex=^X-
       - traefik.http.routers.stack_odata4-0.rule=PathRegexp(`\.(jpeg|jpg|png)$`)
       - traefik.http.routers.stack_odata4-0.middlewares=stack_odata4-0_oauth_provider
     networks:
@@ -70,6 +74,7 @@ services:
       - traefik.enable=true
       - traefik.http.routers.stack_odata5-0.service=stack_odata5-0
       - traefik.http.middlewares.stack_odata5-0_oauth_provider.forwardauth.address=http://stack_name_oauth_provider:7000/auth
+      - traefik.http.middlewares.stack_odata5-0_oauth_provider.forwardauth.authResponseHeadersRegex=^X-
       - traefik.http.routers.stack_odata5-0.rule=PathRegexp(`^/products/(shoes|socks)/[0-9]+$`)
       - traefik.http.routers.stack_odata5-0.middlewares=stack_odata5-0_oauth_provider
     networks:

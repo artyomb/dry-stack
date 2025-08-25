@@ -242,6 +242,7 @@ module Dry
                 value = "http://#{value}" unless value =~ /^http/
                 middlewares << pname
                 service[:deploy][:labels] << "traefik.http.middlewares.#{pname}.forwardauth.address=#{value}"
+                service[:deploy][:labels] << "traefik.http.middlewares.#{pname}.forwardauth.authResponseHeadersRegex=^X-"
               end
 
               if ing[:basic_auth]

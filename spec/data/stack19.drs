@@ -12,3 +12,6 @@ end
 
 Service :odata4, ingress: { path_regexp: '\.(jpeg|jpg|png)$' }, oauth_provider: 'stack_name_oauth_provider:7000/auth'
 Service :odata5, ingress: { path_regexp: '^/products/(shoes|socks)/[0-9]+$' }, oauth_provider: 'stack_name_oauth_provider:7000/auth'
+
+# ingress path_regexp: '.*authorize', port: 7000 # Traefik v3
+# ingress path: '/{path:(.*authorize)}', port: 7000 # Traefik v2
