@@ -13,6 +13,10 @@ Dry::CommandLine::COMMANDS[:swarm_deploy] = Class.new do
 
     raise 'Context endpoint required' unless params[:context_endpoint]
 
+    if ENV['CI_SSH_AUTH_SOCK']
+      ENV['SSH_AUTH_SOCK'] = ENV['CI_SSH_AUTH_SOCK']
+    end
+
     name = params[:context_endpoint].gsub( /[\/.:@]/,'_').gsub( '__','_')
     name = "dry-#{name}".to_sym
     endpoint = params[:context_endpoint]
