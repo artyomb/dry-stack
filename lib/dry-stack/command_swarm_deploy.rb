@@ -46,6 +46,7 @@ Dry::CommandLine::COMMANDS[:swarm_deploy] = Class.new do
     # system " echo \"#{yaml.gsub("`", '\\\`')}\" | docker stack deploy -c - #{stack.name} --prune --resolve-image changed"
 
     begin
+      extra ||= ''
       deploy_status = 'unknown'
       extra += ' --resolve-image=never' unless extra.include? '--resolve-image'
       deploy_command = "docker --context #{name} stack deploy -c - --with-registry-auth #{extra} #{stack.name}"
