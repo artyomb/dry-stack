@@ -24,7 +24,7 @@ services:
         constraints:
         - node.role == manager
     networks:
-      outside:
+      host:
       outside-2:
       app_network:
         aliases:
@@ -59,9 +59,9 @@ services:
 networks:
   default:
     attachable: true
-  outside:
-    external:
-      name: host
+  host:
+    external: true
+    name: host
   ingress_routing:
     external: true
     name: ingress-routing

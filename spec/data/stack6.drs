@@ -10,7 +10,7 @@ Deploy [:admin, :reports],
 
 
 Service :admin,     image: '$REGISTRY_HOST/frontend',  env: { APP: 'admin' },      ports: 5000 do
-  network :outside
+  network :host
   network 'outside-2', external: true, name: 'not-outside.long.long.domain.mane.com'
   network :app_network, name: 'app.network.me', external: true
   network :app_network, aliases: ['a1']
@@ -18,4 +18,4 @@ end
 Service :reports,   image: '$REGISTRY_HOST/reports', env: { DB_URL: '$DB_URL' }
 
 Network :default, attachable: true
-Network :outside, external: { name: 'host' }
+Network :host, external: true, name: 'host'
