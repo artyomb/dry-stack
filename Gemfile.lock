@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    dry-stack (0.1.51)
+    dry-stack (0.1.53)
 
 GEM
   remote: https://rubygems.org/
@@ -61,9 +61,6 @@ DEPENDENCIES
   rubocop (~> 1.12)
   rubocop-rake (~> 0.6.0)
   rubocop-rspec (~> 2.14.2)
-
-RUBY VERSION
-   ruby 3.1.2p20
 
 BUNDLED WITH
    2.3.17

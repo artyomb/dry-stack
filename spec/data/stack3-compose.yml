@@ -8,3 +8,14 @@ services:
       STACK_SERVICE_NAME: reports
     init: true
     image: reports
+  admin:
+    environment:
+      DB_URL: "$DB_URL"
+      STACK_NAME: stack
+      STACK_SERVICE_NAME: admin
+    init: true
+    image: admin
+    cap_add:
+    - NET_ADMIN
+    cap_drop:
+    - SYSLOG

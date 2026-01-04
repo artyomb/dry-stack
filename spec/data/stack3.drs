@@ -1,3 +1,8 @@
 Options traefik: true, ingress: true
 
 Service :reports, image: 'reports', ports: 7000, env: {DB_URL: '$DB_URL'}
+
+Service :admin, image: 'admin', ports: 7000, env: {DB_URL: '$DB_URL'} do
+  cap_add %w[NET_ADMIN]
+  cap_drop %w[SYSLOG]
+end

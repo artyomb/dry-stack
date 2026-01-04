@@ -85,6 +85,8 @@ module Dry
     def network(name, opts = {}) = (@service[:networks][name] ||={}).merge! opts
     def ingress(ing) = ((@service[:ingress] ||=[]) << ing).flatten!
     def oauth_provider(address) = (@service[:oauth_provider] = address)
+    def cap_add(cap_list) = ((@service[:cap_add] ||=[]) << cap_list).flatten!
+    def cap_drop(cap_list) = ((@service[:cap_drop] ||=[]) << cap_list).flatten!
   end
 
   class ConfigurationFunction
