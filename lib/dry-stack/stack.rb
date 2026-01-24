@@ -193,7 +193,13 @@ module Dry
 
             if ing[:host_sni]
               domain = opts[:tls_domain] || 'example.com'
-              domain = ing[:host_sni].gsub('.*', ".#{domain}") if ing[:host_sni]&.include?('*')
+
+              if ing[:host_sni]&.include?('*')
+                domain = ing[:host_sni].gsub('.*', ".#{domain}")
+              else
+                domain = ing[:host_sni]
+              end
+
               domain = ing[:tls_domain] if ing[:tls_domain]
 
               ing[:passthrough] = false unless ing.key? :passthrough
@@ -221,7 +227,14 @@ module Dry
 
               if opts[:traefik_tls]
                 domain = opts[:tls_domain] || 'example.com'
-                domain = ing[:host].gsub('.*', ".#{domain}") if ing[:host]&.include?('.*')
+                if ing[:host]
+                  if ing[:host]&.include?('*')
+                    domain = ing[:host].gsub('*', domain)
+                  else
+                    domain = ing[:host]
+                  end
+                end
+
                 domain = ing[:tls_domain] if ing[:tls_domain]
                 service[:deploy][:labels] += [
                   "traefik.http.routers.#{service_name}-#{index}.tls=true",
@@ -527,4 +540,3 @@ module Dry
 
   end
 end
-

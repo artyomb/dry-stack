@@ -21,6 +21,48 @@ services:
       ingress_routing:
     init: true
     image: "$REGISTRY_HOST/frontend"
+  admin2:
+    environment:
+      STACK_NAME: stack
+      STACK_SERVICE_NAME: admin2
+    deploy:
+      labels:
+      - traefik.enable=true
+      - traefik.http.routers.stack_admin2-0.service=stack_admin2-0
+      - traefik.http.services.stack_admin2-0.loadbalancer.server.port=5000
+      - traefik.http.routers.stack_admin2-0.tls=true
+      - traefik.http.routers.stack_admin2-0.tls.certresolver=le
+      - traefik.http.routers.stack_admin2-0.tls.domains[0].main=admin.test.com
+      - traefik.http.routers.stack_admin2-0.rule=HostRegexp(`{name:admin\.test\.com}`)
+      - traefik.tcp.routers.stack_admin2-1.tls=true
+      - traefik.tcp.routers.stack_admin2-1.tls.certresolver=le
+      - traefik.tcp.routers.stack_admin2-1.tls.domains[0].main=pgsql-override.admin.test.com
+      - traefik.tcp.routers.stack_admin2-1.rule=HostSNI(`pgsql-override.admin.test.com`)
+      - traefik.tcp.routers.stack_admin2-1.tls.passthrough=true
+      - traefik.tcp.routers.stack_admin2-1.service=stack_admin2-1
+      - traefik.tcp.routers.stack_admin2-1.entrypoints=postgres
+      - traefik.tcp.services.stack_admin2-1.loadbalancer.server.port=5432
+      - traefik.tcp.routers.stack_admin2-2.tls=true
+      - traefik.tcp.routers.stack_admin2-2.tls.certresolver=le
+      - traefik.tcp.routers.stack_admin2-2.tls.domains[0].main=test1.example.com
+      - traefik.tcp.routers.stack_admin2-2.rule=HostSNI(`test1.example.com`)
+      - traefik.tcp.routers.stack_admin2-2.tls.passthrough=false
+      - traefik.tcp.routers.stack_admin2-2.service=stack_admin2-2
+      - traefik.tcp.routers.stack_admin2-2.entrypoints=postgres
+      - traefik.tcp.services.stack_admin2-2.loadbalancer.server.port=5000
+      - traefik.tcp.routers.stack_admin2-3.tls=true
+      - traefik.tcp.routers.stack_admin2-3.tls.certresolver=le
+      - traefik.tcp.routers.stack_admin2-3.tls.domains[0].main=test2-override.admin.test.com
+      - traefik.tcp.routers.stack_admin2-3.rule=HostSNI(`test2-override.admin.test.com`)
+      - traefik.tcp.routers.stack_admin2-3.tls.passthrough=false
+      - traefik.tcp.routers.stack_admin2-3.service=stack_admin2-3
+      - traefik.tcp.routers.stack_admin2-3.entrypoints=postgres
+      - traefik.tcp.services.stack_admin2-3.loadbalancer.server.port=5000
+    networks:
+      default:
+      ingress_routing:
+    init: true
+    image: "$REGISTRY_HOST/frontend"
 networks:
   ingress_routing:
     external: true

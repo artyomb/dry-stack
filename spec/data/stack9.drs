@@ -3,3 +3,12 @@ Options traefik_tls: true
 Ingress admin: {host: '~(admin|some)\..*', path: '/bar', tls_domain: 'admin.test.com'}
 
 Service :admin,     image: '$REGISTRY_HOST/frontend',  env: { APP: 'admin' },      ports: 5000
+
+
+Service :admin2,    image: '$REGISTRY_HOST/frontend', ports: 5000,
+        ingress: [
+          { host: 'admin.test.com' },
+          { host_sni: 'pgsql.*', passthrough: true, port: 5432, entrypoints: 'postgres', tls_domain: 'pgsql-override.admin.test.com' },
+          { host_sni: 'test1.*', entrypoints: 'postgres' },
+          { host_sni: 'test2.*', tls_domain: 'test2-override.admin.test.com', entrypoints: 'postgres' }
+        ]
