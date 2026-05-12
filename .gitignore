@@ -1,0 +1,13 @@
+.env.local
+.codex
+*.iml
+.idea
+tmp
+coverage
+/dev/
+*/spec/results
+.playwright-mcp
+*.css.map
+src/data/
+AGENTS.md
+**/.knowledge/

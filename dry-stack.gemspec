@@ -6,6 +6,7 @@ Gem::Specification.new do |s|
   s.name        = 'dry-stack'
   s.version     = Dry::Stack::VERSION
   s.executables << 'dry-stack'
+  s.executables << 'rparallel'
   s.summary     = 'Dry docker swarm stack definition'
   s.description = ''
   s.authors     = ['Artyom B']

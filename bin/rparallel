@@ -1,0 +1,83 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "open3"
+
+Task = Struct.new(:number, :command, :started_at, :ended_at, :exit_code, keyword_init: true) do
+  def duration = ended_at - started_at
+
+  def status = exit_code.zero? ? "ok" : "failed"
+end
+
+class RParallel
+  def self.run(argv, stdin: $stdin, stdout: $stdout, stderr: $stderr)
+    return usage(stdout) if argv == ["--help"] || argv == ["-h"]
+
+    unless argv.empty?
+      stderr.puts "Unsupported arguments: #{argv.join(' ')}"
+      return 2
+    end
+
+    commands = stdin.each_line.map(&:strip).reject(&:empty?)
+    tasks = commands.each_with_index.map { |command, index| Task.new(number: index + 1, command:) }
+
+    tasks.map { |task| Thread.new { run_task(task, stdout, stderr) } }.each(&:join)
+    print_report(tasks, stdout)
+
+    tasks.all? { _1.exit_code.zero? } ? 0 : 1
+  end
+
+  def self.run_task(task, stdout, stderr)
+    task.started_at = monotonic_time
+
+    Open3.popen3("sh", "-c", task.command) do |child_stdin, child_stdout, child_stderr, wait_thread|
+      child_stdin.close
+      readers = [
+        Thread.new { IO.copy_stream(child_stdout, stdout) },
+        Thread.new { IO.copy_stream(child_stderr, stderr) }
+      ]
+      readers.each(&:join)
+      task.exit_code = wait_thread.value.exitstatus || 1
+    end
+  rescue StandardError => e
+    stderr.puts "Task #{task.number} failed to start: #{e.message}"
+    task.exit_code = 1
+  ensure
+    task.ended_at = monotonic_time
+  end
+
+  def self.print_report(tasks, stdout)
+    rows = tasks.map do |task|
+      [task.number.to_s, task.status, task.exit_code.to_s, format("%.3fs", task.duration), task.command]
+    end
+    widths = column_widths([["#", "status", "exit", "duration", "command"], *rows])
+
+    stdout.puts
+    stdout.puts "rparallel report"
+    stdout.puts format_row(["#", "status", "exit", "duration", "command"], widths)
+    rows.each { stdout.puts format_row(_1, widths) }
+  end
+
+  def self.column_widths(rows)
+    rows.transpose.map { _1.map(&:length).max }
+  end
+
+  def self.format_row(row, widths)
+    row.each_with_index.map do |value, index|
+      index == row.length - 1 ? value : value.ljust(widths[index])
+    end.join("  ")
+  end
+
+  def self.usage(stdout)
+    stdout.puts "Usage: rparallel < tasks.txt"
+    stdout.puts
+    stdout.puts "Reads non-empty stdin lines as shell tasks, runs them in parallel, then prints a report."
+    0
+  end
+
+  def self.monotonic_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+
+  private_class_method :run_task, :print_report, :column_widths, :format_row, :usage, :monotonic_time
+end
+
+exit RParallel.run(ARGV)
