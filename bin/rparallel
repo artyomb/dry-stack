@@ -10,6 +10,15 @@ Task = Struct.new(:number, :command, :started_at, :ended_at, :exit_code, keyword
 end
 
 class RParallel
+  COLORS = {
+    bold: "\e[1m",
+    dim: "\e[2m",
+    green: "\e[32m",
+    red: "\e[31m",
+    cyan: "\e[36m",
+    reset: "\e[0m"
+  }.freeze
+
   def self.run(argv, stdin: $stdin, stdout: $stdout, stderr: $stderr)
     return usage(stdout) if argv == ["--help"] || argv == ["-h"]
 
@@ -21,20 +30,22 @@ class RParallel
     commands = stdin.each_line.map(&:strip).reject(&:empty?)
     tasks = commands.each_with_index.map { |command, index| Task.new(number: index + 1, command:) }
 
-    tasks.map { |task| Thread.new { run_task(task, stdout, stderr) } }.each(&:join)
+    color = color_enabled?
+    output_mutex = Mutex.new
+    tasks.map { |task| Thread.new { run_task(task, stdout, stderr, output_mutex, color) } }.each(&:join)
     print_report(tasks, stdout)
 
     tasks.all? { _1.exit_code.zero? } ? 0 : 1
   end
 
-  def self.run_task(task, stdout, stderr)
+  def self.run_task(task, stdout, stderr, output_mutex, color)
     task.started_at = monotonic_time
 
     Open3.popen3("sh", "-c", task.command) do |child_stdin, child_stdout, child_stderr, wait_thread|
       child_stdin.close
       readers = [
-        Thread.new { IO.copy_stream(child_stdout, stdout) },
-        Thread.new { IO.copy_stream(child_stderr, stderr) }
+        Thread.new { stream_output(child_stdout, stdout, task.number, output_mutex) },
+        Thread.new { stream_output(child_stderr, stderr, task.number, output_mutex, color: :red, enabled: color) }
       ]
       readers.each(&:join)
       task.exit_code = wait_thread.value.exitstatus || 1
@@ -46,26 +57,61 @@ class RParallel
     task.ended_at = monotonic_time
   end
 
+  def self.stream_output(source, target, job_number, output_mutex, color: nil, enabled: false)
+    source.each_line do |line|
+      output = "[Job #{job_number}] #{line.chomp}"
+      output_mutex.synchronize { target.puts color ? colorize(output, color, enabled) : output }
+    end
+  end
+
   def self.print_report(tasks, stdout)
     rows = tasks.map do |task|
       [task.number.to_s, task.status, task.exit_code.to_s, format("%.3fs", task.duration), task.command]
     end
-    widths = column_widths([["#", "status", "exit", "duration", "command"], *rows])
+    header = ["#", "status", "exit", "duration", "command"]
+    widths = column_widths([header, *rows])
+    color = color_enabled?
 
     stdout.puts
-    stdout.puts "rparallel report"
-    stdout.puts format_row(["#", "status", "exit", "duration", "command"], widths)
-    rows.each { stdout.puts format_row(_1, widths) }
+    stdout.puts colorize("rparallel report", :bold, color)
+    stdout.puts colorize(border(widths), :dim, color)
+    stdout.puts format_row(header, widths, color:, header: true)
+    stdout.puts colorize(border(widths), :dim, color)
+    rows.each { stdout.puts format_row(_1, widths, color:) }
+    stdout.puts colorize(border(widths), :dim, color)
   end
 
   def self.column_widths(rows)
     rows.transpose.map { _1.map(&:length).max }
   end
 
-  def self.format_row(row, widths)
-    row.each_with_index.map do |value, index|
-      index == row.length - 1 ? value : value.ljust(widths[index])
-    end.join("  ")
+  def self.format_row(row, widths, color:, header: false)
+    cells = row.each_with_index.map do |value, index|
+      padded = value.ljust(widths[index])
+      header ? colorize(padded, :cyan, color) : colorize_report_cell(padded, row, index, color)
+    end
+
+    "| #{cells.join(' | ')} |"
+  end
+
+  def self.border(widths)
+    "+-#{widths.map { '-' * _1 }.join('-+-')}-+"
+  end
+
+  def self.colorize_report_cell(value, row, index, color)
+    return colorize(value, row[1] == "ok" ? :green : :red, color) if [1, 2].include?(index)
+
+    value
+  end
+
+  def self.colorize(value, color_name, enabled)
+    return value unless enabled
+
+    "#{COLORS.fetch(color_name)}#{value}#{COLORS.fetch(:reset)}"
+  end
+
+  def self.color_enabled?
+    ENV["NO_COLOR"].nil? && ENV["RPARALLEL_NO_COLOR"].nil?
   end
 
   def self.usage(stdout)
@@ -77,7 +123,8 @@ class RParallel
 
   def self.monotonic_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 
-  private_class_method :run_task, :print_report, :column_widths, :format_row, :usage, :monotonic_time
+  private_class_method :run_task, :stream_output, :print_report, :column_widths, :format_row, :border,
+                       :colorize_report_cell, :colorize, :color_enabled?, :usage, :monotonic_time
 end
 
 exit RParallel.run(ARGV)
