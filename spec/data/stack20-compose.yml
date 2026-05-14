@@ -1,0 +1,61 @@
+---
+version: '3.8'
+services:
+  front:
+    environment:
+      BEFORE_HOOK: enabled
+      TEST2: enabled
+      TEST1: enabled
+      STACK_NAME: stack
+      STACK_SERVICE_NAME: front
+    deploy:
+      labels:
+      - traefik.enable=true
+      - traefik.http.routers.stack_front-0.service=stack_front-0
+      - traefik.http.middlewares.stack_front-0_oauth_provider.forwardauth.address=http://oauth2_slim:7000/auth
+      - traefik.http.middlewares.stack_front-0_oauth_provider.forwardauth.authResponseHeadersRegex=^X-
+      - traefik.http.routers.stack_front-0.rule=HostRegexp(`{name:front\..*}`)
+      - traefik.http.routers.stack_front-0.middlewares=stack_front-0_oauth_provider
+    networks:
+      default:
+      ingress_routing:
+    init: true
+    image: frontend
+  admin:
+    environment:
+      TEST2: enabled
+      STACK_NAME: stack
+      STACK_SERVICE_NAME: admin
+    deploy:
+      labels:
+      - traefik.enable=true
+      - traefik.http.routers.stack_admin-0.service=stack_admin-0
+      - traefik.http.routers.stack_admin-0.rule=HostRegexp(`{name:admin\..*}`)
+    networks:
+      default:
+      ingress_routing:
+    init: true
+    image: admin
+  worker:
+    environment:
+      BEFORE_HOOK: enabled
+      TEST2: enabled
+      STACK_NAME: stack
+      STACK_SERVICE_NAME: worker
+    deploy:
+      labels:
+      - traefik.enable=true
+      - traefik.http.routers.stack_worker-0.service=stack_worker-0
+      - traefik.http.middlewares.stack_worker-0_oauth_provider.forwardauth.address=http://oauth2_slim:7000/auth
+      - traefik.http.middlewares.stack_worker-0_oauth_provider.forwardauth.authResponseHeadersRegex=^X-
+      - traefik.http.routers.stack_worker-0.rule=HostRegexp(`{name:worker\..*}`)
+      - traefik.http.routers.stack_worker-0.middlewares=stack_worker-0_oauth_provider
+    networks:
+      default:
+      ingress_routing:
+    init: true
+    image: worker
+networks:
+  ingress_routing:
+    external: true
+    name: ingress-routing

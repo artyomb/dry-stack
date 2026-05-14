@@ -1,0 +1,23 @@
+Service :front, image: 'frontend' do
+  ingress host: 'front.*'
+end
+Service :admin, image: 'admin' do
+  ingress host: 'admin.*'
+end
+Service :worker, image: 'worker' do
+  ingress host: 'worker.*'
+end
+
+BeforeService except: [:admin] do
+  env BEFORE_HOOK: 'enabled'
+  oauth_provider 'oauth2_slim:7000/auth'
+end
+
+BeforeService do
+  env TEST2: 'enabled'
+end
+
+BeforeService %i[front] do
+  env TEST1: 'enabled'
+end
+

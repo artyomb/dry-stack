@@ -415,18 +415,31 @@ module Dry
       (@after_blocks ||=[]) << block
     end
 
+    def normalize_service_hook_args(name, opts)
+      if name.is_a?(Hash) && opts.empty?
+        opts = name
+        name = nil
+      end
+
+      opts = opts.dup
+      except = [opts.delete(:except)].flatten.compact
+      [[name].flatten.compact, opts, except]
+    end
+
     def BeforeService(name = nil, opts = {}, &block)
-      (@before_blocks ||=[]).push names: [name].flatten.compact, except: opts[:except],
+      names, opts, except = normalize_service_hook_args(name, opts)
+      (@before_blocks ||=[]).push names:, except:,
                                   block: ->(s_name) {
         _ServiceImplementation s_name, opts, &block
       }
     end
 
     def AfterService(name = nil, opts = {}, &block)
+      names, opts, except = normalize_service_hook_args(name, opts)
       After do
-        names = [name || @services.keys].flatten
-        names -= [opts[:except]].flatten if opts.key? :except
-        names.each do |s_name|
+        hook_names = names.empty? ? @services.keys : names
+        hook_names -= except
+        hook_names.each do |s_name|
           _ServiceImplementation s_name, opts, &block
         end
       end
