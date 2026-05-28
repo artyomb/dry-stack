@@ -17,6 +17,8 @@ module Dry
   EMPTY_HASH = :empty_hash
   DEFAULT_INIT_SERVICE = true # add "init: true" option
 
+  def ENV! = ENV.method(:fetch)
+
   class ::Hash
     def deep_merge!(second)
       merger = proc { |_, v1, v2|
@@ -101,6 +103,7 @@ module Dry
     attr_accessor :name, :options, :description, :configuration
 
     def Stack(...) = Dry::Stack(...)
+    def ENV! = ENV.method(:fetch)
 
     # def self.new(*args, &block)
     #   super

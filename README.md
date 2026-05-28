@@ -73,6 +73,10 @@ Volume :database, driver: 'zfs', name: 'tank/volume1', driver_opts: { compressio
 
 
 ```
+
+Use `ENV!["KEY"]` inside stack files as a shortcut for `ENV.fetch("KEY")`.
+Pass a second value to provide a default: `ENV!["KEY", "default value"]`.
+
 Then run in the current directory
 
     $ dry-stack stack.drs -n --traefik to_compose

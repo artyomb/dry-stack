@@ -23,6 +23,10 @@ Create the file `stack.drs` which describes the stack
 ```ruby
 <%= %x{cat ./examples/simple_stack.drs} %>
 ```
+
+Use `ENV!["KEY"]` inside stack files as a shortcut for `ENV.fetch("KEY")`.
+Pass a second value to provide a default: `ENV!["KEY", "default value"]`.
+
 Then run in the current directory
 
     $ dry-stack stack.drs -n --traefik to_compose
