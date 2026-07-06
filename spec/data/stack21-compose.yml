@@ -1,0 +1,39 @@
+---
+version: '3.8'
+services:
+  app:
+    environment:
+      STACK_NAME: stack
+      STACK_SERVICE_NAME: app
+    deploy:
+      labels:
+      - traefik.enable=true
+      - traefik.http.routers.stack_app-0.service=stack_app-0
+      - traefik.http.services.stack_app-0.loadbalancer.server.port=7000
+      - traefik.http.routers.stack_app-0.rule=PathPrefix(`/oauth_slim`)
+      - traefik.http.routers.stack_app-0.priority=1000
+    networks:
+      default:
+      ingress_routing:
+    init: true
+    image: app
+  admin:
+    environment:
+      STACK_NAME: stack
+      STACK_SERVICE_NAME: admin
+    deploy:
+      labels:
+      - traefik.enable=true
+      - traefik.http.routers.stack_admin-0.service=stack_admin-0
+      - traefik.http.services.stack_admin-0.loadbalancer.server.port=7000
+      - traefik.http.routers.stack_admin-0.rule=HostRegexp(`{name:admin\..*}`)
+      - traefik.http.routers.stack_admin-0.priority=900
+    networks:
+      default:
+      ingress_routing:
+    init: true
+    image: admin
+networks:
+  ingress_routing:
+    external: true
+    name: ingress-routing

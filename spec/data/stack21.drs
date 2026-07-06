@@ -1,0 +1,8 @@
+Options traefik: true, ingress: true
+
+Service :app, image: 'app:latest', ports: 7000,
+        ingress: { path: '/oauth_slim', priority: 1000 }
+
+Service :admin, image: 'admin:latest', ports: 7000 do
+  ingress host: 'admin.*', priority: 900
+end

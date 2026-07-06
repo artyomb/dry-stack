@@ -271,6 +271,7 @@ module Dry
               end
 
               service[:deploy][:labels] << "traefik.http.routers.#{service_name}-#{index}.rule=#{rule.join ' && '}"
+              service[:deploy][:labels] << "traefik.http.routers.#{service_name}-#{index}.priority=#{ing[:priority].to_i}" if ing[:priority]
 
               if ing[:path_sub]
                 middlewares << "#{service_name}-#{index}-path_sub"
