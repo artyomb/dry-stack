@@ -1,0 +1,30 @@
+---
+version: '3.8'
+services:
+  web:
+    environment:
+      STACK_NAME: stack
+      STACK_SERVICE_NAME: web
+    deploy:
+      labels:
+      - dry-stack.deploy.source=https://git.example.com/team/source-project
+    init: true
+    image: web
+  worker:
+    environment:
+      STACK_NAME: stack
+      STACK_SERVICE_NAME: worker
+    deploy:
+      labels:
+      - dry-stack.deploy.source=https://git.example.com/team/source-project
+    init: true
+    image: worker
+  explicit:
+    environment:
+      STACK_NAME: stack
+      STACK_SERVICE_NAME: explicit
+    deploy:
+      labels:
+      - dry-stack.deploy.source=https://git.example.com/team/explicit-project
+    init: true
+    image: explicit

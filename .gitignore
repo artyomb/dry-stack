@@ -10,4 +10,5 @@ coverage
 *.css.map
 src/data/
 AGENTS.md
+TODO.md
 **/.knowledge/

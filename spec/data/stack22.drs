@@ -1,0 +1,8 @@
+Options deploy_source: 'https://git.example.com/team/source-project'
+
+Service :web, image: 'web'
+Service :worker, image: 'worker'
+
+Service :explicit, image: 'explicit' do
+  deploy_label 'dry-stack.deploy.source=https://git.example.com/team/explicit-project'
+end

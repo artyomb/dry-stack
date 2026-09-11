@@ -97,6 +97,7 @@ module Dry
 
   class Stack
     COMPOSE_VERSION = '3.8'
+    DEPLOY_SOURCE_LABEL = 'dry-stack.deploy.source'
     class << self
       attr_accessor :last_stack
     end
@@ -144,6 +145,8 @@ module Dry
 
     def to_compose(opts = @options)
       @name = @options[:name] || @name
+      deploy_source = opts[:deploy_source].to_s.strip
+      deploy_source = ENV['CI_PROJECT_URL'].to_s.strip if deploy_source.empty?
 
       compose = {
         # name: @name.to_s, # https://docs.docker.com/compose/compose-file/#name-top-level-element
@@ -168,6 +171,12 @@ module Dry
         service[:deploy] ||= {}
         service[:deploy][:labels] ||= []
         service[:deploy][:labels] += @labels.map { "#{_1}=#{_2}" }
+        deploy_source_label_present = service[:deploy][:labels].any? do |label|
+          label.to_s.partition('=').first == DEPLOY_SOURCE_LABEL
+        end
+        unless deploy_source.empty? || deploy_source_label_present
+          service[:deploy][:labels] << "#{DEPLOY_SOURCE_LABEL}=#{deploy_source}"
+        end
 
         if ingress[0] && (opts[:ingress] || opts[:traefik] || opts[:traefik_tls])
           service[:networks] ||= {}
